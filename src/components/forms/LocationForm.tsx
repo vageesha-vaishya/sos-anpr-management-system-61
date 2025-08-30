@@ -1,0 +1,228 @@
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
+
+const locationSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  organization_id: z.string().min(1, 'Organization is required'),
+  address: z.string().min(1, 'Address is required'),
+  city_id: z.string().min(1, 'City is required'),
+  coordinates: z.string().optional(),
+})
+
+type LocationFormData = z.infer<typeof locationSchema>
+
+interface LocationFormProps {
+  onSuccess?: () => void
+  editData?: {
+    id: string
+    name: string
+    organization_id: string
+    address: string
+    city_id: string
+    coordinates?: string
+  }
+}
+
+export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData }) => {
+  const { toast } = useToast()
+  const [organizations, setOrganizations] = useState<any[]>([])
+  const [cities, setCities] = useState<any[]>([])
+  
+  const form = useForm<LocationFormData>({
+    resolver: zodResolver(locationSchema),
+    defaultValues: {
+      name: editData?.name || '',
+      organization_id: editData?.organization_id || '',
+      address: editData?.address || '',
+      city_id: editData?.city_id || '',
+      coordinates: editData?.coordinates || '',
+    },
+  })
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [orgsResult, citiesResult] = await Promise.all([
+        supabase.from('organizations').select('id, name'),
+        supabase.from('cities').select('id, name')
+      ])
+      
+      if (orgsResult.data) setOrganizations(orgsResult.data)
+      if (citiesResult.data) setCities(citiesResult.data)
+    }
+    
+    fetchData()
+  }, [])
+
+  const onSubmit = async (data: LocationFormData) => {
+    try {
+      if (editData) {
+        // Update existing location
+        const { error } = await supabase
+          .from('locations')
+          .update({
+            name: data.name,
+            organization_id: data.organization_id,
+            address: data.address,
+            city_id: data.city_id,
+            coordinates: data.coordinates || null,
+          })
+          .eq('id', editData.id)
+
+        if (error) throw error
+
+        toast({
+          title: 'Success',
+          description: 'Location updated successfully',
+        })
+      } else {
+        // Create new location
+        const { error } = await supabase
+          .from('locations')
+          .insert({
+            name: data.name,
+            organization_id: data.organization_id,
+            address: data.address,
+            city_id: data.city_id,
+            coordinates: data.coordinates || null,
+          })
+
+        if (error) throw error
+
+        toast({
+          title: 'Success',
+          description: 'Location created successfully',
+        })
+      }
+      
+      form.reset()
+      onSuccess?.()
+    } catch (error: any) {
+      console.error('Location operation error:', error)
+      toast({
+        title: 'Error',
+        description: error.message || `Failed to ${editData ? 'update' : 'create'} location`,
+        variant: 'destructive',
+      })
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{editData ? 'Edit Location' : 'Add Location'}</CardTitle>
+        <CardDescription>{editData ? 'Update location information' : 'Create a new location for an organization'}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter location name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="organization_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Organization</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select organization" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {organizations.map((org) => (
+                        <SelectItem key={org.id} value={org.id}>
+                          {org.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Enter full address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="city_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select city" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {cities.map((city) => (
+                        <SelectItem key={city.id} value={city.id}>
+                          {city.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="coordinates"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Coordinates (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., 40.7128,-74.0060" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="w-full">
+              {editData ? 'Update Location' : 'Create Location'}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  )
+}
