@@ -141,9 +141,7 @@ const AmenityManagement = () => {
                 <DialogDescription>Create a new amenity for residents to book</DialogDescription>
               </DialogHeader>
               <AmenityForm 
-                organizationId="00000000-0000-0000-0000-000000000003"
                 onSuccess={() => window.location.reload()} 
-                onCancel={() => {}}
               />
             </DialogContent>
           </Dialog>

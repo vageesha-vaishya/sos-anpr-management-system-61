@@ -171,12 +171,6 @@ const Hosts = () => {
         </div>
         <HostForm 
           onSuccess={loadHosts}
-          trigger={
-            <Button className="flex items-center space-x-2">
-              <UserPlus className="h-4 w-4" />
-              <span>Add Host</span>
-            </Button>
-          }
         />
       </div>
 
@@ -312,13 +306,8 @@ const Hosts = () => {
                         Busy
                       </Button>
                       <HostForm 
-                        host={host}
+                        editData={host}
                         onSuccess={loadHosts}
-                        trigger={
-                          <Button variant="ghost" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        }
                       />
                       <Button 
                         variant="ghost" 

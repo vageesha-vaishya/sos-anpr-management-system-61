@@ -419,11 +419,9 @@ const MaintenanceBilling = () => {
                          <DialogTitle>Add New Charge Category</DialogTitle>
                          <DialogDescription>Create a new billing charge type</DialogDescription>
                        </DialogHeader>
-                       <ChargeCategoryForm 
-                         organizationId="00000000-0000-0000-0000-000000000003"
-                         onSuccess={() => window.location.reload()} 
-                         onCancel={() => {}}
-                       />
+                        <ChargeCategoryForm 
+                          onSuccess={() => window.location.reload()} 
+                        />
                      </DialogContent>
                   </Dialog>
                 </div>

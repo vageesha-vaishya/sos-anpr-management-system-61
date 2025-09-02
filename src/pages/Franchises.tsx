@@ -52,7 +52,7 @@ export default function Franchises() {
         location_count: franchise.locations?.[0]?.count || 0
       })) || []
 
-      setFranchises(franchisesWithCounts)
+      setFranchises(franchisesWithCounts as any)
     } catch (error: any) {
       console.error('Error fetching franchises:', error)
       toast({

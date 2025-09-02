@@ -82,7 +82,7 @@ export default function Billing() {
       setCustomers(customersData || []);
 
       // Fetch recent invoices
-      const { data: invoicesData } = await supabase
+      const { data: invoicesData } = await (supabase as any)
         .from("invoices")
         .select(`
           *,
@@ -93,20 +93,20 @@ export default function Billing() {
       setInvoices(invoicesData || []);
 
       // Calculate stats
-      const { data: allInvoices } = await supabase
+      const { data: allInvoices } = await (supabase as any)
         .from("invoices")
         .select("total_amount, outstanding_amount, status");
 
       if (allInvoices) {
-        const totalRevenue = allInvoices
-          .filter(inv => inv.status === 'paid')
-          .reduce((sum, inv) => sum + (inv.total_amount || 0), 0);
+        const totalRevenue = (allInvoices as any[])
+          .filter((inv: any) => inv.status === 'paid')
+          .reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0);
         
-        const outstandingAmount = allInvoices
-          .reduce((sum, inv) => sum + (inv.outstanding_amount || 0), 0);
+        const outstandingAmount = (allInvoices as any[])
+          .reduce((sum: number, inv: any) => sum + (inv.outstanding_amount || 0), 0);
         
-        const paidInvoices = allInvoices.filter(inv => inv.status === 'paid').length;
-        const pendingInvoices = allInvoices.filter(inv => inv.status === 'sent').length;
+        const paidInvoices = (allInvoices as any[]).filter((inv: any) => inv.status === 'paid').length;
+        const pendingInvoices = (allInvoices as any[]).filter((inv: any) => inv.status === 'sent').length;
         
         setStats({
           totalRevenue,
@@ -473,13 +473,8 @@ export default function Billing() {
             </DialogTitle>
           </DialogHeader>
           <BillingCustomerForm
-            customer={editingCustomer}
-            organizations={organizations}
+            editData={editingCustomer}
             onSuccess={handleCustomerSuccess}
-            onCancel={() => {
-              setCustomerDialogOpen(false);
-              setEditingCustomer(null);
-            }}
           />
         </DialogContent>
       </Dialog>
@@ -493,13 +488,7 @@ export default function Billing() {
             </DialogTitle>
           </DialogHeader>
           <InvoiceForm
-            invoice={editingInvoice}
-            customers={customers}
             onSuccess={handleInvoiceSuccess}
-            onCancel={() => {
-              setInvoiceDialogOpen(false);
-              setEditingInvoice(null);
-            }}
           />
         </DialogContent>
       </Dialog>
