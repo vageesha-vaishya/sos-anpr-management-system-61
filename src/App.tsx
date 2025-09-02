@@ -30,6 +30,8 @@ import Analytics from "@/pages/Analytics";
 import Franchises from "@/pages/Franchises";
 import ResetPassword from "@/pages/ResetPassword";
 import Billing from "@/pages/Billing";
+import StaffManagement from "@/pages/StaffManagement";
+import HelpDesk from "@/pages/HelpDesk";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PlatformAdminDashboard } from "@/components/dashboard/PlatformAdminDashboard";
 import { FranchiseAdminDashboard } from "@/components/dashboard/FranchiseAdminDashboard";
@@ -306,6 +308,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Billing />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/staff-management" 
+              element={
+                <ProtectedRoute>
+                  <StaffManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/helpdesk" 
+              element={
+                <ProtectedRoute>
+                  <HelpDesk />
                 </ProtectedRoute>
               } 
             />

@@ -27,7 +27,9 @@ import {
   MessageSquare,
   CalendarDays,
   CreditCard,
-  User
+  User,
+  UserCog,
+  Headphones
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -83,6 +85,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { name: 'Community Forum', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'customer_user'] },
     { name: 'Amenity Management', href: '/amenity-management', icon: CalendarDays, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Maintenance Billing', href: '/maintenance-billing', icon: CreditCard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Staff Management', href: '/staff-management', icon: UserCog, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Help Desk', href: '/helpdesk', icon: Headphones, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'operator', 'resident'] },
     // System Management
     { name: 'Data Management', href: '/data-management', icon: Database, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Master Data Management', href: '/master-data-management', icon: Globe, roles: ['platform_admin', 'franchise_admin'] },
