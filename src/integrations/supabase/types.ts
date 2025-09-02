@@ -996,6 +996,67 @@ export type Database = {
           },
         ]
       }
+      maintenance_charges: {
+        Row: {
+          amount: number
+          billing_period: string
+          charge_category_id: string | null
+          created_at: string | null
+          due_date: string | null
+          id: string
+          organization_id: string | null
+          status: string | null
+          unit_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount?: number
+          billing_period: string
+          charge_category_id?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          billing_period?: string
+          charge_category_id?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_charges_charge_category_id_fkey"
+            columns: ["charge_category_id"]
+            isOneToOne: false
+            referencedRelation: "charge_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_charges_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_charges_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "society_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           address: string | null
@@ -1143,6 +1204,7 @@ export type Database = {
           group_size: number | null
           host_id: string | null
           id: string
+          location_id: string | null
           organization_id: string | null
           purpose: string
           scheduled_date: string
@@ -1164,6 +1226,7 @@ export type Database = {
           group_size?: number | null
           host_id?: string | null
           id?: string
+          location_id?: string | null
           organization_id?: string | null
           purpose: string
           scheduled_date: string
@@ -1185,6 +1248,7 @@ export type Database = {
           group_size?: number | null
           host_id?: string | null
           id?: string
+          location_id?: string | null
           organization_id?: string | null
           purpose?: string
           scheduled_date?: string
@@ -1203,6 +1267,13 @@ export type Database = {
             columns: ["host_id"]
             isOneToOne: false
             referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pre_registrations_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
           {
@@ -1249,6 +1320,8 @@ export type Database = {
           id: string
           last_login: string | null
           organization_id: string | null
+          password_reset_expires: string | null
+          password_reset_token: string | null
           permissions: string[] | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
@@ -1262,6 +1335,8 @@ export type Database = {
           id: string
           last_login?: string | null
           organization_id?: string | null
+          password_reset_expires?: string | null
+          password_reset_token?: string | null
           permissions?: string[] | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
@@ -1275,6 +1350,8 @@ export type Database = {
           id?: string
           last_login?: string | null
           organization_id?: string | null
+          password_reset_expires?: string | null
+          password_reset_token?: string | null
           permissions?: string[] | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
@@ -1351,10 +1428,14 @@ export type Database = {
           floor: number | null
           id: string
           is_occupied: boolean | null
+          monthly_flat_rate: number | null
           monthly_maintenance: number | null
+          monthly_rate_per_sqft: number | null
           owner_email: string | null
           owner_name: string | null
           owner_phone: string | null
+          parking_slots: number | null
+          status: string | null
           tenant_email: string | null
           tenant_name: string | null
           tenant_phone: string | null
@@ -1371,10 +1452,14 @@ export type Database = {
           floor?: number | null
           id?: string
           is_occupied?: boolean | null
+          monthly_flat_rate?: number | null
           monthly_maintenance?: number | null
+          monthly_rate_per_sqft?: number | null
           owner_email?: string | null
           owner_name?: string | null
           owner_phone?: string | null
+          parking_slots?: number | null
+          status?: string | null
           tenant_email?: string | null
           tenant_name?: string | null
           tenant_phone?: string | null
@@ -1391,10 +1476,14 @@ export type Database = {
           floor?: number | null
           id?: string
           is_occupied?: boolean | null
+          monthly_flat_rate?: number | null
           monthly_maintenance?: number | null
+          monthly_rate_per_sqft?: number | null
           owner_email?: string | null
           owner_name?: string | null
           owner_phone?: string | null
+          parking_slots?: number | null
+          status?: string | null
           tenant_email?: string | null
           tenant_name?: string | null
           tenant_phone?: string | null
@@ -1603,6 +1692,72 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "vehicle_whitelist_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitors: {
+        Row: {
+          check_in_time: string | null
+          check_out_time: string | null
+          company: string | null
+          created_at: string | null
+          host_id: string | null
+          id: string
+          organization_id: string | null
+          purpose: string
+          status: string | null
+          updated_at: string | null
+          visit_count: number | null
+          visitor_email: string | null
+          visitor_name: string
+          visitor_phone: string | null
+        }
+        Insert: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          company?: string | null
+          created_at?: string | null
+          host_id?: string | null
+          id?: string
+          organization_id?: string | null
+          purpose: string
+          status?: string | null
+          updated_at?: string | null
+          visit_count?: number | null
+          visitor_email?: string | null
+          visitor_name: string
+          visitor_phone?: string | null
+        }
+        Update: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          company?: string | null
+          created_at?: string | null
+          host_id?: string | null
+          id?: string
+          organization_id?: string | null
+          purpose?: string
+          status?: string | null
+          updated_at?: string | null
+          visit_count?: number | null
+          visitor_email?: string | null
+          visitor_name?: string
+          visitor_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitors_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitors_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"

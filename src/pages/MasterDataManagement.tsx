@@ -19,9 +19,9 @@ interface ChargeCategory {
   id: string
   name: string
   charge_type: string
-  description: string
-  base_amount: number
-  billing_cycle: string
+  description: string | null
+  base_amount: number | null
+  billing_cycle: string | null
   is_active: boolean
   organization_id: string
   created_at: string
@@ -32,9 +32,9 @@ interface ServiceType {
   id: string
   service_name: string
   service_category: string
-  description: string
+  description: string | null
   unit_type: string
-  default_rate: number
+  default_rate: number | null
   billing_model: string
   is_active: boolean
   organization_id: string
@@ -46,8 +46,8 @@ interface Amenity {
   id: string
   name: string
   amenity_type: string
-  description: string
-  capacity: number
+  description: string | null
+  capacity: number | null
   booking_required: boolean
   operating_hours: any
   pricing: any
@@ -58,7 +58,7 @@ interface Amenity {
 }
 
 export default function MasterDataManagement() {
-  const { user } = useAuth()
+  const { userProfile } = useAuth()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   
@@ -79,10 +79,10 @@ export default function MasterDataManagement() {
 
   useEffect(() => {
     fetchData()
-  }, [user])
+  }, [userProfile])
 
   const fetchData = async () => {
-    if (!user) return
+    if (!userProfile) return
 
     try {
       setLoading(true)
@@ -258,7 +258,6 @@ export default function MasterDataManagement() {
                 </DialogHeader>
                 <ChargeCategoryForm
                   editData={selectedChargeCategory}
-                  organizationId={user?.user_metadata?.organization_id || ""}
                   onSuccess={handleChargeCategorySuccess}
                   onCancel={() => {
                     setShowChargeCategoryForm(false)
@@ -287,8 +286,8 @@ export default function MasterDataManagement() {
                     <TableRow key={category.id}>
                       <TableCell className="font-medium">{category.name}</TableCell>
                       <TableCell className="capitalize">{category.charge_type}</TableCell>
-                      <TableCell>${category.base_amount}</TableCell>
-                      <TableCell className="capitalize">{category.billing_cycle?.replace('_', ' ')}</TableCell>
+                      <TableCell>${category.base_amount || 0}</TableCell>
+                      <TableCell className="capitalize">{category.billing_cycle?.replace('_', ' ') || 'N/A'}</TableCell>
                       <TableCell>
                         <Badge variant={category.is_active ? "default" : "secondary"}>
                           {category.is_active ? "Active" : "Inactive"}
@@ -341,7 +340,6 @@ export default function MasterDataManagement() {
                 </DialogHeader>
                 <ServiceTypeForm
                   editData={selectedServiceType}
-                  organizationId={user?.user_metadata?.organization_id || ""}
                   onSuccess={handleServiceTypeSuccess}
                   onCancel={() => {
                     setShowServiceTypeForm(false)
@@ -372,7 +370,7 @@ export default function MasterDataManagement() {
                       <TableCell className="font-medium">{serviceType.service_name}</TableCell>
                       <TableCell className="capitalize">{serviceType.service_category}</TableCell>
                       <TableCell className="capitalize">{serviceType.unit_type.replace('_', ' ')}</TableCell>
-                      <TableCell>${serviceType.default_rate}</TableCell>
+                      <TableCell>${serviceType.default_rate || 0}</TableCell>
                       <TableCell className="capitalize">{serviceType.billing_model.replace('_', ' ')}</TableCell>
                       <TableCell>
                         <Badge variant={serviceType.is_active ? "default" : "secondary"}>
@@ -426,7 +424,6 @@ export default function MasterDataManagement() {
                 </DialogHeader>
                 <AmenityForm
                   editData={selectedAmenity}
-                  organizationId={user?.user_metadata?.organization_id || ""}
                   onSuccess={handleAmenitySuccess}
                   onCancel={() => {
                     setShowAmenityForm(false)
@@ -455,7 +452,7 @@ export default function MasterDataManagement() {
                     <TableRow key={amenity.id}>
                       <TableCell className="font-medium">{amenity.name}</TableCell>
                       <TableCell className="capitalize">{amenity.amenity_type.replace('_', ' ')}</TableCell>
-                      <TableCell>{amenity.capacity} persons</TableCell>
+                      <TableCell>{amenity.capacity || 0} persons</TableCell>
                       <TableCell>
                         <Badge variant={amenity.booking_required ? "default" : "outline"}>
                           {amenity.booking_required ? "Required" : "Not Required"}

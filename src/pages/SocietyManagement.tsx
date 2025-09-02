@@ -1,176 +1,140 @@
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { supabase } from "@/integrations/supabase/client"
-import { useAuth } from "@/contexts/AuthContext"
-import { useToast } from "@/hooks/use-toast"
-import { SocietyUnitForm } from "@/components/forms/SocietyUnitForm"
-import { MaintenanceChargeForm } from "@/components/forms/MaintenanceChargeForm"
-import { Plus, Home, DollarSign, Zap, Calendar, FileText } from "lucide-react"
-import { AnimatedCounter } from "@/components/ui/animated-counter"
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Building2, Users, DollarSign, Plus, Edit, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { SocietyUnitsTable } from '@/components/tables/SocietyUnitsTable';
+import { MaintenanceChargeForm } from '@/components/forms/MaintenanceChargeForm';
 
 interface SocietyUnit {
-  id: string
-  unit_number: string
-  unit_type: string
-  owner_name: string
-  tenant_name: string
-  area_sqft: number
-  monthly_rate_per_sqft: number
-  monthly_flat_rate: number
-  parking_slots: number
-  status: string
-  created_at: string
+  id: string;
+  building_id: string;
+  unit_number: string;
+  unit_type?: string | null;
+  floor?: number | null;
+  area_sqft?: number | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  owner_name?: string | null;
+  owner_email?: string | null;
+  owner_phone?: string | null;
+  tenant_name?: string | null;
+  tenant_email?: string | null;
+  tenant_phone?: string | null;
+  is_occupied: boolean;
+  monthly_maintenance?: number | null;
+  monthly_rate_per_sqft: number;
+  monthly_flat_rate: number;
+  parking_slots: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface MaintenanceCharge {
-  id: string
-  unit_id: string
-  charge_type: string
-  amount: number
-  billing_month: string
-  due_date: string
-  paid_date: string
-  status: string
-  description: string
-  unit: {
-    unit_number: string
-    unit_type: string
-  } | null
+  id: string;
+  organization_id: string;
+  unit_id: string;
+  charge_category_id?: string | null;
+  amount: number;
+  billing_period: string;
+  due_date?: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export default function SocietyManagement() {
-  const { user } = useAuth()
-  const { toast } = useToast()
-  const [units, setUnits] = useState<SocietyUnit[]>([])
-  const [charges, setCharges] = useState<MaintenanceCharge[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showUnitForm, setShowUnitForm] = useState(false)
-  const [showChargeForm, setShowChargeForm] = useState(false)
-  const [selectedUnit, setSelectedUnit] = useState<SocietyUnit | null>(null)
-  const [selectedCharge, setSelectedCharge] = useState<MaintenanceCharge | null>(null)
-
-  // Stats
-  const [stats, setStats] = useState({
-    totalUnits: 0,
-    occupiedUnits: 0,
-    vacantUnits: 0,
-    totalRevenue: 0,
-    pendingCharges: 0,
-    collectionRate: 0,
-  })
+const SocietyManagement = () => {
+  const [units, setUnits] = useState<SocietyUnit[]>([]);
+  const [maintenanceCharges, setMaintenanceCharges] = useState<MaintenanceCharge[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showChargeForm, setShowChargeForm] = useState(false);
+  const [selectedCharge, setSelectedCharge] = useState<MaintenanceCharge | null>(null);
+  const { userProfile } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
-    fetchData()
-  }, [user])
+    fetchData();
+  }, [userProfile]);
 
   const fetchData = async () => {
-    if (!user) return
+    if (!userProfile?.organization_id) return;
 
     try {
-      setLoading(true)
+      setLoading(true);
 
-      // Fetch society units
+      // Fetch units
       const { data: unitsData, error: unitsError } = await supabase
-        .from("society_units")
-        .select("*")
-        .order("unit_number")
+        .from('society_units')
+        .select('*')
+        .order('unit_number');
 
-      if (unitsError) throw unitsError
+      if (unitsError) throw unitsError;
 
-      // Fetch maintenance charges with unit details
+      // Fetch maintenance charges
       const { data: chargesData, error: chargesError } = await supabase
-        .from("maintenance_charges")
-        .select(`
-          *,
-          unit:society_units(unit_number, unit_type)
-        `)
-        .order("due_date", { ascending: false })
+        .from('maintenance_charges')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (chargesError) throw chargesError
+      if (chargesError) throw chargesError;
 
-      setUnits(unitsData || [])
-      setCharges((chargesData as any) || [])
+      setUnits(unitsData || []);
+      setMaintenanceCharges(chargesData || []);
 
-      // Calculate stats
-      const totalUnits = unitsData?.length || 0
-      const occupiedUnits = unitsData?.filter(unit => unit.status === "occupied").length || 0
-      const vacantUnits = unitsData?.filter(unit => unit.status === "vacant").length || 0
-      
-      const totalRevenue = chargesData?.filter(charge => charge.status === "paid")
-        .reduce((sum, charge) => sum + charge.amount, 0) || 0
-      
-      const pendingCharges = chargesData?.filter(charge => charge.status === "pending").length || 0
-      const totalCharges = chargesData?.length || 0
-      const paidCharges = chargesData?.filter(charge => charge.status === "paid").length || 0
-      const collectionRate = totalCharges > 0 ? Math.round((paidCharges / totalCharges) * 100) : 0
-
-      setStats({
-        totalUnits,
-        occupiedUnits,
-        vacantUnits,
-        totalRevenue,
-        pendingCharges,
-        collectionRate,
-      })
-
-    } catch (error: any) {
-      console.error("Error fetching society data:", error)
+    } catch (error) {
+      console.error('Error fetching society data:', error);
       toast({
-        title: "Error",
-        description: "Failed to load society management data",
-        variant: "destructive",
-      })
+        title: 'Error',
+        description: 'Failed to load society data',
+        variant: 'destructive',
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const handleUnitSuccess = () => {
-    setShowUnitForm(false)
-    setSelectedUnit(null)
-    fetchData()
-  }
-
-  const handleChargeSuccess = () => {
-    setShowChargeForm(false)
-    setSelectedCharge(null)
-    fetchData()
-  }
+  };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "occupied":
-      case "paid":
-        return "default"
-      case "vacant":
-      case "pending":
-        return "secondary"
-      case "maintenance":
-      case "overdue":
-        return "destructive"
+      case 'active':
+        return 'default';
+      case 'inactive':
+        return 'secondary';
+      case 'maintenance':
+        return 'outline';
       default:
-        return "outline"
+        return 'outline';
     }
-  }
+  };
+
+  const getChargeStatusVariant = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return 'default';
+      case 'pending':
+        return 'secondary';
+      case 'overdue':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
 
   if (loading) {
     return (
       <div className="container mx-auto py-8">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-muted rounded"></div>
-            ))}
-          </div>
+          <div className="h-64 bg-muted rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -178,48 +142,47 @@ export default function SocietyManagement() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Society Management</h1>
-          <p className="text-muted-foreground">Manage residential and commercial units with maintenance billing</p>
+          <p className="text-muted-foreground">Manage units, residents, and maintenance charges</p>
         </div>
+        <Building2 className="h-8 w-8 text-muted-foreground" />
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Units</CardTitle>
-            <Home className="h-4 w-4 text-muted-foreground" />
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{units.length}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Occupied Units</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <AnimatedCounter value={stats.totalUnits} />
+              {units.filter(unit => unit.is_occupied).length}
             </div>
           </CardContent>
         </Card>
-
+        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Occupied</CardTitle>
-            <Home className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium">Pending Charges</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              <AnimatedCounter value={stats.occupiedUnits} />
+            <div className="text-2xl font-bold">
+              {maintenanceCharges.filter(charge => charge.status === 'pending').length}
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vacant</CardTitle>
-            <Home className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">
-              <AnimatedCounter value={stats.vacantUnits} />
-            </div>
-          </CardContent>
-        </Card>
-
+        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -227,31 +190,7 @@ export default function SocietyManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              $<AnimatedCounter value={stats.totalRevenue} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Charges</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              <AnimatedCounter value={stats.pendingCharges} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Collection Rate</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              <AnimatedCounter value={stats.collectionRate} />%
+              ${maintenanceCharges.reduce((sum, charge) => sum + charge.amount, 0).toLocaleString()}
             </div>
           </CardContent>
         </Card>
@@ -259,91 +198,17 @@ export default function SocietyManagement() {
 
       <Tabs defaultValue="units" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="units">Society Units</TabsTrigger>
+          <TabsTrigger value="units">Units Management</TabsTrigger>
           <TabsTrigger value="charges">Maintenance Charges</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="units" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Society Units</h2>
-            <Dialog open={showUnitForm} onOpenChange={setShowUnitForm}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Unit
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>{selectedUnit ? "Edit Unit" : "Add New Unit"}</DialogTitle>
-                </DialogHeader>
-                <SocietyUnitForm
-                  unit={selectedUnit}
-                  organizationId={user?.user_metadata?.organization_id || ""}
-                  onSuccess={handleUnitSuccess}
-                  onCancel={() => {
-                    setShowUnitForm(false)
-                    setSelectedUnit(null)
-                  }}
-                />
-              </DialogContent>
-            </Dialog>
-          </div>
-
           <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Unit Number</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Owner/Tenant</TableHead>
-                    <TableHead>Area (sq ft)</TableHead>
-                    <TableHead>Monthly Rate</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {units.map((unit) => (
-                    <TableRow key={unit.id}>
-                      <TableCell className="font-medium">{unit.unit_number}</TableCell>
-                      <TableCell className="capitalize">{unit.unit_type}</TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          {unit.owner_name && <div>Owner: {unit.owner_name}</div>}
-                          {unit.tenant_name && <div>Tenant: {unit.tenant_name}</div>}
-                        </div>
-                      </TableCell>
-                      <TableCell>{unit.area_sqft}</TableCell>
-                      <TableCell>
-                        {unit.monthly_flat_rate > 0 
-                          ? `$${unit.monthly_flat_rate}` 
-                          : `$${unit.monthly_rate_per_sqft}/sq ft`
-                        }
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusBadgeVariant(unit.status)}>
-                          {unit.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedUnit(unit)
-                            setShowUnitForm(true)
-                          }}
-                        >
-                          Edit
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <CardHeader>
+              <CardTitle>Society Units</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SocietyUnitsTable units={units} onRefresh={fetchData} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -360,19 +225,15 @@ export default function SocietyManagement() {
               </DialogTrigger>
               <DialogContent className="max-w-4xl">
                 <DialogHeader>
-                  <DialogTitle>{selectedCharge ? "Edit Charge" : "Add New Charge"}</DialogTitle>
+                  <DialogTitle>
+                    {selectedCharge ? "Edit Maintenance Charge" : "Add New Maintenance Charge"}
+                  </DialogTitle>
                 </DialogHeader>
                 <MaintenanceChargeForm
-                  charge={selectedCharge}
-                  units={units.map(unit => ({ 
-                    id: unit.id, 
-                    unit_number: unit.unit_number, 
-                    unit_type: unit.unit_type 
-                  }))}
-                  onSuccess={handleChargeSuccess}
-                  onCancel={() => {
-                    setShowChargeForm(false)
-                    setSelectedCharge(null)
+                  onSuccess={() => {
+                    setShowChargeForm(false);
+                    setSelectedCharge(null);
+                    fetchData();
                   }}
                 />
               </DialogContent>
@@ -381,118 +242,67 @@ export default function SocietyManagement() {
 
           <Card>
             <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Unit</TableHead>
-                    <TableHead>Charge Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Billing Month</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {charges.map((charge) => (
-                    <TableRow key={charge.id}>
-                      <TableCell>
-                        {charge.unit?.unit_number} ({charge.unit?.unit_type})
-                      </TableCell>
-                      <TableCell className="capitalize">
-                        {charge.charge_type.replace('_', ' ')}
-                      </TableCell>
-                      <TableCell>${charge.amount}</TableCell>
-                      <TableCell>
-                        {new Date(charge.billing_month).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'long' 
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(charge.due_date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusBadgeVariant(charge.status)}>
-                          {charge.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedCharge(charge)
-                            setShowChargeForm(true)
-                          }}
-                        >
-                          Edit
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-3 text-left">Unit</th>
+                      <th className="px-4 py-3 text-left">Amount</th>
+                      <th className="px-4 py-3 text-left">Period</th>
+                      <th className="px-4 py-3 text-left">Due Date</th>
+                      <th className="px-4 py-3 text-left">Status</th>
+                      <th className="px-4 py-3 text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {maintenanceCharges.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                          No maintenance charges found
+                        </td>
+                      </tr>
+                    ) : (
+                      maintenanceCharges.map((charge) => (
+                        <tr key={charge.id} className="border-b">
+                          <td className="px-4 py-3 font-medium">
+                            {units.find(u => u.id === charge.unit_id)?.unit_number || 'Unknown'}
+                          </td>
+                          <td className="px-4 py-3">${charge.amount}</td>
+                          <td className="px-4 py-3">{charge.billing_period}</td>
+                          <td className="px-4 py-3">
+                            {charge.due_date ? new Date(charge.due_date).toLocaleDateString() : 'N/A'}
+                          </td>
+                          <td className="px-4 py-3">
+                            <Badge variant={getChargeStatusVariant(charge.status)}>
+                              {charge.status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedCharge(charge);
+                                  setShowChargeForm(true);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Unit Occupancy Report</CardTitle>
-                <CardDescription>Current occupancy statistics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Total Units:</span>
-                    <span className="font-medium">{stats.totalUnits}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Occupied:</span>
-                    <span className="font-medium text-green-600">{stats.occupiedUnits}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Vacant:</span>
-                    <span className="font-medium text-orange-600">{stats.vacantUnits}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Occupancy Rate:</span>
-                    <span className="font-medium">
-                      {stats.totalUnits > 0 ? Math.round((stats.occupiedUnits / stats.totalUnits) * 100) : 0}%
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Collection Report</CardTitle>
-                <CardDescription>Payment collection statistics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Total Revenue:</span>
-                    <span className="font-medium">${stats.totalRevenue}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Pending Charges:</span>
-                    <span className="font-medium text-red-600">{stats.pendingCharges}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Collection Rate:</span>
-                    <span className="font-medium text-blue-600">{stats.collectionRate}%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
+
+export default SocietyManagement;

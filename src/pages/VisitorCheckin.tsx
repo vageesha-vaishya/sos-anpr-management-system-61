@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,23 @@ interface CheckinForm {
   hostId: string;
   visitType: string;
   expectedDuration: number;
+}
+
+interface Visitor {
+  id: string;
+  organization_id: string;
+  visitor_name: string;
+  visitor_email?: string;
+  visitor_phone?: string;
+  company?: string;
+  purpose: string;
+  host_id?: string;
+  check_in_time?: string;
+  check_out_time?: string;
+  visit_count: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const VisitorCheckin = () => {
@@ -56,13 +74,20 @@ const VisitorCheckin = () => {
     try {
       setLoading(true);
       
-      // Create visitor record (check if exists first by email)
-      let visitor;
+      if (!userProfile?.organization_id) {
+        throw new Error('No organization found');
+      }
+
+      // Create or update visitor record
+      const visitorName = `${form.firstName} ${form.lastName}`;
+      let visitor: Visitor;
+
       if (form.email) {
+        // Check if visitor exists by email
         const { data: existingVisitor } = await supabase
           .from('visitors')
           .select('*')
-          .eq('email', form.email)
+          .eq('visitor_email', form.email)
           .maybeSingle();
 
         if (existingVisitor) {
@@ -70,12 +95,11 @@ const VisitorCheckin = () => {
           const { data: updatedVisitor, error: updateError } = await supabase
             .from('visitors')
             .update({
-              first_name: form.firstName,
-              last_name: form.lastName,
-              phone: form.phone,
+              visitor_name: visitorName,
+              visitor_phone: form.phone,
               company: form.company,
               visit_count: (existingVisitor.visit_count || 0) + 1,
-              last_visit_date: new Date().toISOString()
+              updated_at: new Date().toISOString()
             })
             .eq('id', existingVisitor.id)
             .select()
@@ -88,13 +112,16 @@ const VisitorCheckin = () => {
           const { data: newVisitor, error: createError } = await supabase
             .from('visitors')
             .insert({
-              first_name: form.firstName,
-              last_name: form.lastName,
-              email: form.email,
-              phone: form.phone,
+              organization_id: userProfile.organization_id,
+              visitor_name: visitorName,
+              visitor_email: form.email,
+              visitor_phone: form.phone,
               company: form.company,
+              purpose: form.purpose,
+              host_id: form.hostId || null,
               visit_count: 1,
-              last_visit_date: new Date().toISOString()
+              status: 'checked_in',
+              check_in_time: new Date().toISOString()
             })
             .select()
             .single();
@@ -107,12 +134,15 @@ const VisitorCheckin = () => {
         const { data: newVisitor, error: createError } = await supabase
           .from('visitors')
           .insert({
-            first_name: form.firstName,
-            last_name: form.lastName,
-            phone: form.phone,
+            organization_id: userProfile.organization_id,
+            visitor_name: visitorName,
+            visitor_phone: form.phone,
             company: form.company,
+            purpose: form.purpose,
+            host_id: form.hostId || null,
             visit_count: 1,
-            last_visit_date: new Date().toISOString()
+            status: 'checked_in',
+            check_in_time: new Date().toISOString()
           })
           .select()
           .single();
@@ -120,24 +150,6 @@ const VisitorCheckin = () => {
         if (createError) throw createError;
         visitor = newVisitor;
       }
-
-      
-
-      // Create visit record
-      const { error: visitError } = await supabase
-        .from('visits')
-        .insert({
-          visitor_id: visitor.id,
-          organization_id: userProfile?.organization_id,
-          location_id: userProfile?.organization_id, // Using org id as temp location id
-          purpose: form.purpose,
-          visit_type: form.visitType,
-          expected_duration_minutes: form.expectedDuration,
-          host_id: form.hostId || null,
-          status: 'registered'
-        });
-
-      if (visitError) throw visitError;
 
       toast({
         title: 'Success',
