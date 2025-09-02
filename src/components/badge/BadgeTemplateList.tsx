@@ -66,7 +66,7 @@ export const BadgeTemplateList = ({ onEditTemplate }: BadgeTemplateListProps) =>
         .from('badge_templates')
         .insert({
           name: `${template.name} Copy`,
-          template_type: template.template_type,
+          template_type: template.template_type as "visitor" | "emergency" | "vip" | "contractor",
           design_config: template.design_config,
           security_features: template.security_features,
           active: false,

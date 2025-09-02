@@ -70,8 +70,8 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
         .insert({
           title: data.title,
           message: data.message,
-          type: data.type,
-          severity: data.severity,
+          alert_type: data.type as "system" | "security" | "maintenance" | "detection",
+          severity: data.severity as "low" | "medium" | "high" | "critical",
           camera_id: data.camera_id === 'none' ? null : data.camera_id || null,
           organization_id: userProfile.organization_id,
           status: 'unread',

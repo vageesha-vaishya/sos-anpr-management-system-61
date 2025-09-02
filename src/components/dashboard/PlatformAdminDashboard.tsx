@@ -72,10 +72,8 @@ export const PlatformAdminDashboard = () => {
 
       // Load today's detections count
       const today = new Date().toISOString().split('T')[0]
-      const { count: detectionCount } = await supabase
-        .from('anpr_detections')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', today)
+      // Note: ANPR detections will be added in future update
+      const detectionCount = 0
 
       setStats({
         totalOrganizations: orgCount || 47,
