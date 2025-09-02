@@ -74,7 +74,7 @@ export const VehicleWhitelistForm: React.FC<VehicleWhitelistFormProps> = ({ onSu
             license_plate: data.license_plate.toUpperCase(),
             owner_name: data.owner_name,
             owner_contact: data.owner_contact || null,
-            vehicle_type: data.vehicle_type,
+        vehicle_type: data.vehicle_type as any,
             status: data.status,
             expires_at: data.expires_at ? new Date(data.expires_at).toISOString() : null,
             notes: data.notes || null,

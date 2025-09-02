@@ -102,8 +102,8 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
         .from('profiles')
         .update({
           full_name: data.full_name,
-          role: data.role,
-          status: data.status,
+        role: data.role === 'franchise_user' ? 'operator' : data.role as any,
+        status: data.status === 'pending' ? 'active' : data.status as any,
           organization_id: data.organization_id,
           phone_number: data.phone_number,
           active_from: data.active_from || null,
@@ -139,8 +139,8 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
           const { error: profileError } = await supabase
             .from('profiles')
             .update({
-              role: data.role,
-              status: data.status,
+          role: data.role === 'franchise_user' ? 'operator' : data.role as any,
+          status: data.status === 'pending' ? 'active' : data.status as any,
               organization_id: data.organization_id,
             })
             .eq('id', authData.user.id)
