@@ -32,6 +32,10 @@ import ResetPassword from "@/pages/ResetPassword";
 import Billing from "@/pages/Billing";
 import StaffManagement from "@/pages/StaffManagement";
 import HelpDesk from "@/pages/HelpDesk";
+import EventManagement from "@/pages/EventManagement";
+import AssetManagement from "@/pages/AssetManagement";
+import ParkingManagement from "@/pages/ParkingManagement";
+import DocumentManagement from "@/pages/DocumentManagement";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PlatformAdminDashboard } from "@/components/dashboard/PlatformAdminDashboard";
 import { FranchiseAdminDashboard } from "@/components/dashboard/FranchiseAdminDashboard";
@@ -324,6 +328,38 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <HelpDesk />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events" 
+              element={
+                <ProtectedRoute>
+                  <EventManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/assets" 
+              element={
+                <ProtectedRoute>
+                  <AssetManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/parking" 
+              element={
+                <ProtectedRoute>
+                  <ParkingManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/documents" 
+              element={
+                <ProtectedRoute>
+                  <DocumentManagement />
                 </ProtectedRoute>
               } 
             />

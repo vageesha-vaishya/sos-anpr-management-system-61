@@ -29,7 +29,10 @@ import {
   CreditCard,
   User,
   UserCog,
-  Headphones
+  Headphones,
+  Package,
+  Car,
+  FileText
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -87,6 +90,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { name: 'Maintenance Billing', href: '/maintenance-billing', icon: CreditCard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Staff Management', href: '/staff-management', icon: UserCog, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Help Desk', href: '/helpdesk', icon: Headphones, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'operator', 'resident'] },
+    { name: 'Events', href: '/events', icon: Calendar, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Assets', href: '/assets', icon: Package, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Parking', href: '/parking', icon: Car, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Documents', href: '/documents', icon: FileText, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     // System Management
     { name: 'Data Management', href: '/data-management', icon: Database, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Master Data Management', href: '/master-data-management', icon: Globe, roles: ['platform_admin', 'franchise_admin'] },

@@ -521,6 +521,222 @@ export type Database = {
           },
         ]
       }
+      community_assets: {
+        Row: {
+          asset_name: string
+          asset_type: string
+          assigned_to: string | null
+          condition: string | null
+          created_at: string
+          current_value: number | null
+          description: string | null
+          id: string
+          location: string | null
+          maintenance_schedule: Json | null
+          organization_id: string | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          status: string | null
+          updated_at: string
+          warranty_expires: string | null
+        }
+        Insert: {
+          asset_name: string
+          asset_type: string
+          assigned_to?: string | null
+          condition?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          maintenance_schedule?: Json | null
+          organization_id?: string | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          status?: string | null
+          updated_at?: string
+          warranty_expires?: string | null
+        }
+        Update: {
+          asset_name?: string
+          asset_type?: string
+          assigned_to?: string | null
+          condition?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          maintenance_schedule?: Json | null
+          organization_id?: string | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          status?: string | null
+          updated_at?: string
+          warranty_expires?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_assets_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_assets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_documents: {
+        Row: {
+          access_level: string | null
+          category: string
+          created_at: string
+          description: string | null
+          document_name: string
+          document_type: string
+          file_path: string | null
+          file_size: number | null
+          id: string
+          is_active: boolean | null
+          mime_type: string | null
+          organization_id: string | null
+          updated_at: string
+          uploaded_by: string | null
+          version_number: number | null
+        }
+        Insert: {
+          access_level?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          document_name: string
+          document_type: string
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          is_active?: boolean | null
+          mime_type?: string | null
+          organization_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          version_number?: number | null
+        }
+        Update: {
+          access_level?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          document_name?: string
+          document_type?: string
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          is_active?: boolean | null
+          mime_type?: string | null
+          organization_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+          version_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          end_time: string | null
+          event_type: string
+          id: string
+          location: string | null
+          max_capacity: number | null
+          organization_id: string | null
+          registration_deadline: string | null
+          registration_required: boolean | null
+          start_date: string
+          start_time: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_type: string
+          id?: string
+          location?: string | null
+          max_capacity?: number | null
+          organization_id?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          start_date: string
+          start_time?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_type?: string
+          id?: string
+          location?: string | null
+          max_capacity?: number | null
+          organization_id?: string | null
+          registration_deadline?: string | null
+          registration_required?: boolean | null
+          start_date?: string
+          start_time?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_polls: {
         Row: {
           created_at: string | null
@@ -714,6 +930,51 @@ export type Database = {
             columns: ["building_id"]
             isOneToOne: false
             referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_registrations: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          notes: string | null
+          registration_date: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          registration_date?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          registration_date?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "community_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_registrations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1117,6 +1378,79 @@ export type Database = {
           {
             foreignKeyName: "organizations_parent_id_fkey"
             columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parking_slots: {
+        Row: {
+          area: string | null
+          assigned_unit_id: string | null
+          building_id: string | null
+          created_at: string
+          floor_level: number | null
+          id: string
+          is_reserved: boolean | null
+          monthly_fee: number | null
+          notes: string | null
+          organization_id: string | null
+          slot_number: string
+          slot_type: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          area?: string | null
+          assigned_unit_id?: string | null
+          building_id?: string | null
+          created_at?: string
+          floor_level?: number | null
+          id?: string
+          is_reserved?: boolean | null
+          monthly_fee?: number | null
+          notes?: string | null
+          organization_id?: string | null
+          slot_number: string
+          slot_type?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string | null
+          assigned_unit_id?: string | null
+          building_id?: string | null
+          created_at?: string
+          floor_level?: number | null
+          id?: string
+          is_reserved?: boolean | null
+          monthly_fee?: number | null
+          notes?: string | null
+          organization_id?: string | null
+          slot_number?: string
+          slot_type?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parking_slots_assigned_unit_id_fkey"
+            columns: ["assigned_unit_id"]
+            isOneToOne: false
+            referencedRelation: "society_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parking_slots_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parking_slots_organization_id_fkey"
+            columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["id"]
