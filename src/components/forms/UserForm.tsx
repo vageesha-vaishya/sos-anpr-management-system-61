@@ -56,7 +56,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
       full_name: editData?.full_name || '',
       role: (editData?.role as any) || 'customer_user',
       status: (editData?.status as any) || 'active',
-      organization_id: editData?.organization_id || userProfile?.organization_id || '',
+      organization_id: editData?.organization_id || userProfile?.organization_id || '00000000-0000-0000-0000-000000000003',
       phone_number: editData?.phone_number || '',
       active_from: editData?.active_from || '',
       active_until: editData?.active_until || '',
@@ -67,12 +67,28 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
 
   useEffect(() => {
     const fetchOrganizations = async () => {
-      const { data } = await supabase
-        .from('organizations')
-        .select('id, name')
-        .order('name')
-      
-      if (data) setOrganizations(data)
+      try {
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('id, name')
+          .order('name')
+        
+        if (error) {
+          console.error('Error fetching organizations:', error)
+          // Fallback to demo organization
+          setOrganizations([
+            { id: '00000000-0000-0000-0000-000000000003', name: 'Demo Organization' }
+          ])
+        } else if (data) {
+          setOrganizations(data)
+        }
+      } catch (err) {
+        console.error('Exception fetching organizations:', err)
+        // Fallback to demo organization
+        setOrganizations([
+          { id: '00000000-0000-0000-0000-000000000003', name: 'Demo Organization' }
+        ])
+      }
     }
     
     fetchOrganizations()

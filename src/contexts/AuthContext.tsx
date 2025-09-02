@@ -250,7 +250,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      // Clear demo user state
+      setUser(null)
+      setUserProfile(null)
+      setSession(null)
+      setLoading(false)
+      
+      // Also attempt to sign out from Supabase (in case real auth is used later)
+      await supabase.auth.signOut()
+      
+      console.log('User signed out successfully')
+    } catch (error) {
+      console.error('Sign out error:', error)
+    }
   }
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
