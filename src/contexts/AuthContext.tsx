@@ -44,7 +44,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true
 
-    // Get initial session
+    // For demo purposes - create a mock user profile to test ADDA features
+    const createDemoUser = () => {
+      const demoUser = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: 'demo@adda.io',
+        email_confirmed_at: new Date().toISOString(),
+        app_metadata: {},
+        user_metadata: {},
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      } as User
+
+      const demoProfile: UserProfile = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        organization_id: '00000000-0000-0000-0000-000000000003',
+        email: 'demo@adda.io',
+        full_name: 'Demo Admin User',
+        role: 'customer_admin',
+        permissions: ['all'],
+        status: 'active',
+        last_login: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      }
+
+      setUser(demoUser)
+      setUserProfile(demoProfile)
+      setSession({
+        access_token: 'demo-token',
+        refresh_token: 'demo-refresh',
+        expires_in: 3600,
+        expires_at: Date.now() + 3600000,
+        token_type: 'bearer',
+        user: demoUser
+      } as Session)
+      setLoading(false)
+      
+      console.log('Demo user logged in for ADDA testing:', demoProfile)
+    }
+
+    // Create demo user immediately for testing
+    createDemoUser()
+
+    // Get initial session (commented out for demo)
+    /*
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return
       
@@ -89,6 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       mounted = false
       subscription.unsubscribe()
     }
+    */
   }, [])
 
   const loadUserProfile = async (authUserId: string): Promise<void> => {

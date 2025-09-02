@@ -23,7 +23,11 @@ import {
   Building2,
   DollarSign,
   Home,
-  TrendingUp
+  TrendingUp,
+  MessageSquare,
+  CalendarDays,
+  CreditCard,
+  User
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -74,6 +78,12 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    // ADDA Core Features
+    { name: 'Resident Portal', href: '/resident-portal', icon: User, roles: ['customer_admin', 'customer_user'] },
+    { name: 'Community Forum', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'customer_user'] },
+    { name: 'Amenity Management', href: '/amenity-management', icon: CalendarDays, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Maintenance Billing', href: '/maintenance-billing', icon: CreditCard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    // System Management
     { name: 'Data Management', href: '/data-management', icon: Database, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Master Data Management', href: '/master-data-management', icon: Globe, roles: ['platform_admin', 'franchise_admin'] },
     { name: 'Financial Management', href: '/billing', icon: DollarSign, roles: ['platform_admin', 'franchise_admin'] },
@@ -148,7 +158,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <div className="flex items-center space-x-2">
               <Shield className="w-8 h-8 text-sidebar-primary" />
-              <span className="text-lg font-bold text-sidebar-foreground">ANPR System</span>
+              <span className="text-lg font-bold text-sidebar-foreground">ADDA System</span>
             </div>
             <Button
               variant="ghost"
