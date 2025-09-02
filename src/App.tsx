@@ -250,6 +250,38 @@ const App = () => (
               } 
             />
             <Route 
+              path="/resident-portal" 
+              element={
+                <ProtectedRoute>
+                  <ResidentPortal />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/amenity-management" 
+              element={
+                <ProtectedRoute>
+                  <AmenityManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/community-forum" 
+              element={
+                <ProtectedRoute>
+                  <CommunityForum />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/maintenance-billing" 
+              element={
+                <ProtectedRoute>
+                  <MaintenanceBilling />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/analytics" 
               element={
                 <ProtectedRoute>
