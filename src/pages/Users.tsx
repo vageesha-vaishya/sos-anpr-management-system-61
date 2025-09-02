@@ -21,6 +21,7 @@ const Users = () => {
   const { toast } = useToast()
 
   const fetchUsers = async () => {
+    console.log('Fetching users...')
     const { data, error } = await supabase
       .from('profiles')
       .select(`
