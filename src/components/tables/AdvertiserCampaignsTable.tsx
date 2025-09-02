@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { AdvertisementCampaignForm } from "@/components/forms/AdvertisementCampaignForm"
+import { ComingSoonForm } from "@/components/forms/ComingSoonForm"
 import { Plus, Edit, Play, Pause, BarChart3, Eye, TrendingUp, Users, DollarSign } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
@@ -158,14 +158,9 @@ export function AdvertiserCampaignsTable({
               <DialogHeader>
                 <DialogTitle>{selectedCampaign ? "Edit Campaign" : "Create New Campaign"}</DialogTitle>
               </DialogHeader>
-              <AdvertisementCampaignForm
-                organizationId={organizationId}
-                advertisers={advertisers.map(adv => ({ id: adv.id, name: adv.billing_name }))}
-                onSuccess={handleSuccess}
-                onCancel={() => {
-                  setShowForm(false)
-                  setSelectedCampaign(null)
-                }}
+              <ComingSoonForm 
+                title="Campaign Management"
+                description="Campaign editing will be available soon"
               />
             </DialogContent>
           </Dialog>
