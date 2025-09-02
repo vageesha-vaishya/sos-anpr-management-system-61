@@ -38,7 +38,7 @@ const Hosts = () => {
     try {
       setLoading(true);
       // First get hosts
-      const { data: hostsData, error: hostsError } = await supabase
+      const { data: hostsData, error: hostsError } = await (supabase as any)
         .from('hosts')
         .select('*')
         .eq('organization_id', userProfile?.organization_id)
@@ -48,7 +48,7 @@ const Hosts = () => {
 
       // Then get profiles for each host
       if (hostsData && hostsData.length > 0) {
-        const userIds = hostsData.map(host => host.user_id);
+        const userIds = (hostsData as any[]).map((host: any) => host.user_id);
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id, full_name, email')
@@ -57,12 +57,16 @@ const Hosts = () => {
         if (profilesError) throw profilesError;
 
         // Combine the data
-        const hostsWithProfiles = hostsData.map(host => ({
+        const hostsWithProfiles = (hostsData as any[]).map((host: any) => ({
           ...host,
-          profiles: profilesData?.find(profile => profile.id === host.user_id)
+          user_id: host.user_id,
+          availability_status: host.availability_status || 'available',
+          auto_approve_visitors: host.auto_approve_visitors || false,
+          notification_preferences: host.notification_preferences || {},
+          profiles: (profilesData as any[])?.find((profile: any) => profile.id === host.user_id)
         }));
 
-        setHosts(hostsWithProfiles);
+        setHosts(hostsWithProfiles as any);
       } else {
         setHosts([]);
       }
@@ -96,9 +100,9 @@ const Hosts = () => {
 
   const updateAvailability = async (hostId: string, status: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('hosts')
-        .update({ availability_status: status })
+        .update({ availability_status: status } as any)
         .eq('id', hostId);
 
       if (error) throw error;
@@ -123,7 +127,7 @@ const Hosts = () => {
     if (!confirm('Are you sure you want to delete this host?')) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('hosts')
         .delete()
         .eq('id', hostId);
@@ -306,7 +310,6 @@ const Hosts = () => {
                         Busy
                       </Button>
                       <HostForm 
-                        editData={host}
                         onSuccess={loadHosts}
                       />
                       <Button 

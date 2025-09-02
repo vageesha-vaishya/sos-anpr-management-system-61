@@ -162,7 +162,7 @@ export default function MasterDataManagement() {
     if (!confirm("Are you sure you want to delete this service type?")) return
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("service_types")
         .delete()
         .eq("id", id)
