@@ -55,9 +55,9 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
       const { error } = await supabase
         .from('organizations')
         .insert({
-          name: data.name,
-          organization_type: data.type,
-          subscription_plan: data.subscription_plan,
+        name: data.name,
+        organization_type: data.type,
+        subscription_plan: data.subscription_plan,
           status: data.status,
           parent_id: data.parent_id || null,
         })

@@ -1,1 +1,1 @@
-export { HostFormFull as HostForm } from './HostFormFull'
+export { HostFormFull as default } from './HostFormFull'
