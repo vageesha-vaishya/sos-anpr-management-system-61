@@ -1705,10 +1705,16 @@ export type Database = {
           check_out_time: string | null
           company: string | null
           created_at: string | null
+          email: string | null
+          first_name: string | null
           host_id: string | null
           id: string
+          last_name: string | null
+          last_visit_date: string | null
           organization_id: string | null
+          phone: string | null
           purpose: string
+          security_status: string | null
           status: string | null
           updated_at: string | null
           visit_count: number | null
@@ -1721,10 +1727,16 @@ export type Database = {
           check_out_time?: string | null
           company?: string | null
           created_at?: string | null
+          email?: string | null
+          first_name?: string | null
           host_id?: string | null
           id?: string
+          last_name?: string | null
+          last_visit_date?: string | null
           organization_id?: string | null
+          phone?: string | null
           purpose: string
+          security_status?: string | null
           status?: string | null
           updated_at?: string | null
           visit_count?: number | null
@@ -1737,10 +1749,16 @@ export type Database = {
           check_out_time?: string | null
           company?: string | null
           created_at?: string | null
+          email?: string | null
+          first_name?: string | null
           host_id?: string | null
           id?: string
+          last_name?: string | null
+          last_visit_date?: string | null
           organization_id?: string | null
+          phone?: string | null
           purpose?: string
+          security_status?: string | null
           status?: string | null
           updated_at?: string | null
           visit_count?: number | null
@@ -1761,6 +1779,80 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visits: {
+        Row: {
+          check_in_time: string | null
+          check_out_time: string | null
+          created_at: string | null
+          expected_checkout_time: string | null
+          host_id: string | null
+          id: string
+          location_id: string | null
+          organization_id: string | null
+          purpose: string
+          status: string | null
+          updated_at: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          created_at?: string | null
+          expected_checkout_time?: string | null
+          host_id?: string | null
+          id?: string
+          location_id?: string | null
+          organization_id?: string | null
+          purpose: string
+          status?: string | null
+          updated_at?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          created_at?: string | null
+          expected_checkout_time?: string | null
+          host_id?: string | null
+          id?: string
+          location_id?: string | null
+          organization_id?: string | null
+          purpose?: string
+          status?: string | null
+          updated_at?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
             referencedColumns: ["id"]
           },
         ]

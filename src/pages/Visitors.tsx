@@ -20,6 +20,17 @@ interface Visitor {
   visit_count: number;
   last_visit_date?: string;
   security_status: string;
+  visitor_name?: string;
+  visitor_email?: string;
+  visitor_phone?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
+  organization_id?: string;
+  host_id?: string;
+  purpose?: string;
+  check_in_time?: string;
+  check_out_time?: string;
 }
 
 const Visitors = () => {
@@ -42,7 +53,18 @@ const Visitors = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setVisitors(data || []);
+      
+      // Map the data to match our interface
+      const mappedData = (data || []).map(visitor => ({
+        ...visitor,
+        first_name: visitor.first_name || visitor.visitor_name?.split(' ')[0] || '',
+        last_name: visitor.last_name || visitor.visitor_name?.split(' ').slice(1).join(' ') || '',
+        email: visitor.email || visitor.visitor_email || '',
+        phone: visitor.phone || visitor.visitor_phone || '',
+        security_status: visitor.security_status || 'pending'
+      }));
+      
+      setVisitors(mappedData);
     } catch (error) {
       console.error('Error loading visitors:', error);
       toast({

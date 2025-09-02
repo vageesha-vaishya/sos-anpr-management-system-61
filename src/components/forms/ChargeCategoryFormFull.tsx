@@ -25,9 +25,10 @@ type ChargeCategoryFormData = z.infer<typeof chargeCategorySchema>
 interface ChargeCategoryFormProps {
   onSuccess?: () => void
   editData?: any
+  onCancel?: () => void
 }
 
-export const ChargeCategoryFormFull: React.FC<ChargeCategoryFormProps> = ({ onSuccess, editData }) => {
+export const ChargeCategoryFormFull: React.FC<ChargeCategoryFormProps> = ({ onSuccess, editData, onCancel }) => {
   const { userProfile } = useAuth()
   const { toast } = useToast()
 

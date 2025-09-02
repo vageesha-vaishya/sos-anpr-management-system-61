@@ -77,12 +77,10 @@ const VisitorDashboard = () => {
       
       // Load today's visits with visitor details
       const today = new Date().toISOString().split('T')[0];
+      // For now, use visitors table until visits table is properly set up
       const { data: visits, error: visitsError } = await supabase
-        .from('visits')
-        .select(`
-          *,
-          visitors(first_name, last_name, company)
-        `)
+        .from('visitors')
+        .select('*')
         .gte('created_at', `${today}T00:00:00.000Z`)
         .lt('created_at', `${today}T23:59:59.999Z`)
         .order('created_at', { ascending: false });
@@ -91,20 +89,33 @@ const VisitorDashboard = () => {
 
       const visitsData = visits || [];
       
-      // Calculate stats
+      // Calculate stats from visitors data
       const statsData: VisitorStats = {
         totalVisitors: visitsData.length,
-        checkedIn: visitsData.filter(v => v.status === 'checked_in').length,
-        checkedOut: visitsData.filter(v => v.status === 'checked_out').length,
-        pending: visitsData.filter(v => v.status === 'registered' || v.status === 'approved').length,
-        overdueVisitors: visitsData.filter(v => {
-          if (!v.expected_checkout_time || v.status === 'checked_out') return false;
-          return new Date(v.expected_checkout_time) < new Date();
-        }).length
+        checkedIn: visitsData.filter((v: any) => v.status === 'checked_in').length,
+        checkedOut: visitsData.filter((v: any) => v.status === 'checked_out').length,
+        pending: visitsData.filter((v: any) => v.status === 'pending' || v.status === 'registered').length,
+        overdueVisitors: 0 // Will implement when visits table is ready
       };
 
       setStats(statsData);
-      setRecentVisits(visitsData.slice(0, 10));
+      
+      // Map visitors data to recent visits format
+      const recentVisitsData = visitsData.slice(0, 10).map((visitor: any) => ({
+        id: visitor.id,
+        visitors: {
+          first_name: visitor.first_name || visitor.visitor_name?.split(' ')[0] || '',
+          last_name: visitor.last_name || visitor.visitor_name?.split(' ').slice(1).join(' ') || '',
+          company: visitor.company
+        },
+        purpose: visitor.purpose || 'General visit',
+        status: visitor.status || 'registered',
+        check_in_time: visitor.check_in_time,
+        expected_checkout_time: visitor.check_out_time,
+        created_at: visitor.created_at
+      }));
+      
+      setRecentVisits(recentVisitsData);
 
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -132,7 +143,7 @@ const VisitorDashboard = () => {
   const handleCheckOut = async (visitId: string) => {
     try {
       const { error } = await supabase
-        .from('visits')
+        .from('visitors')
         .update({
           status: 'checked_out',
           check_out_time: new Date().toISOString()

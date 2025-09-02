@@ -28,9 +28,10 @@ type AmenityFormData = z.infer<typeof amenitySchema>
 interface AmenityFormProps {
   onSuccess?: () => void
   editData?: any
+  onCancel?: () => void
 }
 
-export const AmenityFormFull: React.FC<AmenityFormProps> = ({ onSuccess, editData }) => {
+export const AmenityFormFull: React.FC<AmenityFormProps> = ({ onSuccess, editData, onCancel }) => {
   const { userProfile } = useAuth()
   const { toast } = useToast()
   const [buildings, setBuildings] = useState<any[]>([])

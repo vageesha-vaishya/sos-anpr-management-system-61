@@ -3,9 +3,11 @@ import { ComingSoonForm } from './ComingSoonForm'
 
 interface ServiceTypeFormProps {
   onSuccess?: () => void
+  editData?: any
+  onCancel?: () => void
 }
 
-export const ServiceTypeFormFull: React.FC<ServiceTypeFormProps> = ({ onSuccess }) => {
+export const ServiceTypeFormFull: React.FC<ServiceTypeFormProps> = ({ onSuccess, editData, onCancel }) => {
   return (
     <ComingSoonForm
       title="Service Type Management"

@@ -10,26 +10,36 @@ import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 
 interface SocietyUnit {
-  id: string
-  unit_number: string
-  unit_type: string
-  owner_name: string
-  tenant_name: string
-  area_sqft: number
-  monthly_rate_per_sqft: number
-  monthly_flat_rate: number
-  parking_slots: number
-  status: string
-  created_at: string
+  id: string;
+  unit_number: string;
+  unit_type?: string | null;
+  owner_name?: string | null;
+  tenant_name?: string | null;
+  area_sqft?: number | null;
+  monthly_rate_per_sqft?: number | null;
+  monthly_flat_rate?: number | null;
+  parking_slots?: number | null;
+  status?: string | null;
+  created_at?: string;
+  building_id?: string | null;
+  floor?: number | null;
+  bedrooms?: number | null;
+  bathrooms?: number | null;
+  owner_email?: string | null;
+  owner_phone?: string | null;
+  tenant_email?: string | null;
+  tenant_phone?: string | null;
+  monthly_maintenance?: number | null;
+  is_occupied?: boolean | null;
+  updated_at?: string;
 }
 
 interface SocietyUnitsTableProps {
   units: SocietyUnit[]
-  organizationId: string
   onRefresh: () => void
 }
 
-export function SocietyUnitsTable({ units, organizationId, onRefresh }: SocietyUnitsTableProps) {
+export function SocietyUnitsTable({ units, onRefresh }: SocietyUnitsTableProps) {
   const [showForm, setShowForm] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<SocietyUnit | null>(null)
   const { toast } = useToast()
@@ -117,7 +127,7 @@ export function SocietyUnitsTable({ units, organizationId, onRefresh }: SocietyU
               </DialogHeader>
               <SocietyUnitForm
                 unit={selectedUnit}
-                organizationId={organizationId}
+                organizationId=""
                 onSuccess={handleSuccess}
                 onCancel={() => {
                   setShowForm(false)
