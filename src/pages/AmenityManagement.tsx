@@ -3,12 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { CalendarDays, Clock, Users, MapPin, DollarSign, Settings, Plus, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { AmenityForm } from '@/components/forms/AmenityForm';
 
 const AmenityManagement = () => {
   const [selectedAmenity, setSelectedAmenity] = useState(null);
@@ -138,45 +135,16 @@ const AmenityManagement = () => {
                 Add Amenity
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Amenity</DialogTitle>
                 <DialogDescription>Create a new amenity for residents to book</DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Amenity Name</Label>
-                  <Input id="name" placeholder="e.g., Swimming Pool" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="type">Type</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="recreation">Recreation</SelectItem>
-                      <SelectItem value="sports">Sports</SelectItem>
-                      <SelectItem value="fitness">Fitness</SelectItem>
-                      <SelectItem value="event_space">Event Space</SelectItem>
-                      <SelectItem value="utility">Utility</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="capacity">Capacity</Label>
-                  <Input id="capacity" type="number" placeholder="Maximum occupancy" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="rate">Hourly Rate (₹)</Label>
-                  <Input id="rate" type="number" placeholder="Cost per hour" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" placeholder="Describe the amenity" />
-                </div>
-                <Button className="w-full">Create Amenity</Button>
-              </div>
+              <AmenityForm 
+                organizationId="00000000-0000-0000-0000-000000000003"
+                onSuccess={() => window.location.reload()} 
+                onCancel={() => {}}
+              />
             </DialogContent>
           </Dialog>
         </div>

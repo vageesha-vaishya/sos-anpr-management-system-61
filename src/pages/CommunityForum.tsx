@@ -3,12 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ForumDiscussionForm } from '@/components/forms/ForumDiscussionForm';
+import { PollForm } from '@/components/forms/PollForm';
 import { 
   MessageSquare, 
   Heart, 
@@ -166,32 +164,12 @@ const CommunityForum = () => {
                   Create Poll
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create New Poll</DialogTitle>
                   <DialogDescription>Get community opinion on important matters</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="poll-title">Poll Title</Label>
-                    <Input id="poll-title" placeholder="Ask a question..." />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="poll-description">Description (Optional)</Label>
-                    <Textarea id="poll-description" placeholder="Provide context for your poll" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Poll Options</Label>
-                    <Input placeholder="Option 1" />
-                    <Input placeholder="Option 2" />
-                    <Button variant="outline" size="sm">Add Option</Button>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="poll-end">End Date</Label>
-                    <Input id="poll-end" type="date" />
-                  </div>
-                  <Button className="w-full">Create Poll</Button>
-                </div>
+                <PollForm onSuccess={() => window.location.reload()} />
               </DialogContent>
             </Dialog>
             <Dialog>
@@ -201,41 +179,12 @@ const CommunityForum = () => {
                   New Discussion
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Start New Discussion</DialogTitle>
                   <DialogDescription>Share your thoughts with the community</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
-                    <Input id="title" placeholder="What's on your mind?" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="general">General Discussion</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
-                        <SelectItem value="events">Events & Social</SelectItem>
-                        <SelectItem value="complaints">Complaints</SelectItem>
-                        <SelectItem value="buy_sell">Buy/Sell/Rent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="content">Content</Label>
-                    <Textarea id="content" placeholder="Share your thoughts..." rows={4} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tags">Tags (comma separated)</Label>
-                    <Input id="tags" placeholder="e.g., maintenance, urgent, proposal" />
-                  </div>
-                  <Button className="w-full">Post Discussion</Button>
-                </div>
+                <ForumDiscussionForm onSuccess={() => window.location.reload()} />
               </DialogContent>
             </Dialog>
           </div>

@@ -3,11 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChargeCategoryForm } from '@/components/forms/ChargeCategoryForm';
 import { 
   CreditCard, 
   FileText, 
@@ -413,41 +414,17 @@ const MaintenanceBilling = () => {
                         Add Charge
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Charge Category</DialogTitle>
-                        <DialogDescription>Create a new billing charge type</DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="charge-name">Charge Name</Label>
-                          <Input id="charge-name" placeholder="e.g., Water Charges" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="charge-type">Charge Type</Label>
-                          <Select>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="fixed">Fixed Amount</SelectItem>
-                              <SelectItem value="variable">Variable</SelectItem>
-                              <SelectItem value="per_sq_ft">Per Sq Ft</SelectItem>
-                              <SelectItem value="percentage">Percentage</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="amount">Amount/Rate</Label>
-                          <Input id="amount" type="number" placeholder="Enter amount" />
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input type="checkbox" id="mandatory" />
-                          <Label htmlFor="mandatory">Mandatory charge</Label>
-                        </div>
-                        <Button className="w-full">Add Charge Category</Button>
-                      </div>
-                    </DialogContent>
+                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                       <DialogHeader>
+                         <DialogTitle>Add New Charge Category</DialogTitle>
+                         <DialogDescription>Create a new billing charge type</DialogDescription>
+                       </DialogHeader>
+                       <ChargeCategoryForm 
+                         organizationId="00000000-0000-0000-0000-000000000003"
+                         onSuccess={() => window.location.reload()} 
+                         onCancel={() => {}}
+                       />
+                     </DialogContent>
                   </Dialog>
                 </div>
               </CardHeader>
