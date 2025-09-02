@@ -76,7 +76,7 @@ export const PollForm: React.FC<PollFormProps> = ({ onSuccess, editData, trigger
       }
 
       if (editData?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('community_polls')
           .update(pollData)
           .eq('id', editData.id)
@@ -84,7 +84,7 @@ export const PollForm: React.FC<PollFormProps> = ({ onSuccess, editData, trigger
         if (error) throw error
 
         // Update poll options
-        await supabase.from('poll_options').delete().eq('poll_id', editData.id)
+        await (supabase as any).from('poll_options').delete().eq('poll_id', editData.id)
         
         const optionsData = values.options.map(option => ({
           poll_id: editData.id,
@@ -92,14 +92,14 @@ export const PollForm: React.FC<PollFormProps> = ({ onSuccess, editData, trigger
           vote_count: 0
         }))
 
-        await supabase.from('poll_options').insert(optionsData)
+        await (supabase as any).from('poll_options').insert(optionsData)
 
         toast({
           title: 'Success',
           description: 'Poll updated successfully',
         })
       } else {
-        const { data: pollResult, error } = await supabase
+        const { data: pollResult, error } = await (supabase as any)
           .from('community_polls')
           .insert([pollData])
           .select()
@@ -114,7 +114,7 @@ export const PollForm: React.FC<PollFormProps> = ({ onSuccess, editData, trigger
           vote_count: 0
         }))
 
-        await supabase.from('poll_options').insert(optionsData)
+        await (supabase as any).from('poll_options').insert(optionsData)
 
         toast({
           title: 'Success',

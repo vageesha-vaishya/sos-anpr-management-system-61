@@ -63,7 +63,7 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
       }
 
       if (department?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('departments')
           .update(departmentData)
           .eq('id', department.id)
@@ -74,7 +74,7 @@ export const DepartmentForm: React.FC<DepartmentFormProps> = ({
           description: 'Department updated successfully',
         })
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('departments')
           .insert([departmentData])
 

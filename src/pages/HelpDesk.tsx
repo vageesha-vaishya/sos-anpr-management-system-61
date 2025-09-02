@@ -70,7 +70,7 @@ export default function HelpDesk() {
   const loadTickets = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('helpdesk_tickets')
         .select(`
           *,
@@ -80,7 +80,7 @@ export default function HelpDesk() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setTickets(data || [])
+      setTickets(data as any || [])
     } catch (error) {
       console.error('Error loading tickets:', error)
       toast({
@@ -99,7 +99,7 @@ export default function HelpDesk() {
 
   const handleDeleteTicket = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('helpdesk_tickets')
         .delete()
         .eq('id', id)
@@ -128,7 +128,7 @@ export default function HelpDesk() {
         updateData.resolved_at = new Date().toISOString()
       }
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('helpdesk_tickets')
         .update(updateData)
         .eq('id', ticketId)

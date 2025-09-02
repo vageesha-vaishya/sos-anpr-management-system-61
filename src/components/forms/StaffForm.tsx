@@ -58,7 +58,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({ staff, onSuccess, trigger 
 
   const loadDepartments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('departments')
         .select('id, name')
         .order('name')
@@ -99,7 +99,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({ staff, onSuccess, trigger 
       }
 
       if (staff?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('staff_members')
           .update(staffData)
           .eq('id', staff.id)
@@ -110,7 +110,7 @@ export const StaffForm: React.FC<StaffFormProps> = ({ staff, onSuccess, trigger 
           description: 'Staff member updated successfully',
         })
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('staff_members')
           .insert([staffData])
 

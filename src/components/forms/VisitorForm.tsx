@@ -76,7 +76,7 @@ const VisitorForm: React.FC<VisitorFormProps> = ({ visitor, onSuccess, trigger }
       }
 
       if (visitor?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('visitors')
           .update(visitorData)
           .eq('id', visitor.id)
@@ -87,7 +87,7 @@ const VisitorForm: React.FC<VisitorFormProps> = ({ visitor, onSuccess, trigger }
           description: 'Visitor updated successfully',
         })
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('visitors')
           .insert([visitorData])
 
@@ -118,7 +118,7 @@ const VisitorForm: React.FC<VisitorFormProps> = ({ visitor, onSuccess, trigger }
     
     setLoading(true)
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('visitors')
         .update({
           visitor_status: 'checked_in',
@@ -152,7 +152,7 @@ const VisitorForm: React.FC<VisitorFormProps> = ({ visitor, onSuccess, trigger }
     
     setLoading(true)
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('visitors')
         .update({
           visitor_status: 'checked_out',

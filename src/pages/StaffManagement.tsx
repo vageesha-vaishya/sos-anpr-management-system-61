@@ -73,7 +73,7 @@ export default function StaffManagement() {
 
   const loadStaff = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('staff_members')
         .select(`
           *,
@@ -82,7 +82,7 @@ export default function StaffManagement() {
         .order('full_name')
 
       if (error) throw error
-      setStaff(data || [])
+      setStaff(data as any || [])
     } catch (error) {
       console.error('Error loading staff:', error)
       toast({
@@ -95,7 +95,7 @@ export default function StaffManagement() {
 
   const loadDepartments = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('departments')
         .select('*')
         .order('name')
@@ -105,7 +105,7 @@ export default function StaffManagement() {
       // Get staff count for each department
       const departmentsWithCount = await Promise.all(
         (data || []).map(async (dept) => {
-          const { count } = await supabase
+          const { count } = await (supabase as any)
             .from('staff_members')
             .select('*', { count: 'exact', head: true })
             .eq('department_id', dept.id)
@@ -141,7 +141,7 @@ export default function StaffManagement() {
 
   const handleDeleteStaff = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('staff_members')
         .delete()
         .eq('id', id)
@@ -165,7 +165,7 @@ export default function StaffManagement() {
 
   const handleDeleteDepartment = async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('departments')
         .delete()
         .eq('id', id)

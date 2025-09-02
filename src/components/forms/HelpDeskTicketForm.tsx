@@ -58,7 +58,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
 
   const loadStaffMembers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('staff_members')
         .select('id, full_name, position')
         .eq('is_active', true)
@@ -102,7 +102,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
       }
 
       if (ticket?.id) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('helpdesk_tickets')
           .update(ticketData)
           .eq('id', ticket.id)
@@ -113,7 +113,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
           description: 'Ticket updated successfully',
         })
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('helpdesk_tickets')
           .insert([ticketData])
 
