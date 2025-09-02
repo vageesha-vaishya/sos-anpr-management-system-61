@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
 import { DataManagement } from "@/pages/DataManagement";
@@ -66,28 +67,45 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const DashboardRouter = () => {
   const { userProfile, loading, user } = useAuth();
   
+  console.log('DashboardRouter state:', { user: !!user, userProfile: !!userProfile, loading, role: userProfile?.role });
+  
   if (loading) {
+    console.log('DashboardRouter: Loading...');
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="text-center space-y-2">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
   
   if (!user) {
+    console.log('DashboardRouter: No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
   
   if (!userProfile) {
+    console.log('DashboardRouter: No user profile, loading...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-2">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-sm text-muted-foreground">Loading profile...</p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            className="mt-4"
+          >
+            Refresh Page
+          </Button>
         </div>
       </div>
     );
   }
+  
+  console.log('DashboardRouter: Rendering dashboard for role:', userProfile.role);
   
   switch (userProfile.role) {
     case 'platform_admin':
@@ -99,6 +117,7 @@ const DashboardRouter = () => {
     case 'resident':
       return <CustomerDashboard />;
     default:
+      console.error('DashboardRouter: Invalid role:', userProfile.role);
       return (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-2">
@@ -114,13 +133,19 @@ const DashboardRouter = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <AuthProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route 
@@ -365,11 +390,12 @@ const App = () => (
             />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
