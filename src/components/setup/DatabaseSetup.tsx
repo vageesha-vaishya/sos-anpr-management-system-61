@@ -74,9 +74,9 @@ export const DatabaseSetup = () => {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <div className="text-center">
         <Database className="w-16 h-16 mx-auto mb-4 text-primary" />
-        <h1 className="text-3xl font-bold">ANPR Database Setup</h1>
+        <h1 className="text-3xl font-bold">ADDA Database Setup</h1>
         <p className="text-muted-foreground mt-2">
-          Initialize your ANPR system database with demo data
+          Initialize your ADDA society management system with demo data
         </p>
       </div>
 
@@ -87,7 +87,7 @@ export const DatabaseSetup = () => {
             <span>Database Configuration</span>
           </CardTitle>
           <CardDescription>
-            Set up the complete ANPR database schema with demo data including organizations, locations, cameras, and sample detections.
+            Set up the complete ADDA database schema with demo data including organizations, societies, residents, and amenities.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -106,7 +106,7 @@ export const DatabaseSetup = () => {
               <div>
                 <h4 className="font-medium">Demo Data</h4>
                 <p className="text-sm text-muted-foreground">
-                  Sample organizations, locations, cameras, and vehicles
+                  Sample societies, residents, amenities, and maintenance data
                 </p>
               </div>
               <Badge variant="outline">Sample Data</Badge>
@@ -127,7 +127,7 @@ export const DatabaseSetup = () => {
             <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                Database setup completed successfully! You can now use all ANPR system features.
+                Database setup completed successfully! You can now use all ADDA society management features.
               </AlertDescription>
             </Alert>
           )}
@@ -184,11 +184,11 @@ export const DatabaseSetup = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm">
-            <p><strong>Location Hierarchy:</strong> Continents → Countries → States → Cities → Locations → Buildings → Gates → Cameras</p>
-            <p><strong>Organizations:</strong> Platform, Franchise, and Customer organizations with proper relationships</p>
-            <p><strong>ANPR System:</strong> Camera configurations, detection logs, vehicle whitelist/blacklist</p>
-            <p><strong>Security:</strong> Alerts system, user roles, and permissions</p>
-            <p><strong>Demo Data:</strong> Sample vehicles, detections, and alerts for testing</p>
+            <p><strong>Geography Hierarchy:</strong> Continents → Countries → States → Cities</p>
+            <p><strong>Organizations:</strong> Society management organizations with proper relationships</p>
+            <p><strong>Society Management:</strong> Buildings, units, residents, amenities, and billing</p>
+            <p><strong>Community Features:</strong> Forums, polls, alerts, and communication tools</p>
+            <p><strong>Demo Data:</strong> Sample societies, residents, amenities, and maintenance for testing</p>
           </div>
         </CardContent>
       </Card>
