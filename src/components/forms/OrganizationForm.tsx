@@ -15,9 +15,9 @@ import { Building2, CheckCircle } from 'lucide-react'
 
 const organizationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  type: z.enum(['platform', 'franchise', 'customer']),
+  organization_type: z.enum(['platform', 'franchise', 'customer']),
   subscription_plan: z.enum(['basic', 'premium', 'enterprise']),
-  status: z.enum(['active', 'inactive', 'suspended']),
+  is_active: z.boolean().default(true),
   parent_id: z.string().optional(),
 })
 
@@ -36,9 +36,9 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
     resolver: zodResolver(organizationSchema),
     defaultValues: {
       name: '',
-      type: 'customer',
+      organization_type: 'customer',
       subscription_plan: 'basic',
-      status: 'active',
+      is_active: true,
     },
   })
 
@@ -55,10 +55,10 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
       const { error } = await supabase
         .from('organizations')
         .insert({
-        name: data.name,
-        organization_type: data.type,
-        subscription_plan: data.subscription_plan,
-          status: data.status,
+          name: data.name,
+          organization_type: data.organization_type,
+          subscription_plan: data.subscription_plan,
+          is_active: data.is_active,
           parent_id: data.parent_id || null,
         })
 
@@ -123,7 +123,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
 
             <FormField
               control={form.control}
-              name="type"
+              name="organization_type"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
@@ -169,20 +169,19 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
 
             <FormField
               control={form.control}
-              name="status"
+              name="is_active"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormLabel>Active</FormLabel>
+                  <Select onValueChange={(value) => field.onChange(value === 'true')} defaultValue={field.value ? 'true' : 'false'}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
+                      <SelectItem value="true">Active</SelectItem>
+                      <SelectItem value="false">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

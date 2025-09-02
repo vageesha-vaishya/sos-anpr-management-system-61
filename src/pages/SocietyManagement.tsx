@@ -230,10 +230,16 @@ const SocietyManagement = () => {
                   </DialogTitle>
                 </DialogHeader>
                 <MaintenanceChargeForm
+                  charge={selectedCharge}
+                  units={units}
                   onSuccess={() => {
                     setShowChargeForm(false);
                     setSelectedCharge(null);
                     fetchData();
+                  }}
+                  onCancel={() => {
+                    setShowChargeForm(false);
+                    setSelectedCharge(null);
                   }}
                 />
               </DialogContent>
