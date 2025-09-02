@@ -87,10 +87,10 @@ const DashboardRouter = () => {
     case 'platform_admin':
       return <PlatformAdminDashboard />;
     case 'franchise_admin':
-    case 'franchise_user':
       return <FranchiseAdminDashboard />;
     case 'customer_admin':
-    case 'customer_user':
+    case 'operator':
+    case 'resident':
       return <CustomerDashboard />;
     default:
       return (

@@ -65,8 +65,8 @@ export default function Auth() {
   }
 
   const handleTestLogin = () => {
-    setEmail('admin@anpr.com')
-    setPassword('Admin@123')
+    setEmail('bahuguna.vimal@gmail.com')
+    setPassword('Vimal@1234')
     setIsLogin(true)
   }
 
@@ -168,13 +168,13 @@ export default function Auth() {
               )}
             </div>
 
-            {isLogin && (
-              <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                <strong>Demo Credentials:</strong><br />
-                Email: admin@anpr.com<br />
-                Password: Admin@123
-              </div>
-            )}
+              {isLogin && (
+                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
+                  <strong>Admin Credentials:</strong><br />
+                  Email: bahuguna.vimal@gmail.com<br />
+                  Password: Vimal@1234
+                </div>
+              )}
           </CardContent>
         </Card>
       </div>

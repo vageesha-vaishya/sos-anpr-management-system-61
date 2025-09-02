@@ -7,15 +7,15 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useEffect } from "react"
 
 export default function Index() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       navigate('/dashboard')
     }
-  }, [user, navigate])
+  }, [user, loading, navigate])
 
   const features = [
     {

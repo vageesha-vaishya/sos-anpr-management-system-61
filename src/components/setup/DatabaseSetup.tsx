@@ -99,7 +99,7 @@ export const DatabaseSetup = () => {
                   Create all required tables with proper relationships
                 </p>
               </div>
-              <Badge variant="outline">13 Tables</Badge>
+              <Badge variant="outline">15 Tables</Badge>
             </div>
             
             <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -116,7 +116,7 @@ export const DatabaseSetup = () => {
               <div>
                 <h4 className="font-medium">Admin User</h4>
                 <p className="text-sm text-muted-foreground">
-                  Platform admin profile for Bahuguna.vimal@gmail.com
+                  Platform admin profile for bahuguna.vimal@gmail.com
                 </p>
               </div>
               <Badge variant="outline">Admin Setup</Badge>
@@ -146,7 +146,7 @@ export const DatabaseSetup = () => {
               ) : (
                 <>
                   <Database className="w-4 h-4 mr-2" />
-                  Setup Database
+                  Check Database
                 </>
               )}
             </Button>
@@ -180,14 +180,14 @@ export const DatabaseSetup = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>What gets created?</CardTitle>
+          <CardTitle>What's included?</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm">
             <p><strong>Geography Hierarchy:</strong> Continents → Countries → States → Cities</p>
             <p><strong>Organizations:</strong> Society management organizations with proper relationships</p>
             <p><strong>Society Management:</strong> Buildings, units, residents, amenities, and billing</p>
-            <p><strong>Community Features:</strong> Forums, polls, alerts, and communication tools</p>
+            <p><strong>ANPR Features:</strong> Cameras, vehicle management, and security alerts</p>
             <p><strong>Demo Data:</strong> Sample societies, residents, amenities, and maintenance for testing</p>
           </div>
         </CardContent>
