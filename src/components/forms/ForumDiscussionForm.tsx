@@ -73,14 +73,13 @@ export const ForumDiscussionForm: React.FC<ForumDiscussionFormProps> = ({ onSucc
         toast({ title: 'Success', description: 'Discussion updated successfully' })
       } else {
         const { error } = await supabase
-          .from('alerts')
+          .from('forum_discussions')
           .insert({
             title: data.title,
-            message: data.content,
-            type: 'announcement',
-            severity: 'medium',
-            organization_id: userProfile.organization_id,
-            status: 'active'
+            content: data.content,
+            category: data.category_id,
+            author_id: userProfile.id,
+            organization_id: userProfile.organization_id
           })
         
         if (error) throw error

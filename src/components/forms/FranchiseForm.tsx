@@ -59,9 +59,9 @@ export const FranchiseForm: React.FC<FranchiseFormProps> = ({ onSuccess, editDat
       
       const organizationData = {
         name: data.name,
-        type: 'franchise',
+        organization_type: 'franchise' as any,
         subscription_plan: data.subscription_plan,
-        status: data.status,
+        is_active: data.status === 'active',
         parent_id: null, // Franchises are top-level organizations under platform
       }
 

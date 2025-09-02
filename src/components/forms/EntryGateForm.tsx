@@ -56,8 +56,8 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
         .insert({
           name: data.name,
           building_id: data.building_id,
-          type: data.type,
-          status: data.status,
+          gate_type: data.type as any,
+          is_active: data.status === 'active',
         })
 
       if (error) throw error

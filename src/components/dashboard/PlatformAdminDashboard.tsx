@@ -68,7 +68,7 @@ export const PlatformAdminDashboard = () => {
       const { count: alertCount } = await supabase
         .from('alerts')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'unread')
+        .eq('is_active', true)
 
       // Load today's detections count
       const today = new Date().toISOString().split('T')[0]

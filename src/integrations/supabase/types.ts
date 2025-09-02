@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      advertisement_campaigns: {
+        Row: {
+          advertiser_id: string | null
+          budget: number | null
+          campaign_name: string
+          campaign_type: string
+          created_at: string | null
+          description: string | null
+          end_date: string
+          id: string
+          organization_id: string | null
+          start_date: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          advertiser_id?: string | null
+          budget?: number | null
+          campaign_name: string
+          campaign_type: string
+          created_at?: string | null
+          description?: string | null
+          end_date: string
+          id?: string
+          organization_id?: string | null
+          start_date: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          advertiser_id?: string | null
+          budget?: number | null
+          campaign_name?: string
+          campaign_type?: string
+          created_at?: string | null
+          description?: string | null
+          end_date?: string
+          id?: string
+          organization_id?: string | null
+          start_date?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       alerts: {
         Row: {
           alert_type: Database["public"]["Enums"]["alert_type"]
@@ -64,6 +109,103 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      amenities: {
+        Row: {
+          amenity_type: string
+          booking_required: boolean | null
+          building_id: string | null
+          capacity: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          operating_hours: Json | null
+          pricing: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          amenity_type: string
+          booking_required?: boolean | null
+          building_id?: string | null
+          capacity?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          operating_hours?: Json | null
+          pricing?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          amenity_type?: string
+          booking_required?: boolean | null
+          building_id?: string | null
+          capacity?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          operating_hours?: Json | null
+          pricing?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amenities_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anpr_detections: {
+        Row: {
+          camera_id: string | null
+          confidence: number
+          created_at: string | null
+          detection_timestamp: string | null
+          id: string
+          image_url: string | null
+          license_plate: string
+          organization_id: string | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          camera_id?: string | null
+          confidence: number
+          created_at?: string | null
+          detection_timestamp?: string | null
+          id?: string
+          image_url?: string | null
+          license_plate: string
+          organization_id?: string | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          camera_id?: string | null
+          confidence?: number
+          created_at?: string | null
+          detection_timestamp?: string | null
+          id?: string
+          image_url?: string | null
+          license_plate?: string
+          organization_id?: string | null
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anpr_detections_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: false
+            referencedRelation: "cameras"
             referencedColumns: ["id"]
           },
         ]
@@ -122,6 +264,48 @@ export type Database = {
           },
         ]
       }
+      billing_customers: {
+        Row: {
+          address: string | null
+          billing_plan: string | null
+          created_at: string | null
+          customer_name: string
+          email: string
+          id: string
+          is_active: boolean | null
+          organization_id: string | null
+          payment_method: Json | null
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          billing_plan?: string | null
+          created_at?: string | null
+          customer_name: string
+          email: string
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string | null
+          payment_method?: Json | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          billing_plan?: string | null
+          created_at?: string | null
+          customer_name?: string
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string | null
+          payment_method?: Json | null
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       buildings: {
         Row: {
           building_type: Database["public"]["Enums"]["building_type"]
@@ -162,6 +346,56 @@ export type Database = {
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camera_subscriptions: {
+        Row: {
+          camera_id: string | null
+          created_at: string | null
+          end_date: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          monthly_cost: number | null
+          organization_id: string | null
+          start_date: string
+          subscription_plan: string
+          updated_at: string | null
+        }
+        Insert: {
+          camera_id?: string | null
+          created_at?: string | null
+          end_date?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          monthly_cost?: number | null
+          organization_id?: string | null
+          start_date: string
+          subscription_plan: string
+          updated_at?: string | null
+        }
+        Update: {
+          camera_id?: string | null
+          created_at?: string | null
+          end_date?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          monthly_cost?: number | null
+          organization_id?: string | null
+          start_date?: string
+          subscription_plan?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "camera_subscriptions_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: false
+            referencedRelation: "cameras"
             referencedColumns: ["id"]
           },
         ]
@@ -212,6 +446,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      charge_categories: {
+        Row: {
+          base_amount: number | null
+          billing_cycle: string | null
+          charge_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          organization_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          base_amount?: number | null
+          billing_cycle?: string | null
+          charge_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          base_amount?: number | null
+          billing_cycle?: string | null
+          charge_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       cities: {
         Row: {
@@ -351,6 +624,42 @@ export type Database = {
           },
         ]
       }
+      forum_discussions: {
+        Row: {
+          author_id: string | null
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          category: string
+          content: string
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           address: string
@@ -470,6 +779,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      premise_types: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

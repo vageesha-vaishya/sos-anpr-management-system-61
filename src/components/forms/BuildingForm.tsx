@@ -56,7 +56,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
         .insert({
           name: data.name,
           location_id: data.location_id,
-          type: data.type,
+          building_type: data.type as any,
           floors: data.floors,
         })
 
