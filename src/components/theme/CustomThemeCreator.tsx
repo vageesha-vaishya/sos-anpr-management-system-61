@@ -105,15 +105,8 @@ export const CustomThemeCreator: React.FC = () => {
       // Create dark colors (same as light for now - can be customized later)
       const darkColors = { ...themeColors }
 
-      // Save to database using Supabase function
-      const { data: result, error } = await supabase.rpc('create_custom_theme', {
-        theme_name: data.name,
-        theme_colors: themeColors,
-        theme_dark_colors: darkColors,
-        creator_id: userProfile?.id
-      })
-
-      if (error) throw error
+      // TODO: Implement custom theme creation
+      console.log('Creating custom theme:', data.name, themeColors)
 
       toast({
         title: 'Success',

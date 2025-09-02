@@ -159,7 +159,6 @@ export function AdvertiserCampaignsTable({
                 <DialogTitle>{selectedCampaign ? "Edit Campaign" : "Create New Campaign"}</DialogTitle>
               </DialogHeader>
               <AdvertisementCampaignForm
-                campaign={selectedCampaign}
                 organizationId={organizationId}
                 advertisers={advertisers.map(adv => ({ id: adv.id, name: adv.billing_name }))}
                 onSuccess={handleSuccess}

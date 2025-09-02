@@ -56,7 +56,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
         .from('organizations')
         .insert({
           name: data.name,
-          type: data.type,
+          organization_type: data.type,
           subscription_plan: data.subscription_plan,
           status: data.status,
           parent_id: data.parent_id || null,

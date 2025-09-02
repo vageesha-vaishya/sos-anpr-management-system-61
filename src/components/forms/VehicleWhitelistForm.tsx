@@ -74,7 +74,7 @@ export const VehicleWhitelistForm: React.FC<VehicleWhitelistFormProps> = ({ onSu
             license_plate: data.license_plate.toUpperCase(),
             owner_name: data.owner_name,
             owner_contact: data.owner_contact || null,
-        vehicle_type: data.vehicle_type as any,
+        vehicle_type: data.vehicle_type as 'car' | 'motorcycle' | 'truck' | 'van' | 'bus',
             status: data.status,
             expires_at: data.expires_at ? new Date(data.expires_at).toISOString() : null,
             notes: data.notes || null,
@@ -95,7 +95,7 @@ export const VehicleWhitelistForm: React.FC<VehicleWhitelistFormProps> = ({ onSu
             license_plate: data.license_plate.toUpperCase(),
             owner_name: data.owner_name,
             owner_contact: data.owner_contact || null,
-            vehicle_type: data.vehicle_type,
+            vehicle_type: data.vehicle_type as 'car' | 'motorcycle' | 'truck' | 'van' | 'bus',
             status: data.status,
             expires_at: data.expires_at ? new Date(data.expires_at).toISOString() : null,
             notes: data.notes || null,
@@ -163,7 +163,7 @@ export const VehicleWhitelistForm: React.FC<VehicleWhitelistFormProps> = ({ onSu
                         <SelectItem value="motorcycle">Motorcycle</SelectItem>
                         <SelectItem value="van">Van</SelectItem>
                         <SelectItem value="bus">Bus</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        
                       </SelectContent>
                     </Select>
                     <FormMessage />
