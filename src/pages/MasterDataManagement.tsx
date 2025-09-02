@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,13 +17,15 @@ import { Plus, Settings, Trash2, Edit, Database, Globe } from "lucide-react"
 
 interface ChargeCategory {
   id: string
-  category_name: string
-  category_type: string
+  name: string
+  charge_type: string
   description: string
-  default_amount: number
-  billing_frequency: string
-  is_mandatory: boolean
+  base_amount: number
+  billing_cycle: string
   is_active: boolean
+  organization_id: string
+  created_at: string
+  updated_at: string
 }
 
 interface ServiceType {
@@ -34,18 +37,24 @@ interface ServiceType {
   default_rate: number
   billing_model: string
   is_active: boolean
+  organization_id: string
+  created_at: string
+  updated_at: string
 }
 
 interface Amenity {
   id: string
-  amenity_name: string
+  name: string
   amenity_type: string
   description: string
   capacity: number
-  hourly_rate: number
-  advance_booking_days: number
-  max_booking_hours: number
+  booking_required: boolean
+  operating_hours: any
+  pricing: any
   is_active: boolean
+  building_id: string
+  created_at: string
+  updated_at: string
 }
 
 export default function MasterDataManagement() {
@@ -82,7 +91,7 @@ export default function MasterDataManagement() {
       const { data: categoriesData, error: categoriesError } = await supabase
         .from("charge_categories")
         .select("*")
-        .order("category_name")
+        .order("name")
 
       if (categoriesError) throw categoriesError
 
@@ -98,7 +107,7 @@ export default function MasterDataManagement() {
       const { data: amenitiesData, error: amenitiesError } = await supabase
         .from("amenities")
         .select("*")
-        .order("amenity_name")
+        .order("name")
 
       if (amenitiesError) throw amenitiesError
 
@@ -162,7 +171,7 @@ export default function MasterDataManagement() {
     if (!confirm("Are you sure you want to delete this service type?")) return
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("service_types")
         .delete()
         .eq("id", id)
@@ -248,7 +257,7 @@ export default function MasterDataManagement() {
                   </DialogTitle>
                 </DialogHeader>
                 <ChargeCategoryForm
-                  category={selectedChargeCategory}
+                  editData={selectedChargeCategory}
                   organizationId={user?.user_metadata?.organization_id || ""}
                   onSuccess={handleChargeCategorySuccess}
                   onCancel={() => {
@@ -267,8 +276,8 @@ export default function MasterDataManagement() {
                   <TableRow>
                     <TableHead>Category Name</TableHead>
                     <TableHead>Type</TableHead>
-                    <TableHead>Default Amount</TableHead>
-                    <TableHead>Frequency</TableHead>
+                    <TableHead>Base Amount</TableHead>
+                    <TableHead>Billing Cycle</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -276,19 +285,14 @@ export default function MasterDataManagement() {
                 <TableBody>
                   {chargeCategories.map((category) => (
                     <TableRow key={category.id}>
-                      <TableCell className="font-medium">{category.category_name}</TableCell>
-                      <TableCell className="capitalize">{category.category_type}</TableCell>
-                      <TableCell>${category.default_amount}</TableCell>
-                      <TableCell className="capitalize">{category.billing_frequency.replace('_', ' ')}</TableCell>
+                      <TableCell className="font-medium">{category.name}</TableCell>
+                      <TableCell className="capitalize">{category.charge_type}</TableCell>
+                      <TableCell>${category.base_amount}</TableCell>
+                      <TableCell className="capitalize">{category.billing_cycle?.replace('_', ' ')}</TableCell>
                       <TableCell>
-                        <div className="flex gap-1">
-                          <Badge variant={category.is_active ? "default" : "secondary"}>
-                            {category.is_active ? "Active" : "Inactive"}
-                          </Badge>
-                          {category.is_mandatory && (
-                            <Badge variant="outline">Mandatory</Badge>
-                          )}
-                        </div>
+                        <Badge variant={category.is_active ? "default" : "secondary"}>
+                          {category.is_active ? "Active" : "Inactive"}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -336,7 +340,7 @@ export default function MasterDataManagement() {
                   </DialogTitle>
                 </DialogHeader>
                 <ServiceTypeForm
-                  serviceType={selectedServiceType}
+                  editData={selectedServiceType}
                   organizationId={user?.user_metadata?.organization_id || ""}
                   onSuccess={handleServiceTypeSuccess}
                   onCancel={() => {
@@ -421,7 +425,7 @@ export default function MasterDataManagement() {
                   </DialogTitle>
                 </DialogHeader>
                 <AmenityForm
-                  amenity={selectedAmenity}
+                  editData={selectedAmenity}
                   organizationId={user?.user_metadata?.organization_id || ""}
                   onSuccess={handleAmenitySuccess}
                   onCancel={() => {
@@ -441,8 +445,7 @@ export default function MasterDataManagement() {
                     <TableHead>Amenity Name</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead>Capacity</TableHead>
-                    <TableHead>Hourly Rate</TableHead>
-                    <TableHead>Booking Rules</TableHead>
+                    <TableHead>Booking Required</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -450,15 +453,13 @@ export default function MasterDataManagement() {
                 <TableBody>
                   {amenities.map((amenity) => (
                     <TableRow key={amenity.id}>
-                      <TableCell className="font-medium">{amenity.amenity_name}</TableCell>
+                      <TableCell className="font-medium">{amenity.name}</TableCell>
                       <TableCell className="capitalize">{amenity.amenity_type.replace('_', ' ')}</TableCell>
                       <TableCell>{amenity.capacity} persons</TableCell>
-                      <TableCell>${amenity.hourly_rate}/hour</TableCell>
                       <TableCell>
-                        <div className="text-sm">
-                          <div>{amenity.advance_booking_days} days advance</div>
-                          <div>{amenity.max_booking_hours} hours max</div>
-                        </div>
+                        <Badge variant={amenity.booking_required ? "default" : "outline"}>
+                          {amenity.booking_required ? "Required" : "Not Required"}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant={amenity.is_active ? "default" : "secondary"}>

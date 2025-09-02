@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,8 +15,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 interface Franchise {
   id: string
   name: string
-  type: string
-  status: string
+  organization_type: string
+  is_active: boolean
   subscription_plan: string
   created_at: string
   updated_at: string
@@ -41,7 +42,7 @@ export default function Franchises() {
           customer_organizations:organizations!parent_id(count),
           locations(count)
         `)
-        .eq('type', 'franchise')
+        .eq('organization_type', 'franchise')
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -52,7 +53,7 @@ export default function Franchises() {
         location_count: franchise.locations?.[0]?.count || 0
       })) || []
 
-      setFranchises(franchisesWithCounts as any)
+      setFranchises(franchisesWithCounts as Franchise[])
     } catch (error: any) {
       console.error('Error fetching franchises:', error)
       toast({
@@ -108,13 +109,8 @@ export default function Franchises() {
     }
   }
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'active': return 'default'
-      case 'inactive': return 'secondary'
-      case 'suspended': return 'destructive'
-      default: return 'outline'
-    }
+  const getStatusBadgeVariant = (isActive: boolean) => {
+    return isActive ? 'default' : 'secondary'
   }
 
   const getPlanBadgeVariant = (plan: string) => {
@@ -228,8 +224,8 @@ export default function Franchises() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Status</span>
-                  <Badge variant={getStatusBadgeVariant(franchise.status)}>
-                    {formatRoleName(franchise.status)}
+                  <Badge variant={getStatusBadgeVariant(franchise.is_active)}>
+                    {franchise.is_active ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
                 
