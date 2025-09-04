@@ -166,6 +166,51 @@ export type Database = {
           },
         ]
       }
+      announcements: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          created_by: string | null
+          expiry_date: string | null
+          id: string
+          is_active: boolean | null
+          organization_id: string
+          priority: string | null
+          target_audience: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          organization_id: string
+          priority?: string | null
+          target_audience?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string
+          priority?: string | null
+          target_audience?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       anpr_detections: {
         Row: {
           camera_id: string | null
@@ -893,6 +938,51 @@ export type Database = {
           },
         ]
       }
+      digital_id_cards: {
+        Row: {
+          access_permissions: Json | null
+          card_number: string
+          card_type: string | null
+          created_at: string
+          expiry_date: string | null
+          id: string
+          is_active: boolean | null
+          issue_date: string | null
+          organization_id: string
+          qr_code_data: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_permissions?: Json | null
+          card_number: string
+          card_type?: string | null
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          issue_date?: string | null
+          organization_id: string
+          qr_code_data: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_permissions?: Json | null
+          card_number?: string
+          card_type?: string | null
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          issue_date?: string | null
+          organization_id?: string
+          qr_code_data?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       entry_gates: {
         Row: {
           building_id: string | null
@@ -1318,6 +1408,72 @@ export type Database = {
           },
         ]
       }
+      move_records: {
+        Row: {
+          checklist_completed: boolean | null
+          checklist_items: Json | null
+          created_at: string
+          created_by: string | null
+          deposit_status: string | null
+          documentation: Json | null
+          id: string
+          key_handover: boolean | null
+          move_date: string
+          move_type: string
+          notes: string | null
+          organization_id: string
+          resident_email: string | null
+          resident_name: string
+          resident_phone: string | null
+          security_deposit: number | null
+          status: string | null
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          checklist_completed?: boolean | null
+          checklist_items?: Json | null
+          created_at?: string
+          created_by?: string | null
+          deposit_status?: string | null
+          documentation?: Json | null
+          id?: string
+          key_handover?: boolean | null
+          move_date: string
+          move_type: string
+          notes?: string | null
+          organization_id: string
+          resident_email?: string | null
+          resident_name: string
+          resident_phone?: string | null
+          security_deposit?: number | null
+          status?: string | null
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          checklist_completed?: boolean | null
+          checklist_items?: Json | null
+          created_at?: string
+          created_by?: string | null
+          deposit_status?: string | null
+          documentation?: Json | null
+          id?: string
+          key_handover?: boolean | null
+          move_date?: string
+          move_type?: string
+          notes?: string | null
+          organization_id?: string
+          resident_email?: string | null
+          resident_name?: string
+          resident_phone?: string | null
+          security_deposit?: number | null
+          status?: string | null
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
           address: string | null
@@ -1456,6 +1612,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      photo_albums: {
+        Row: {
+          album_name: string
+          cover_photo_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_id: string | null
+          id: string
+          is_public: boolean | null
+          organization_id: string
+          photos: Json | null
+          updated_at: string
+        }
+        Insert: {
+          album_name: string
+          cover_photo_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          is_public?: boolean | null
+          organization_id: string
+          photos?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          album_name?: string
+          cover_photo_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string | null
+          id?: string
+          is_public?: boolean | null
+          organization_id?: string
+          photos?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       poll_options: {
         Row: {
@@ -1702,6 +1900,60 @@ export type Database = {
           },
         ]
       }
+      service_bookings: {
+        Row: {
+          amount: number | null
+          booking_date: string
+          created_at: string
+          customer_id: string | null
+          id: string
+          organization_id: string
+          payment_status: string | null
+          service_description: string | null
+          service_provider_id: string | null
+          service_type: string
+          special_instructions: string | null
+          status: string | null
+          time_slot: string | null
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          booking_date: string
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          organization_id: string
+          payment_status?: string | null
+          service_description?: string | null
+          service_provider_id?: string | null
+          service_type: string
+          special_instructions?: string | null
+          status?: string | null
+          time_slot?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          booking_date?: string
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          organization_id?: string
+          payment_status?: string | null
+          service_description?: string | null
+          service_provider_id?: string | null
+          service_type?: string
+          special_instructions?: string | null
+          status?: string | null
+          time_slot?: string | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_types: {
         Row: {
           billing_model: string
@@ -1751,6 +2003,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      social_network_posts: {
+        Row: {
+          attachments: Json | null
+          author_id: string
+          comments_count: number | null
+          content: string
+          created_at: string
+          id: string
+          is_pinned: boolean | null
+          likes_count: number | null
+          organization_id: string
+          post_type: string | null
+          status: string | null
+          title: string | null
+          updated_at: string
+          visibility: string | null
+        }
+        Insert: {
+          attachments?: Json | null
+          author_id: string
+          comments_count?: number | null
+          content: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean | null
+          likes_count?: number | null
+          organization_id: string
+          post_type?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string
+          visibility?: string | null
+        }
+        Update: {
+          attachments?: Json | null
+          author_id?: string
+          comments_count?: number | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_pinned?: boolean | null
+          likes_count?: number | null
+          organization_id?: string
+          post_type?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string
+          visibility?: string | null
+        }
+        Relationships: []
       }
       society_units: {
         Row: {
@@ -2032,6 +2335,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      visitor_invitations: {
+        Row: {
+          created_at: string
+          current_uses: number | null
+          guest_code: string
+          host_id: string
+          id: string
+          is_recurring: boolean | null
+          max_uses: number | null
+          organization_id: string
+          purpose: string | null
+          qr_code_data: string | null
+          status: string | null
+          updated_at: string
+          vehicle_number: string | null
+          visit_date: string
+          visit_time_from: string | null
+          visit_time_to: string | null
+          visitor_email: string | null
+          visitor_name: string
+          visitor_phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_uses?: number | null
+          guest_code: string
+          host_id: string
+          id?: string
+          is_recurring?: boolean | null
+          max_uses?: number | null
+          organization_id: string
+          purpose?: string | null
+          qr_code_data?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_number?: string | null
+          visit_date: string
+          visit_time_from?: string | null
+          visit_time_to?: string | null
+          visitor_email?: string | null
+          visitor_name: string
+          visitor_phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_uses?: number | null
+          guest_code?: string
+          host_id?: string
+          id?: string
+          is_recurring?: boolean | null
+          max_uses?: number | null
+          organization_id?: string
+          purpose?: string | null
+          qr_code_data?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_number?: string | null
+          visit_date?: string
+          visit_time_from?: string | null
+          visit_time_to?: string | null
+          visitor_email?: string | null
+          visitor_name?: string
+          visitor_phone?: string | null
+        }
+        Relationships: []
       }
       visitors: {
         Row: {
