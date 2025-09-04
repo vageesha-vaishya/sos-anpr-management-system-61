@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_cards: {
+        Row: {
+          access_levels: Json | null
+          card_number: string
+          card_type: string | null
+          created_at: string
+          created_by: string | null
+          expiry_date: string | null
+          holder_id: string | null
+          holder_name: string
+          id: string
+          is_active: boolean | null
+          issue_date: string | null
+          last_used_at: string | null
+          organization_id: string
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          access_levels?: Json | null
+          card_number: string
+          card_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          holder_id?: string | null
+          holder_name: string
+          id?: string
+          is_active?: boolean | null
+          issue_date?: string | null
+          last_used_at?: string | null
+          organization_id: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          access_levels?: Json | null
+          card_number?: string
+          card_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string | null
+          holder_id?: string | null
+          holder_name?: string
+          id?: string
+          is_active?: boolean | null
+          issue_date?: string | null
+          last_used_at?: string | null
+          organization_id?: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       advertisement_campaigns: {
         Row: {
           advertiser_id: string | null
@@ -112,6 +166,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      amc_contracts: {
+        Row: {
+          contract_end_date: string
+          contract_number: string
+          contract_start_date: string
+          contract_value: number
+          created_at: string
+          created_by: string | null
+          equipment_details: string | null
+          equipment_type: string
+          id: string
+          last_service_date: string | null
+          next_service_date: string | null
+          organization_id: string
+          renewal_alert_days: number | null
+          service_frequency: string | null
+          service_history: Json | null
+          status: string | null
+          terms_conditions: string | null
+          updated_at: string
+          vendor_id: string | null
+          warranty_period: number | null
+        }
+        Insert: {
+          contract_end_date: string
+          contract_number: string
+          contract_start_date: string
+          contract_value: number
+          created_at?: string
+          created_by?: string | null
+          equipment_details?: string | null
+          equipment_type: string
+          id?: string
+          last_service_date?: string | null
+          next_service_date?: string | null
+          organization_id: string
+          renewal_alert_days?: number | null
+          service_frequency?: string | null
+          service_history?: Json | null
+          status?: string | null
+          terms_conditions?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+          warranty_period?: number | null
+        }
+        Update: {
+          contract_end_date?: string
+          contract_number?: string
+          contract_start_date?: string
+          contract_value?: number
+          created_at?: string
+          created_by?: string | null
+          equipment_details?: string | null
+          equipment_type?: string
+          id?: string
+          last_service_date?: string | null
+          next_service_date?: string | null
+          organization_id?: string
+          renewal_alert_days?: number | null
+          service_frequency?: string | null
+          service_history?: Json | null
+          status?: string | null
+          terms_conditions?: string | null
+          updated_at?: string
+          vendor_id?: string | null
+          warranty_period?: number | null
+        }
+        Relationships: []
       }
       amenities: {
         Row: {
@@ -308,6 +431,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      bank_accounts: {
+        Row: {
+          account_name: string
+          account_number: string
+          account_type: string | null
+          bank_name: string
+          branch_name: string | null
+          created_at: string
+          current_balance: number | null
+          id: string
+          ifsc_code: string | null
+          is_active: boolean | null
+          opening_balance: number | null
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          account_type?: string | null
+          bank_name: string
+          branch_name?: string | null
+          created_at?: string
+          current_balance?: number | null
+          id?: string
+          ifsc_code?: string | null
+          is_active?: boolean | null
+          opening_balance?: number | null
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          account_type?: string | null
+          bank_name?: string
+          branch_name?: string | null
+          created_at?: string
+          current_balance?: number | null
+          id?: string
+          ifsc_code?: string | null
+          is_active?: boolean | null
+          opening_balance?: number | null
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       billing_customers: {
         Row: {
@@ -530,6 +701,56 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      chart_of_accounts: {
+        Row: {
+          account_category: string | null
+          account_code: string
+          account_name: string
+          account_type: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          organization_id: string
+          parent_account_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_category?: string | null
+          account_code: string
+          account_name: string
+          account_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          organization_id: string
+          parent_account_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_category?: string | null
+          account_code?: string
+          account_name?: string
+          account_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string
+          parent_account_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chart_of_accounts_parent_account_id_fkey"
+            columns: ["parent_account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cities: {
         Row: {
@@ -983,6 +1204,57 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_contacts: {
+        Row: {
+          address: string | null
+          availability: string | null
+          contact_name: string
+          contact_type: string
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean | null
+          is_primary: boolean | null
+          notes: string | null
+          organization_id: string
+          phone_primary: string
+          phone_secondary: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          availability?: string | null
+          contact_name: string
+          contact_type: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          notes?: string | null
+          organization_id: string
+          phone_primary: string
+          phone_secondary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          availability?: string | null
+          contact_name?: string
+          contact_type?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          notes?: string | null
+          organization_id?: string
+          phone_primary?: string
+          phone_secondary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       entry_gates: {
         Row: {
           building_id: string | null
@@ -1289,6 +1561,99 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_entries: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          entry_date: string
+          entry_number: string
+          id: string
+          organization_id: string
+          reference_number: string | null
+          status: string | null
+          total_credit_amount: number
+          total_debit_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          entry_date: string
+          entry_number: string
+          id?: string
+          organization_id: string
+          reference_number?: string | null
+          status?: string | null
+          total_credit_amount?: number
+          total_debit_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          entry_date?: string
+          entry_number?: string
+          id?: string
+          organization_id?: string
+          reference_number?: string | null
+          status?: string | null
+          total_credit_amount?: number
+          total_debit_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      journal_entry_lines: {
+        Row: {
+          account_id: string
+          created_at: string
+          credit_amount: number | null
+          debit_amount: number | null
+          description: string | null
+          id: string
+          journal_entry_id: string
+          line_number: number | null
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          credit_amount?: number | null
+          debit_amount?: number | null
+          description?: string | null
+          id?: string
+          journal_entry_id: string
+          line_number?: number | null
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          credit_amount?: number | null
+          debit_amount?: number | null
+          description?: string | null
+          id?: string
+          journal_entry_id?: string
+          line_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_entry_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "chart_of_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
             referencedColumns: ["id"]
           },
         ]
@@ -1900,6 +2265,132 @@ export type Database = {
           },
         ]
       }
+      project_meetings: {
+        Row: {
+          action_items: Json | null
+          agenda: string | null
+          created_at: string
+          created_by: string | null
+          decisions: Json | null
+          description: string | null
+          id: string
+          location: string | null
+          meeting_date: string | null
+          meeting_time: string | null
+          meeting_type: string | null
+          minutes: string | null
+          organization_id: string
+          participants: Json | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_items?: Json | null
+          agenda?: string | null
+          created_at?: string
+          created_by?: string | null
+          decisions?: Json | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          meeting_date?: string | null
+          meeting_time?: string | null
+          meeting_type?: string | null
+          minutes?: string | null
+          organization_id: string
+          participants?: Json | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_items?: Json | null
+          agenda?: string | null
+          created_at?: string
+          created_by?: string | null
+          decisions?: Json | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          meeting_date?: string | null
+          meeting_time?: string | null
+          meeting_type?: string | null
+          minutes?: string | null
+          organization_id?: string
+          participants?: Json | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      security_incidents: {
+        Row: {
+          actions_taken: string | null
+          assigned_to: string | null
+          created_at: string
+          description: string
+          evidence: Json | null
+          id: string
+          incident_date: string
+          incident_number: string
+          incident_type: string
+          location: string | null
+          organization_id: string
+          reported_by: string | null
+          resolution: string | null
+          resolved_at: string | null
+          severity: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          witnesses: Json | null
+        }
+        Insert: {
+          actions_taken?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          description: string
+          evidence?: Json | null
+          id?: string
+          incident_date: string
+          incident_number: string
+          incident_type: string
+          location?: string | null
+          organization_id: string
+          reported_by?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          witnesses?: Json | null
+        }
+        Update: {
+          actions_taken?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          description?: string
+          evidence?: Json | null
+          id?: string
+          incident_date?: string
+          incident_number?: string
+          incident_type?: string
+          location?: string | null
+          organization_id?: string
+          reported_by?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          witnesses?: Json | null
+        }
+        Relationships: []
+      }
       service_bookings: {
         Row: {
           amount: number | null
@@ -2239,6 +2730,69 @@ export type Database = {
           },
         ]
       }
+      utility_readings: {
+        Row: {
+          bill_number: string | null
+          building_id: string | null
+          consumption: number | null
+          created_at: string
+          created_by: string | null
+          current_reading: number
+          due_date: string | null
+          id: string
+          meter_number: string | null
+          organization_id: string
+          payment_status: string | null
+          previous_reading: number | null
+          rate_per_unit: number | null
+          reading_date: string
+          total_amount: number | null
+          unit_id: string | null
+          updated_at: string
+          utility_type: string
+        }
+        Insert: {
+          bill_number?: string | null
+          building_id?: string | null
+          consumption?: number | null
+          created_at?: string
+          created_by?: string | null
+          current_reading: number
+          due_date?: string | null
+          id?: string
+          meter_number?: string | null
+          organization_id: string
+          payment_status?: string | null
+          previous_reading?: number | null
+          rate_per_unit?: number | null
+          reading_date: string
+          total_amount?: number | null
+          unit_id?: string | null
+          updated_at?: string
+          utility_type: string
+        }
+        Update: {
+          bill_number?: string | null
+          building_id?: string | null
+          consumption?: number | null
+          created_at?: string
+          created_by?: string | null
+          current_reading?: number
+          due_date?: string | null
+          id?: string
+          meter_number?: string | null
+          organization_id?: string
+          payment_status?: string | null
+          previous_reading?: number | null
+          rate_per_unit?: number | null
+          reading_date?: string
+          total_amount?: number | null
+          unit_id?: string | null
+          updated_at?: string
+          utility_type?: string
+        }
+        Relationships: []
+      }
       vehicle_blacklist: {
         Row: {
           created_at: string | null
@@ -2335,6 +2889,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vendor_contracts: {
+        Row: {
+          contract_end_date: string | null
+          contract_start_date: string
+          contract_type: string
+          contract_value: number | null
+          created_at: string
+          created_by: string | null
+          documents: Json | null
+          id: string
+          organization_id: string
+          payment_terms: string | null
+          performance_rating: number | null
+          renewal_notice_period: number | null
+          service_description: string | null
+          status: string | null
+          updated_at: string
+          vendor_contact_person: string | null
+          vendor_email: string | null
+          vendor_name: string
+          vendor_phone: string | null
+        }
+        Insert: {
+          contract_end_date?: string | null
+          contract_start_date: string
+          contract_type: string
+          contract_value?: number | null
+          created_at?: string
+          created_by?: string | null
+          documents?: Json | null
+          id?: string
+          organization_id: string
+          payment_terms?: string | null
+          performance_rating?: number | null
+          renewal_notice_period?: number | null
+          service_description?: string | null
+          status?: string | null
+          updated_at?: string
+          vendor_contact_person?: string | null
+          vendor_email?: string | null
+          vendor_name: string
+          vendor_phone?: string | null
+        }
+        Update: {
+          contract_end_date?: string | null
+          contract_start_date?: string
+          contract_type?: string
+          contract_value?: number | null
+          created_at?: string
+          created_by?: string | null
+          documents?: Json | null
+          id?: string
+          organization_id?: string
+          payment_terms?: string | null
+          performance_rating?: number | null
+          renewal_notice_period?: number | null
+          service_description?: string | null
+          status?: string | null
+          updated_at?: string
+          vendor_contact_person?: string | null
+          vendor_email?: string | null
+          vendor_name?: string
+          vendor_phone?: string | null
+        }
+        Relationships: []
       }
       visitor_invitations: {
         Row: {

@@ -83,23 +83,31 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-    // ADDA Core Features
+    
+    // 🚀 Core Society Management Modules (NEW)
+    { name: '🏠 Routine Management', href: '/routine-management', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: '🏢 Society Management', href: '/society-management-new', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: '💰 Society Books', href: '/society-books', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: '🛡️ Gatekeeper Module', href: '/gatekeeper', icon: Shield, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    
+    // Individual Module Access (Existing Features)
     { name: 'Resident Portal', href: '/resident-portal', icon: User, roles: ['customer_admin', 'customer_user'] },
     { name: 'Community Forum', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'customer_user'] },
     { name: 'Amenity Management', href: '/amenity-management', icon: CalendarDays, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-    { name: 'Maintenance Billing', href: '/maintenance-billing', icon: CreditCard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-    { name: 'Staff Management', href: '/staff-management', icon: UserCog, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Help Desk', href: '/helpdesk', icon: Headphones, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'operator', 'resident'] },
     { name: 'Events', href: '/events', icon: Calendar, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Assets', href: '/assets', icon: Package, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Parking', href: '/parking', icon: Car, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Documents', href: '/documents', icon: FileText, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Staff Management', href: '/staff-management', icon: UserCog, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    
     // System Management
     { name: 'Data Management', href: '/data-management', icon: Database, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Master Data Management', href: '/master-data-management', icon: Globe, roles: ['platform_admin', 'franchise_admin'] },
+    { name: 'Maintenance Billing', href: '/maintenance-billing', icon: CreditCard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Financial Management', href: '/billing', icon: DollarSign, roles: ['platform_admin', 'franchise_admin'] },
     { name: 'ANPR Service Billing', href: '/anpr-service-billing', icon: Camera, roles: ['platform_admin', 'franchise_admin'] },
-    { name: 'Society Management', href: '/society-management', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Legacy Society Mgmt', href: '/society-management', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Advertiser Management', href: '/advertiser-management', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin'] },
     { name: 'Franchises', href: '/franchises', icon: Building2, roles: ['platform_admin'] },
     { name: 'Locations', href: '/locations', icon: MapPin, roles: ['platform_admin', 'franchise_admin'] },
@@ -107,6 +115,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { name: 'Vehicles', href: '/vehicles', icon: Shield, roles: ['franchise_admin', 'customer_admin'] },
     { name: 'Users', href: '/users', icon: Users, roles: ['platform_admin', 'franchise_admin'] },
     { name: 'Alerts', href: '/alerts', icon: Bell, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    
     // VMS Navigation Items
     { name: 'Visitor Dashboard', href: '/visitor-dashboard', icon: Monitor, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Visitors', href: '/visitors', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },

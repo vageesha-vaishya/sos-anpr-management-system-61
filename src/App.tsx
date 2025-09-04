@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
@@ -37,6 +38,10 @@ import EventManagement from "@/pages/EventManagement";
 import AssetManagement from "@/pages/AssetManagement";
 import ParkingManagement from "@/pages/ParkingManagement";
 import DocumentManagement from "@/pages/DocumentManagement";
+import RoutineManagement from "@/pages/RoutineManagement";
+import SocietyManagementNew from "@/pages/SocietyManagementNew";
+import SocietyBooksManagement from "@/pages/SocietyBooksManagement";
+import GatekeeperModule from "@/pages/GatekeeperModule";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PlatformAdminDashboard } from "@/components/dashboard/PlatformAdminDashboard";
 import { FranchiseAdminDashboard } from "@/components/dashboard/FranchiseAdminDashboard";
@@ -66,16 +71,30 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const DashboardRouter = () => {
   const { userProfile, loading, user } = useAuth();
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   
   console.log('DashboardRouter state:', { user: !!user, userProfile: !!userProfile, loading, role: userProfile?.role });
   
-  if (loading) {
+  // Set timeout for loading state
+  useEffect(() => {
+    if (loading) {
+      const timer = setTimeout(() => {
+        console.warn('Dashboard loading timeout - forcing refresh option');
+        setLoadingTimeout(true);
+      }, 8000); // 8 second timeout
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  if (loading && !loadingTimeout) {
     console.log('DashboardRouter: Loading...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-2">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+          <p className="text-xs text-muted-foreground">This may take a few moments...</p>
         </div>
       </div>
     );
@@ -86,20 +105,32 @@ const DashboardRouter = () => {
     return <Navigate to="/auth" replace />;
   }
   
-  if (!userProfile) {
-    console.log('DashboardRouter: No user profile, loading...');
+  if (!userProfile || loadingTimeout) {
+    console.log('DashboardRouter: No user profile or timeout, showing refresh option');
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-sm text-muted-foreground">Loading profile...</p>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.reload()}
-            className="mt-4"
-          >
-            Refresh Page
-          </Button>
+        <div className="text-center space-y-4">
+          <div className="text-center">
+            <h2 className="text-lg font-semibold mb-2">Dashboard Loading Issue</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              {loadingTimeout ? 'Loading timed out. Please try refreshing.' : 'Unable to load user profile.'}
+            </p>
+          </div>
+          <div className="flex gap-2 justify-center">
+            <Button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2"
+            >
+              Refresh Page
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => window.location.href = '/auth'}
+              className="px-4 py-2"
+            >
+              Back to Login
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -385,6 +416,38 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <DocumentManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/routine-management" 
+              element={
+                <ProtectedRoute>
+                  <RoutineManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/society-management-new" 
+              element={
+                <ProtectedRoute>
+                  <SocietyManagementNew />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/society-books" 
+              element={
+                <ProtectedRoute>
+                  <SocietyBooksManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/gatekeeper" 
+              element={
+                <ProtectedRoute>
+                  <GatekeeperModule />
                 </ProtectedRoute>
               } 
             />
