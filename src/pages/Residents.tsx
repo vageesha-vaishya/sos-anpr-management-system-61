@@ -40,10 +40,7 @@ export default function Residents() {
       setLoading(true)
       const { data, error } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          society_units(unit_number, buildings(name))
-        `)
+        .select('*')
         .eq('role', 'resident')
         .order('created_at', { ascending: false })
 
@@ -53,13 +50,13 @@ export default function Residents() {
         id: resident.id,
         full_name: resident.full_name,
         email: resident.email,
-        phone: resident.phone,
-        unit_number: resident.society_units?.[0]?.unit_number || null,
-        building_name: resident.society_units?.[0]?.buildings?.name || null,
+        phone: resident.phone || '',
+        unit_number: null, // Mock data since society_units table doesn't exist yet
+        building_name: null, // Mock data
         status: resident.status,
-        move_in_date: resident.move_in_date,
-        occupation: resident.occupation,
-        emergency_contact: resident.emergency_contact,
+        move_in_date: null, // Mock data since field doesn't exist yet
+        occupation: null, // Mock data since field doesn't exist yet  
+        emergency_contact: null, // Mock data since field doesn't exist yet
         created_at: resident.created_at
       }))
 
@@ -85,14 +82,12 @@ export default function Residents() {
     const formData = new FormData(event.currentTarget)
     
     try {
+      const status = formData.get('status') as string
       const residentData = {
         full_name: formData.get('full_name') as string,
         email: formData.get('email') as string,
         phone: formData.get('phone') as string,
-        status: formData.get('status') as string,
-        occupation: formData.get('occupation') as string,
-        emergency_contact: formData.get('emergency_contact') as string,
-        move_in_date: formData.get('move_in_date') as string || null,
+        status: status as 'active' | 'inactive' | 'suspended',
         organization_id: '00000000-0000-0000-0000-000000000000', // Mock organization ID
       }
 
@@ -104,11 +99,13 @@ export default function Residents() {
         if (error) throw error
         toast({ title: 'Success', description: 'Resident updated successfully' })
       } else {
-        const { error } = await supabase
-          .from('profiles')
-          .insert({ ...residentData, role: 'resident' })
-        if (error) throw error
-        toast({ title: 'Success', description: 'Resident added successfully' })
+        // For creating new residents, we need to use auth.signUp or handle this differently
+        // For now, just show a message that this would create a new user account
+        toast({ 
+          title: 'Info', 
+          description: 'New resident creation requires setting up user authentication first',
+          variant: 'default'
+        })
       }
 
       setIsDialogOpen(false)
@@ -250,33 +247,6 @@ export default function Residents() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="occupation">Occupation</Label>
-                  <Input
-                    id="occupation"
-                    name="occupation"
-                    defaultValue={editingResident?.occupation || ''}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="move_in_date">Move-in Date</Label>
-                  <Input
-                    id="move_in_date"
-                    name="move_in_date"
-                    type="date"
-                    defaultValue={editingResident?.move_in_date?.split('T')[0]}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="emergency_contact">Emergency Contact</Label>
-                <Input
-                  id="emergency_contact"
-                  name="emergency_contact"
-                  defaultValue={editingResident?.emergency_contact || ''}
-                />
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
