@@ -755,6 +755,7 @@ export type Database = {
       cities: {
         Row: {
           created_at: string | null
+          created_by: string | null
           id: string
           name: string
           postal_code: string | null
@@ -763,6 +764,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name: string
           postal_code?: string | null
@@ -771,6 +773,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name?: string
           postal_code?: string | null
@@ -780,13 +783,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cities_state_id_fkey"
-            columns: ["state_id"]
-            isOneToOne: false
-            referencedRelation: "states"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_cities_state"
             columns: ["state_id"]
             isOneToOne: false
             referencedRelation: "states"
@@ -1064,6 +1060,7 @@ export type Database = {
         Row: {
           code: string
           created_at: string | null
+          created_by: string | null
           id: string
           name: string
           updated_at: string | null
@@ -1071,6 +1068,7 @@ export type Database = {
         Insert: {
           code: string
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name: string
           updated_at?: string | null
@@ -1078,6 +1076,7 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name?: string
           updated_at?: string | null
@@ -1089,6 +1088,7 @@ export type Database = {
           code: string
           continent_id: string | null
           created_at: string | null
+          created_by: string | null
           id: string
           name: string
           phone_code: string | null
@@ -1098,6 +1098,7 @@ export type Database = {
           code: string
           continent_id?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name: string
           phone_code?: string | null
@@ -1107,6 +1108,7 @@ export type Database = {
           code?: string
           continent_id?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name?: string
           phone_code?: string | null
@@ -1115,13 +1117,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "countries_continent_id_fkey"
-            columns: ["continent_id"]
-            isOneToOne: false
-            referencedRelation: "continents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_countries_continent"
             columns: ["continent_id"]
             isOneToOne: false
             referencedRelation: "continents"
@@ -2771,13 +2766,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_states_country"
-            columns: ["country_id"]
-            isOneToOne: false
-            referencedRelation: "countries"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "states_country_id_fkey"
             columns: ["country_id"]
