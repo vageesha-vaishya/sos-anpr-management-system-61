@@ -11,7 +11,9 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
-import { Building2, CheckCircle } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Building2, CheckCircle, AlertTriangle } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const organizationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -29,6 +31,7 @@ interface OrganizationFormProps {
 
 export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess }) => {
   const { toast } = useToast()
+  const { user, userProfile, loading } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitProgress, setSubmitProgress] = useState(0)
   
@@ -43,6 +46,24 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
   })
 
   const onSubmit = async (data: OrganizationFormData) => {
+    if (!user || !userProfile) {
+      toast({
+        title: 'Authentication Required',
+        description: 'You must be logged in to create organizations',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    if (userProfile.role !== 'platform_admin') {
+      toast({
+        title: 'Permission Denied',
+        description: 'Only platform administrators can create organizations',
+        variant: 'destructive',
+      })
+      return
+    }
+
     setIsSubmitting(true)
     setSubmitProgress(0)
 
@@ -60,6 +81,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
           subscription_plan: data.subscription_plan,
           is_active: data.is_active,
           parent_id: data.parent_id || null,
+          created_by: user.id,
         })
 
       setSubmitProgress(75)
@@ -85,6 +107,44 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
       setIsSubmitting(false)
       setSubmitProgress(0)
     }
+  }
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <Card className="animate-fade-in">
+        <CardContent className="flex items-center justify-center py-8">
+          <LoadingSpinner size="lg" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Show permission error if user is not authorized
+  if (!user || !userProfile || userProfile.role !== 'platform_admin') {
+    return (
+      <Card className="animate-fade-in">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-destructive/10 rounded-lg flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+            </div>
+            Access Denied
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {!user 
+                ? 'You must be logged in to access organization management.'
+                : 'Only platform administrators can create organizations. Please contact your system administrator for access.'
+              }
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

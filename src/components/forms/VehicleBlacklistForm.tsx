@@ -46,8 +46,8 @@ export const VehicleBlacklistForm: React.FC<VehicleBlacklistFormProps> = ({ onSu
   const onSubmit = async (data: VehicleBlacklistFormData) => {
     if (!userProfile?.organization_id) {
       toast({
-        title: 'Error',
-        description: 'User organization not found. Please log in again.',
+        title: 'Authentication Required',
+        description: 'You must be logged in to manage vehicle blacklist',
         variant: 'destructive',
       })
       return

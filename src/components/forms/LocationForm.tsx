@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import { useAuth } from '@/contexts/AuthContext'
 
 const locationSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -35,6 +36,7 @@ interface LocationFormProps {
 
 export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
+  const { user, userProfile } = useAuth()
   const [organizations, setOrganizations] = useState<any[]>([])
   const [cities, setCities] = useState<any[]>([])
   
@@ -64,6 +66,15 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
   }, [])
 
   const onSubmit = async (data: LocationFormData) => {
+    if (!user || !userProfile) {
+      toast({
+        title: 'Authentication Required',
+        description: 'You must be logged in to manage locations',
+        variant: 'destructive',
+      })
+      return
+    }
+
     try {
       if (editData) {
         // Update existing location
@@ -94,6 +105,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
             address: data.address,
             city_id: data.city_id,
             coordinates: data.coordinates || null,
+            created_by: user.id,
           })
 
         if (error) throw error
