@@ -55,17 +55,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           // Fetch user profile when logged in
           try {
-            const { data: profile } = await supabase
+            console.log('AuthContext: Fetching profile for user:', session.user.id)
+            const { data: profile, error } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .maybeSingle()
             
-            if (profile && mounted) {
+            console.log('AuthContext: Profile fetch result:', { profile, error })
+            
+            if (error) {
+              console.error('Error fetching user profile:', error)
+            } else if (profile && mounted) {
+              console.log('AuthContext: Setting user profile:', profile)
               setUserProfile(profile)
+            } else {
+              console.log('AuthContext: No profile found for user')
             }
           } catch (error) {
-            console.error('Error fetching user profile:', error)
+            console.error('Exception fetching user profile:', error)
           }
         } else {
           setUserProfile(null)
@@ -94,17 +102,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         try {
-          const { data: profile } = await supabase
+          console.log('AuthContext: Getting session profile for user:', session.user.id)
+          const { data: profile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle()
           
-          if (profile && mounted) {
+          console.log('AuthContext: Session profile fetch result:', { profile, error })
+          
+          if (error) {
+            console.error('Error fetching session profile:', error)
+          } else if (profile && mounted) {
+            console.log('AuthContext: Setting session profile:', profile)
             setUserProfile(profile)
+          } else {
+            console.log('AuthContext: No session profile found')
           }
         } catch (error) {
-          console.error('Error fetching user profile:', error)
+          console.error('Exception fetching session profile:', error)
         }
       }
       
