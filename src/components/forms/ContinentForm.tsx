@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
-import { Globe } from 'lucide-react'
+import { Globe, Lock, AlertTriangle } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const continentSchema = z.object({
   name: z.string().min(1, 'Continent name is required'),
@@ -24,6 +26,8 @@ interface ContinentFormProps {
 
 export const ContinentForm: React.FC<ContinentFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
+  const { user, userProfile } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<ContinentFormData>({
     resolver: zodResolver(continentSchema),
@@ -33,7 +37,20 @@ export const ContinentForm: React.FC<ContinentFormProps> = ({ onSuccess, editDat
     },
   })
 
+  const isPlatformAdmin = userProfile?.role === 'platform_admin'
+  const canManage = user && isPlatformAdmin
+
   const onSubmit = async (data: ContinentFormData) => {
+    if (!canManage) {
+      toast({
+        title: 'Permission Denied',
+        description: 'Only platform administrators can manage continent data',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsSubmitting(true)
     try {
       if (editData) {
         const { error } = await supabase
@@ -55,12 +72,67 @@ export const ContinentForm: React.FC<ContinentFormProps> = ({ onSuccess, editDat
       form.reset()
       onSuccess?.()
     } catch (error: any) {
+      let errorMessage = 'Failed to save continent'
+      
+      if (error.message?.includes('row-level security policy')) {
+        errorMessage = 'You need to be logged in as a platform administrator to manage geographical data'
+      } else if (error.message?.includes('unique constraint') || error.code === '23505') {
+        errorMessage = 'A continent with this code already exists'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to save continent',
+        title: 'Database Error',
+        description: errorMessage,
         variant: 'destructive',
       })
+    } finally {
+      setIsSubmitting(false)
     }
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            Authentication Required
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              You must be logged in to access geographical data management.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!canManage) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            Access Restricted
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Only platform administrators can manage geographical master data. 
+              Current role: {userProfile?.role || 'Unknown'}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -84,7 +156,7 @@ export const ContinentForm: React.FC<ContinentFormProps> = ({ onSuccess, editDat
                 <FormItem>
                   <FormLabel>Continent Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="North America" {...field} />
+                    <Input placeholder="North America" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,15 +170,15 @@ export const ContinentForm: React.FC<ContinentFormProps> = ({ onSuccess, editDat
                 <FormItem>
                   <FormLabel>Continent Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="NA" {...field} />
+                    <Input placeholder="NA" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="w-full">
-              {editData ? 'Update Continent' : 'Create Continent'}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : (editData ? 'Update Continent' : 'Create Continent')}
             </Button>
           </form>
         </Form>

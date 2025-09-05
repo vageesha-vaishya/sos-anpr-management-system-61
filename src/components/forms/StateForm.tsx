@@ -7,9 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
-import { MapPin } from 'lucide-react'
+import { MapPin, Lock, AlertTriangle } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const stateSchema = z.object({
   name: z.string().min(1, 'State name is required'),
@@ -26,7 +28,9 @@ interface StateFormProps {
 
 export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
+  const { user, userProfile } = useAuth()
   const [countries, setCountries] = useState<any[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<StateFormData>({
     resolver: zodResolver(stateSchema),
@@ -36,6 +40,9 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
       country_id: editData?.country_id || '',
     },
   })
+
+  const isPlatformAdmin = userProfile?.role === 'platform_admin'
+  const canManage = user && isPlatformAdmin
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -59,6 +66,16 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
   }, [toast])
 
   const onSubmit = async (data: StateFormData) => {
+    if (!canManage) {
+      toast({
+        title: 'Permission Denied',
+        description: 'Only platform administrators can manage state data',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsSubmitting(true)
     try {
       if (editData) {
         const { error } = await supabase
@@ -80,12 +97,69 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
       form.reset()
       onSuccess?.()
     } catch (error: any) {
+      let errorMessage = 'Failed to save state'
+      
+      if (error.message?.includes('row-level security policy')) {
+        errorMessage = 'You need to be logged in as a platform administrator to manage geographical data'
+      } else if (error.message?.includes('unique constraint') || error.code === '23505') {
+        errorMessage = 'A state with this code already exists in the selected country'
+      } else if (error.message?.includes('foreign key constraint') || error.code === '23503') {
+        errorMessage = 'Please select a valid country'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to save state',
+        title: 'Database Error',
+        description: errorMessage,
         variant: 'destructive',
       })
+    } finally {
+      setIsSubmitting(false)
     }
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            Authentication Required
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              You must be logged in to access geographical data management.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!canManage) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            Access Restricted
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Only platform administrators can manage geographical master data. 
+              Current role: {userProfile?.role || 'Unknown'}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -109,7 +183,7 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
                 <FormItem>
                   <FormLabel>State Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="California" {...field} />
+                    <Input placeholder="California" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -123,7 +197,7 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
                 <FormItem>
                   <FormLabel>State Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="CA" {...field} />
+                    <Input placeholder="CA" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,7 +210,7 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Country</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a country" />
@@ -155,8 +229,8 @@ export const StateForm: React.FC<StateFormProps> = ({ onSuccess, editData }) => 
               )}
             />
 
-            <Button type="submit" className="w-full">
-              {editData ? 'Update State' : 'Create State'}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : (editData ? 'Update State' : 'Create State')}
             </Button>
           </form>
         </Form>

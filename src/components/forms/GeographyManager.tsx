@@ -59,9 +59,9 @@ export const GeographyManager: React.FC = () => {
       setLoading(true)
       const [continentsRes, countriesRes, statesRes, citiesRes, premiseTypesRes] = await Promise.all([
         supabase.from('continents').select('*').order('name'),
-        supabase.from('countries').select('*, continent:continents(name)').order('name'),
-        supabase.from('states').select('*, country:countries(name)').order('name'),
-        supabase.from('cities').select('*, state:states(name)').order('name'),
+        supabase.from('countries').select('*, continents!inner(name)').order('name'),
+        supabase.from('states').select('*, countries!inner(name)').order('name'),
+        supabase.from('cities').select('*, states!inner(name)').order('name'),
         supabase.from('premise_types').select('*').order('name')
       ])
 

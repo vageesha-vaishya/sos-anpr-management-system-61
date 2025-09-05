@@ -785,6 +785,13 @@ export type Database = {
             referencedRelation: "states"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_cities_state"
+            columns: ["state_id"]
+            isOneToOne: false
+            referencedRelation: "states"
+            referencedColumns: ["id"]
+          },
         ]
       }
       community_assets: {
@@ -1108,6 +1115,13 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "countries_continent_id_fkey"
+            columns: ["continent_id"]
+            isOneToOne: false
+            referencedRelation: "continents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_countries_continent"
             columns: ["continent_id"]
             isOneToOne: false
             referencedRelation: "continents"
@@ -1846,6 +1860,7 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           created_at: string | null
+          created_by: string | null
           id: string
           is_active: boolean | null
           name: string
@@ -1862,6 +1877,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           is_active?: boolean | null
           name: string
@@ -1878,6 +1894,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
@@ -2730,6 +2747,7 @@ export type Database = {
           code: string | null
           country_id: string | null
           created_at: string | null
+          created_by: string | null
           id: string
           name: string
           updated_at: string | null
@@ -2738,6 +2756,7 @@ export type Database = {
           code?: string | null
           country_id?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name: string
           updated_at?: string | null
@@ -2746,11 +2765,19 @@ export type Database = {
           code?: string | null
           country_id?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
           name?: string
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_states_country"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "states_country_id_fkey"
             columns: ["country_id"]

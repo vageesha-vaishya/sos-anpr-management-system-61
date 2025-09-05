@@ -7,9 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
-import { Flag } from 'lucide-react'
+import { Flag, Lock, AlertTriangle } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const countrySchema = z.object({
   name: z.string().min(1, 'Country name is required'),
@@ -27,7 +29,9 @@ interface CountryFormProps {
 
 export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
+  const { user, userProfile } = useAuth()
   const [continents, setContinents] = useState<any[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CountryFormData>({
     resolver: zodResolver(countrySchema),
@@ -38,6 +42,9 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
       plate_format: editData?.plate_format || '',
     },
   })
+
+  const isPlatformAdmin = userProfile?.role === 'platform_admin'
+  const canManage = user && isPlatformAdmin
 
   useEffect(() => {
     const fetchContinents = async () => {
@@ -61,6 +68,16 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
   }, [toast])
 
   const onSubmit = async (data: CountryFormData) => {
+    if (!canManage) {
+      toast({
+        title: 'Permission Denied',
+        description: 'Only platform administrators can manage country data',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsSubmitting(true)
     try {
       if (editData) {
         const { error } = await supabase
@@ -82,12 +99,69 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
       form.reset()
       onSuccess?.()
     } catch (error: any) {
+      let errorMessage = 'Failed to save country'
+      
+      if (error.message?.includes('row-level security policy')) {
+        errorMessage = 'You need to be logged in as a platform administrator to manage geographical data'
+      } else if (error.message?.includes('unique constraint') || error.code === '23505') {
+        errorMessage = 'A country with this code already exists'
+      } else if (error.message?.includes('foreign key constraint') || error.code === '23503') {
+        errorMessage = 'Please select a valid continent'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to save country',
+        title: 'Database Error',
+        description: errorMessage,
         variant: 'destructive',
       })
+    } finally {
+      setIsSubmitting(false)
     }
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            Authentication Required
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              You must be logged in to access geographical data management.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!canManage) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5" />
+            Access Restricted
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Only platform administrators can manage geographical master data. 
+              Current role: {userProfile?.role || 'Unknown'}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -111,7 +185,7 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
                 <FormItem>
                   <FormLabel>Country Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="United States" {...field} />
+                    <Input placeholder="United States" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -125,7 +199,7 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
                 <FormItem>
                   <FormLabel>Country Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="US" {...field} />
+                    <Input placeholder="US" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,7 +212,7 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Continent</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a continent" />
@@ -164,15 +238,15 @@ export const CountryForm: React.FC<CountryFormProps> = ({ onSuccess, editData })
                 <FormItem>
                   <FormLabel>License Plate Format</FormLabel>
                   <FormControl>
-                    <Input placeholder="ABC-1234 or AAA-000" {...field} />
+                    <Input placeholder="ABC-1234 or AAA-000" {...field} disabled={isSubmitting} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="w-full">
-              {editData ? 'Update Country' : 'Create Country'}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : (editData ? 'Update Country' : 'Create Country')}
             </Button>
           </form>
         </Form>
