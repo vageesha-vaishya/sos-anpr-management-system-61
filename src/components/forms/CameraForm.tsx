@@ -55,11 +55,32 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
 
   useEffect(() => {
     const fetchEntryGates = async () => {
-      const { data } = await supabase
-        .from('entry_gates')
-        .select('id, name, building_id, buildings(name)')
-      
-      if (data) setEntryGates(data)
+      try {
+        console.log('Fetching entry gates for dropdown...')
+        const { data, error } = await supabase
+          .from('entry_gates')
+          .select('id, name, building_id, buildings!inner(name)')
+          .order('name')
+        
+        if (error) {
+          console.error('Error fetching entry gates:', error)
+          toast({
+            title: 'Error loading entry gates',
+            description: error.message,
+            variant: 'destructive',
+          })
+        } else {
+          console.log(`Loaded ${data?.length || 0} entry gates`)
+          setEntryGates(data || [])
+        }
+      } catch (error: any) {
+        console.error('Error in fetchEntryGates:', error)
+        toast({
+          title: 'Error loading entry gates',
+          description: error.message,
+          variant: 'destructive',
+        })
+      }
     }
     
     fetchEntryGates()

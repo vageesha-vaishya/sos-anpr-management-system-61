@@ -59,13 +59,44 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
 
   useEffect(() => {
     const fetchData = async () => {
-      const [orgsResult, citiesResult] = await Promise.all([
-        supabase.from('organizations').select('id, name'),
-        supabase.from('cities').select('id, name')
-      ])
-      
-      if (orgsResult.data) setOrganizations(orgsResult.data)
-      if (citiesResult.data) setCities(citiesResult.data)
+      try {
+        console.log('Fetching organizations and cities for dropdown...')
+        const [orgsResult, citiesResult] = await Promise.all([
+          supabase.from('organizations').select('id, name').order('name'),
+          supabase.from('cities').select('id, name').order('name')
+        ])
+        
+        if (orgsResult.error) {
+          console.error('Error fetching organizations:', orgsResult.error)
+          toast({
+            title: 'Error loading organizations',
+            description: orgsResult.error.message,
+            variant: 'destructive',
+          })
+        } else {
+          console.log(`Loaded ${orgsResult.data?.length || 0} organizations`)
+          setOrganizations(orgsResult.data || [])
+        }
+        
+        if (citiesResult.error) {
+          console.error('Error fetching cities:', citiesResult.error)
+          toast({
+            title: 'Error loading cities',
+            description: citiesResult.error.message,
+            variant: 'destructive',
+          })
+        } else {
+          console.log(`Loaded ${citiesResult.data?.length || 0} cities`)
+          setCities(citiesResult.data || [])
+        }
+      } catch (error: any) {
+        console.error('Error in fetchData:', error)
+        toast({
+          title: 'Error loading form data',
+          description: error.message,
+          variant: 'destructive',
+        })
+      }
     }
     
     fetchData()

@@ -21,29 +21,57 @@ type BuildingFormData = z.infer<typeof buildingSchema>
 
 interface BuildingFormProps {
   onSuccess?: () => void
+  editData?: {
+    id: string
+    name: string
+    location_id: string
+    building_type: string
+    floors: number
+  }
 }
 
-export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
+export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const [locations, setLocations] = useState<any[]>([])
   
   const form = useForm<BuildingFormData>({
     resolver: zodResolver(buildingSchema),
     defaultValues: {
-      name: '',
-      location_id: '',
-      building_type: 'office',
-      floors: 1,
+      name: editData?.name || '',
+      location_id: editData?.location_id || '',
+      building_type: (editData?.building_type as any) || 'office',
+      floors: editData?.floors || 1,
     },
   })
 
   useEffect(() => {
     const fetchLocations = async () => {
-      const { data } = await supabase
-        .from('locations')
-        .select('id, name, organizations(name)')
-      
-      if (data) setLocations(data)
+      try {
+        console.log('Fetching locations for dropdown...')
+        const { data, error } = await supabase
+          .from('locations')
+          .select('id, name, organizations!inner(name)')
+          .order('name')
+        
+        if (error) {
+          console.error('Error fetching locations:', error)
+          toast({
+            title: 'Error loading locations',
+            description: error.message,
+            variant: 'destructive',
+          })
+        } else {
+          console.log(`Loaded ${data?.length || 0} locations`)
+          setLocations(data || [])
+        }
+      } catch (error: any) {
+        console.error('Error in fetchLocations:', error)
+        toast({
+          title: 'Error loading locations',
+          description: error.message,
+          variant: 'destructive',
+        })
+      }
     }
     
     fetchLocations()
@@ -51,29 +79,50 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
 
   const onSubmit = async (data: BuildingFormData) => {
     try {
-      const { error } = await supabase
-        .from('buildings')
-        .insert({
-          name: data.name,
-          location_id: data.location_id,
-          building_type: data.building_type,
-          floors: data.floors,
+      if (editData) {
+        // Update existing building
+        const { error } = await supabase
+          .from('buildings')
+          .update({
+            name: data.name,
+            location_id: data.location_id,
+            building_type: data.building_type,
+            floors: data.floors,
+          })
+          .eq('id', editData.id)
+
+        if (error) throw error
+
+        toast({
+          title: 'Success',
+          description: 'Building updated successfully',
         })
+      } else {
+        // Create new building
+        const { error } = await supabase
+          .from('buildings')
+          .insert({
+            name: data.name,
+            location_id: data.location_id,
+            building_type: data.building_type,
+            floors: data.floors,
+          })
 
-      if (error) throw error
+        if (error) throw error
 
-      toast({
-        title: 'Success',
-        description: 'Building created successfully',
-      })
+        toast({
+          title: 'Success',
+          description: 'Building created successfully',
+        })
+      }
       
       form.reset()
       onSuccess?.()
     } catch (error: any) {
-      console.error('Building creation error:', error)
+      console.error('Building operation error:', error)
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create building',
+        description: error.message || `Failed to ${editData ? 'update' : 'create'} building`,
         variant: 'destructive',
       })
     }
@@ -82,8 +131,8 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Building</CardTitle>
-        <CardDescription>Register a new building at a location</CardDescription>
+        <CardTitle>{editData ? 'Edit Building' : 'Add Building'}</CardTitle>
+        <CardDescription>{editData ? 'Update building information' : 'Register a new building at a location'}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -174,7 +223,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
             </div>
 
             <Button type="submit" className="w-full">
-              Create Building
+              {editData ? 'Update Building' : 'Create Building'}
             </Button>
           </form>
         </Form>

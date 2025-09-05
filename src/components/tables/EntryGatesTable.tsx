@@ -62,7 +62,7 @@ export const EntryGatesTable: React.FC = () => {
       columns={columns}
       FormComponent={EntryGateForm}
       searchFields={['name', 'description']}
-      selectQuery="*, buildings(name)"
+      selectQuery="*, buildings!inner(name)"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

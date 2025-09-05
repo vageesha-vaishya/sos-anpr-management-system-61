@@ -57,7 +57,7 @@ export const LocationsTable: React.FC = () => {
       columns={columns}
       FormComponent={LocationForm}
       searchFields={['name', 'address']}
-      selectQuery="*, organizations(name), cities(name)"
+      selectQuery="*, organizations!inner(name), cities!inner(name)"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

@@ -27,9 +27,17 @@ type OrganizationFormData = z.infer<typeof organizationSchema>
 
 interface OrganizationFormProps {
   onSuccess?: () => void
+  editData?: {
+    id: string
+    name: string
+    organization_type: string
+    subscription_plan: string
+    is_active: boolean
+    parent_id?: string
+  }
 }
 
-export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess }) => {
+export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const { user, userProfile, loading } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -38,10 +46,11 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
   const form = useForm<OrganizationFormData>({
     resolver: zodResolver(organizationSchema),
     defaultValues: {
-      name: '',
-      organization_type: 'customer',
-      subscription_plan: 'basic',
-      is_active: true,
+      name: editData?.name || '',
+      organization_type: (editData?.organization_type as any) || 'customer',
+      subscription_plan: (editData?.subscription_plan as any) || 'basic',
+      is_active: editData?.is_active ?? true,
+      parent_id: editData?.parent_id || '',
     },
   })
 
@@ -73,26 +82,43 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
       await new Promise(resolve => setTimeout(resolve, 300))
       
       setSubmitProgress(50)
-      const { error } = await supabase
-        .from('organizations')
-        .insert({
-          name: data.name,
-          organization_type: data.organization_type,
-          subscription_plan: data.subscription_plan,
-          is_active: data.is_active,
-          parent_id: data.parent_id || null,
-          created_by: user.id,
-        })
+      if (editData) {
+        // Update existing organization
+        const { error } = await supabase
+          .from('organizations')
+          .update({
+            name: data.name,
+            organization_type: data.organization_type,
+            subscription_plan: data.subscription_plan,
+            is_active: data.is_active,
+            parent_id: data.parent_id || null,
+          })
+          .eq('id', editData.id)
+        
+        if (error) throw error
+      } else {
+        // Create new organization
+        const { error: insertError } = await supabase
+          .from('organizations')
+          .insert({
+            name: data.name,
+            organization_type: data.organization_type,
+            subscription_plan: data.subscription_plan,
+            is_active: data.is_active,
+            parent_id: data.parent_id || null,
+          })
+        
+        if (insertError) throw insertError
+      }
 
       setSubmitProgress(75)
-      if (error) throw error
-
+      
       setSubmitProgress(100)
       await new Promise(resolve => setTimeout(resolve, 300))
 
       toast({
         title: 'Success',
-        description: 'Organization created successfully',
+        description: `Organization ${editData ? 'updated' : 'created'} successfully`,
       })
       
       form.reset()
@@ -154,9 +180,9 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
           <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
             <Building2 className="w-5 h-5 text-primary" />
           </div>
-          Add Organization
+          {editData ? 'Edit Organization' : 'Add Organization'}
         </CardTitle>
-        <CardDescription>Create a new organization in the system</CardDescription>
+        <CardDescription>{editData ? 'Update organization information' : 'Create a new organization in the system'}</CardDescription>
         {isSubmitting && (
           <div className="space-y-2">
             <ProgressBar value={submitProgress} variant="default" showValue />
@@ -262,7 +288,7 @@ export const OrganizationForm: React.FC<OrganizationFormProps> = ({ onSuccess })
               ) : (
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" />
-                  Create Organization
+                  {editData ? 'Update Organization' : 'Create Organization'}
                 </div>
               )}
             </Button>

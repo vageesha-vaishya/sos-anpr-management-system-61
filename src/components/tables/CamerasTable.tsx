@@ -61,7 +61,7 @@ export const CamerasTable: React.FC = () => {
       columns={columns}
       FormComponent={CameraForm}
       searchFields={['name', 'ip_address']}
-      selectQuery="*, entry_gates(name)"
+      selectQuery="*, entry_gates!inner(name)"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

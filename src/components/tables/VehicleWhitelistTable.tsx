@@ -77,6 +77,7 @@ export const VehicleWhitelistTable: React.FC = () => {
       columns={columns}
       FormComponent={VehicleWhitelistForm}
       searchFields={['license_plate', 'owner_name', 'owner_contact']}
+      selectQuery="*"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

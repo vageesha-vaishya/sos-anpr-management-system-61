@@ -25,21 +25,30 @@ type VehicleBlacklistFormData = z.infer<typeof vehicleBlacklistSchema>
 
 interface VehicleBlacklistFormProps {
   onSuccess?: () => void
+  editData?: {
+    id: string
+    license_plate: string
+    reason: string
+    severity: string
+    reported_by: string
+    status: string
+    notes?: string
+  }
 }
 
-export const VehicleBlacklistForm: React.FC<VehicleBlacklistFormProps> = ({ onSuccess }) => {
+export const VehicleBlacklistForm: React.FC<VehicleBlacklistFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const { userProfile } = useAuth()
   
   const form = useForm<VehicleBlacklistFormData>({
     resolver: zodResolver(vehicleBlacklistSchema),
     defaultValues: {
-      license_plate: '',
-      reason: '',
-      severity: 'medium',
-      reported_by: '',
-      status: 'active',
-      notes: '',
+      license_plate: editData?.license_plate || '',
+      reason: editData?.reason || '',
+      severity: (editData?.severity as any) || 'medium',
+      reported_by: editData?.reported_by || '',
+      status: (editData?.status as any) || 'active',
+      notes: editData?.notes || '',
     },
   })
 
@@ -54,24 +63,47 @@ export const VehicleBlacklistForm: React.FC<VehicleBlacklistFormProps> = ({ onSu
     }
 
     try {
-      const { error } = await supabase
-        .from('vehicle_blacklist')
-        .insert({
-          license_plate: data.license_plate.toUpperCase(),
-          reason: data.reason,
-          severity: data.severity,
-          reported_by: data.reported_by,
-          status: data.status,
-          notes: data.notes || null,
-          organization_id: userProfile.organization_id,
+      if (editData) {
+        // Update existing vehicle
+        const { error } = await supabase
+          .from('vehicle_blacklist')
+          .update({
+            license_plate: data.license_plate.toUpperCase(),
+            reason: data.reason,
+            severity: data.severity,
+            reported_by: data.reported_by,
+            status: data.status,
+            notes: data.notes || null,
+          })
+          .eq('id', editData.id)
+
+        if (error) throw error
+
+        toast({
+          title: 'Success',
+          description: 'Vehicle updated successfully',
         })
+      } else {
+        // Create new vehicle
+        const { error } = await supabase
+          .from('vehicle_blacklist')
+          .insert({
+            license_plate: data.license_plate.toUpperCase(),
+            reason: data.reason,
+            severity: data.severity,
+            reported_by: data.reported_by,
+            status: data.status,
+            notes: data.notes || null,
+            organization_id: userProfile.organization_id,
+          })
 
-      if (error) throw error
+        if (error) throw error
 
-      toast({
-        title: 'Success',
-        description: 'Vehicle added to blacklist successfully',
-      })
+        toast({
+          title: 'Success',
+          description: 'Vehicle added to blacklist successfully',
+        })
+      }
       
       form.reset()
       onSuccess?.()
@@ -87,8 +119,8 @@ export const VehicleBlacklistForm: React.FC<VehicleBlacklistFormProps> = ({ onSu
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Vehicle to Blacklist</CardTitle>
-        <CardDescription>Block unauthorized or problematic vehicles</CardDescription>
+        <CardTitle>{editData ? 'Edit Blacklisted Vehicle' : 'Add Vehicle to Blacklist'}</CardTitle>
+        <CardDescription>{editData ? 'Update vehicle blacklist information' : 'Block unauthorized or problematic vehicles'}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -213,7 +245,7 @@ export const VehicleBlacklistForm: React.FC<VehicleBlacklistFormProps> = ({ onSu
             />
 
             <Button type="submit" variant="destructive" className="w-full">
-              Add to Blacklist
+              {editData ? 'Update Vehicle' : 'Add to Blacklist'}
             </Button>
           </form>
         </Form>

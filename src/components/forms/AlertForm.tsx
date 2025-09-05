@@ -24,9 +24,17 @@ type AlertFormData = z.infer<typeof alertSchema>
 
 interface AlertFormProps {
   onSuccess?: () => void
+  editData?: {
+    id: string
+    title: string
+    message: string
+    alert_type: string
+    severity: string
+    camera_id?: string
+  }
 }
 
-export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
+export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const { userProfile } = useAuth()
   const [cameras, setCameras] = useState<any[]>([])
@@ -34,21 +42,42 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
   const form = useForm<AlertFormData>({
     resolver: zodResolver(alertSchema),
     defaultValues: {
-      title: '',
-      message: '',
-      alert_type: 'system',
-      severity: 'medium',
-      camera_id: '',
+      title: editData?.title || '',
+      message: editData?.message || '',
+      alert_type: (editData?.alert_type as any) || 'system',
+      severity: (editData?.severity as any) || 'medium',
+      camera_id: editData?.camera_id || '',
     },
   })
 
   useEffect(() => {
     const fetchCameras = async () => {
-      const { data } = await supabase
-        .from('cameras')
-        .select('id, name, entry_gates(name)')
-      
-      if (data) setCameras(data)
+      try {
+        console.log('Fetching cameras for dropdown...')
+        const { data, error } = await supabase
+          .from('cameras')
+          .select('id, name, entry_gates!inner(name)')
+          .order('name')
+        
+        if (error) {
+          console.error('Error fetching cameras:', error)
+          toast({
+            title: 'Error loading cameras',
+            description: error.message,
+            variant: 'destructive',
+          })
+        } else {
+          console.log(`Loaded ${data?.length || 0} cameras`)
+          setCameras(data || [])
+        }
+      } catch (error: any) {
+        console.error('Error in fetchCameras:', error)
+        toast({
+          title: 'Error loading cameras',
+          description: error.message,
+          variant: 'destructive',
+        })
+      }
     }
     
     fetchCameras()
@@ -65,23 +94,44 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
     }
 
     try {
-      const { error } = await supabase
-        .from('alerts')
-        .insert({
-          title: data.title,
-          message: data.message,
-          alert_type: data.alert_type,
-          severity: data.severity,
-          created_by: userProfile.id,
-          organization_id: userProfile.organization_id,
+      if (editData) {
+        // Update existing alert
+        const { error } = await supabase
+          .from('alerts')
+          .update({
+            title: data.title,
+            message: data.message,
+            alert_type: data.alert_type,
+            severity: data.severity,
+          })
+          .eq('id', editData.id)
+
+        if (error) throw error
+
+        toast({
+          title: 'Success',
+          description: 'Alert updated successfully',
         })
+      } else {
+        // Create new alert
+        const { error } = await supabase
+          .from('alerts')
+          .insert({
+            title: data.title,
+            message: data.message,
+            alert_type: data.alert_type,
+            severity: data.severity,
+            created_by: userProfile.id,
+            organization_id: userProfile.organization_id,
+          })
 
-      if (error) throw error
+        if (error) throw error
 
-      toast({
-        title: 'Success',
-        description: 'Alert created successfully',
-      })
+        toast({
+          title: 'Success',
+          description: 'Alert created successfully',
+        })
+      }
       
       form.reset()
       onSuccess?.()
@@ -97,8 +147,8 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create Alert</CardTitle>
-        <CardDescription>Create a new system or security alert</CardDescription>
+        <CardTitle>{editData ? 'Edit Alert' : 'Create Alert'}</CardTitle>
+        <CardDescription>{editData ? 'Update alert information' : 'Create a new system or security alert'}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -208,7 +258,7 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
             />
 
             <Button type="submit" className="w-full">
-              Create Alert
+              {editData ? 'Update Alert' : 'Create Alert'}
             </Button>
           </form>
         </Form>

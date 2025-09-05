@@ -58,6 +58,7 @@ export const OrganizationsTable: React.FC = () => {
       columns={columns}
       FormComponent={OrganizationForm}
       searchFields={['name']}
+      selectQuery="*"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

@@ -53,7 +53,7 @@ export const BuildingsTable: React.FC = () => {
       columns={columns}
       FormComponent={BuildingForm}
       searchFields={['name', 'description']}
-      selectQuery="*, locations(name)"
+      selectQuery="*, locations!inner(name)"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

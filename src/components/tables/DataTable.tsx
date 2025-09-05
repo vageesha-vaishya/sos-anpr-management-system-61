@@ -56,6 +56,9 @@ export const DataTable: React.FC<DataTableProps> = ({
   const fetchData = async () => {
     setLoading(true)
     try {
+      console.log(`Fetching data from table: ${tableName}`)
+      console.log(`Select query: ${selectQuery}`)
+      
       let query = supabase
         .from(tableName as any)
         .select(selectQuery, { count: 'exact' })
@@ -68,21 +71,28 @@ export const DataTable: React.FC<DataTableProps> = ({
           `${field}.ilike.%${searchTerm}%`
         ).join(',')
         query = query.or(searchConditions)
+        console.log(`Search conditions: ${searchConditions}`)
       }
 
       const { data: result, error, count } = await query
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase query error:', error)
+        throw error
+      }
 
+      console.log(`Fetched ${result?.length || 0} records out of ${count || 0} total`)
       setData(result || [])
       setTotalCount(count || 0)
     } catch (error: any) {
       console.error(`Failed to fetch ${tableName}:`, error)
       toast({
-        title: 'Error',
-        description: `Failed to fetch ${title.toLowerCase()}`,
+        title: 'Data Fetch Error',
+        description: error.message || `Failed to load ${title.toLowerCase()}`,
         variant: 'destructive',
       })
+      setData([])
+      setTotalCount(0)
     } finally {
       setLoading(false)
     }

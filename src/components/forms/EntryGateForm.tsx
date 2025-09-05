@@ -21,29 +21,57 @@ type EntryGateFormData = z.infer<typeof entryGateSchema>
 
 interface EntryGateFormProps {
   onSuccess?: () => void
+  editData?: {
+    id: string
+    name: string
+    building_id: string
+    gate_type: string
+    is_active: boolean
+  }
 }
 
-export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
+export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const [buildings, setBuildings] = useState<any[]>([])
   
   const form = useForm<EntryGateFormData>({
     resolver: zodResolver(entryGateSchema),
     defaultValues: {
-      name: '',
-      building_id: '',
-      gate_type: 'main',
-      is_active: true,
+      name: editData?.name || '',
+      building_id: editData?.building_id || '',
+      gate_type: (editData?.gate_type as any) || 'main',
+      is_active: editData?.is_active ?? true,
     },
   })
 
   useEffect(() => {
     const fetchBuildings = async () => {
-      const { data } = await supabase
-        .from('buildings')
-        .select('id, name, locations(name)')
-      
-      if (data) setBuildings(data)
+      try {
+        console.log('Fetching buildings for dropdown...')
+        const { data, error } = await supabase
+          .from('buildings')
+          .select('id, name, locations!inner(name)')
+          .order('name')
+        
+        if (error) {
+          console.error('Error fetching buildings:', error)
+          toast({
+            title: 'Error loading buildings',
+            description: error.message,
+            variant: 'destructive',
+          })
+        } else {
+          console.log(`Loaded ${data?.length || 0} buildings`)
+          setBuildings(data || [])
+        }
+      } catch (error: any) {
+        console.error('Error in fetchBuildings:', error)
+        toast({
+          title: 'Error loading buildings',
+          description: error.message,
+          variant: 'destructive',
+        })
+      }
     }
     
     fetchBuildings()
@@ -51,29 +79,50 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
 
   const onSubmit = async (data: EntryGateFormData) => {
     try {
-      const { error } = await supabase
-        .from('entry_gates')
-        .insert({
-          name: data.name,
-          building_id: data.building_id,
-          gate_type: data.gate_type,
-          is_active: data.is_active,
+      if (editData) {
+        // Update existing entry gate
+        const { error } = await supabase
+          .from('entry_gates')
+          .update({
+            name: data.name,
+            building_id: data.building_id,
+            gate_type: data.gate_type,
+            is_active: data.is_active,
+          })
+          .eq('id', editData.id)
+
+        if (error) throw error
+
+        toast({
+          title: 'Success',
+          description: 'Entry gate updated successfully',
         })
+      } else {
+        // Create new entry gate
+        const { error } = await supabase
+          .from('entry_gates')
+          .insert({
+            name: data.name,
+            building_id: data.building_id,
+            gate_type: data.gate_type,
+            is_active: data.is_active,
+          })
 
-      if (error) throw error
+        if (error) throw error
 
-      toast({
-        title: 'Success',
-        description: 'Entry gate created successfully',
-      })
+        toast({
+          title: 'Success',
+          description: 'Entry gate created successfully',
+        })
+      }
       
       form.reset()
       onSuccess?.()
     } catch (error: any) {
-      console.error('Entry gate creation error:', error)
+      console.error('Entry gate operation error:', error)
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create entry gate',
+        description: error.message || `Failed to ${editData ? 'update' : 'create'} entry gate`,
         variant: 'destructive',
       })
     }
@@ -82,8 +131,8 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Entry Gate</CardTitle>
-        <CardDescription>Create a new entry/exit point for a building</CardDescription>
+        <CardTitle>{editData ? 'Edit Entry Gate' : 'Add Entry Gate'}</CardTitle>
+        <CardDescription>{editData ? 'Update entry gate information' : 'Create a new entry/exit point for a building'}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -176,7 +225,7 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
             </div>
 
             <Button type="submit" className="w-full">
-              Create Entry Gate
+              {editData ? 'Update Entry Gate' : 'Create Entry Gate'}
             </Button>
           </form>
         </Form>

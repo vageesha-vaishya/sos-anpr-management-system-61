@@ -84,6 +84,7 @@ export const AlertsTable: React.FC = () => {
       columns={columns}
       FormComponent={AlertForm}
       searchFields={['title', 'message']}
+      selectQuery="*"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )

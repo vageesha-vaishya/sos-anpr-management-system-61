@@ -76,6 +76,7 @@ export const VehicleBlacklistTable: React.FC = () => {
       columns={columns}
       FormComponent={VehicleBlacklistForm}
       searchFields={['license_plate', 'reason', 'reported_by']}
+      selectQuery="*"
       orderBy={{ column: 'created_at', ascending: false }}
     />
   )
