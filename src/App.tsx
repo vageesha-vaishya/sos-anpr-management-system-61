@@ -74,22 +74,42 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const DashboardRouter = () => {
-  const { userProfile, loading, user } = useAuth();
+  const { userProfile, loading, user, profileError, forceRefresh } = useAuth();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   
-  console.log('DashboardRouter state:', { user: !!user, userProfile: !!userProfile, loading, role: userProfile?.role });
+  console.log('DashboardRouter state:', { 
+    user: !!user, 
+    userProfile: !!userProfile, 
+    loading, 
+    profileError,
+    role: userProfile?.role 
+  });
   
   // Set timeout for loading state
   useEffect(() => {
     if (loading) {
       const timer = setTimeout(() => {
-        console.warn('Dashboard loading timeout - forcing refresh option');
+        console.warn('Dashboard loading timeout - showing recovery options');
         setLoadingTimeout(true);
-      }, 8000); // 8 second timeout
+      }, 10000); // 10 second timeout
 
       return () => clearTimeout(timer);
+    } else {
+      setLoadingTimeout(false);
     }
   }, [loading]);
+
+  const handleForceRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await forceRefresh();
+    } catch (error) {
+      console.error('Force refresh failed:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (loading && !loadingTimeout) {
     console.log('DashboardRouter: Loading...');
@@ -98,7 +118,7 @@ const DashboardRouter = () => {
         <div className="text-center space-y-2">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-sm text-muted-foreground">Loading dashboard...</p>
-          <p className="text-xs text-muted-foreground">This may take a few moments...</p>
+          <p className="text-xs text-muted-foreground">Validating your session...</p>
         </div>
       </div>
     );
@@ -109,32 +129,69 @@ const DashboardRouter = () => {
     return <Navigate to="/auth" replace />;
   }
   
-  if (!userProfile || loadingTimeout) {
-    console.log('DashboardRouter: No user profile or timeout, showing refresh option');
+  if (!userProfile || loadingTimeout || profileError) {
+    console.log('DashboardRouter: Profile issue detected, showing recovery options');
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-md mx-auto p-6">
           <div className="text-center">
             <h2 className="text-lg font-semibold mb-2">Dashboard Loading Issue</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              {loadingTimeout ? 'Loading timed out. Please try refreshing.' : 'Unable to load user profile.'}
+              {profileError || (loadingTimeout 
+                ? 'Loading timed out. Your session may need to be refreshed.' 
+                : 'Unable to load your user profile.')}
             </p>
+            {profileError && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3 mb-4">
+                <p className="text-xs text-destructive">{profileError}</p>
+              </div>
+            )}
           </div>
-          <div className="flex gap-2 justify-center">
+          <div className="flex flex-col gap-2 w-full">
             <Button 
-              onClick={() => window.location.reload()}
-              className="px-4 py-2"
+              onClick={handleForceRefresh}
+              disabled={refreshing}
+              className="w-full"
             >
-              Refresh Page
+              {refreshing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Refreshing...
+                </>
+              ) : (
+                'Force Refresh Session'
+              )}
             </Button>
             <Button 
               variant="outline"
+              onClick={() => window.location.reload()}
+              className="w-full"
+            >
+              Reload Page
+            </Button>
+            <Button 
+              variant="ghost"
               onClick={() => window.location.href = '/auth'}
-              className="px-4 py-2"
+              className="w-full"
             >
               Back to Login
             </Button>
           </div>
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-4 text-left">
+              <summary className="text-xs text-muted-foreground cursor-pointer">Debug Info</summary>
+              <pre className="text-xs mt-2 p-2 bg-muted rounded overflow-auto">
+{JSON.stringify({
+  user: !!user,
+  userProfile: !!userProfile,
+  loading,
+  profileError,
+  loadingTimeout,
+  userId: user?.id
+}, null, 2)}
+              </pre>
+            </details>
+          )}
         </div>
       </div>
     );

@@ -20,6 +20,8 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   signingOut: boolean
+  profileError: string | null
+  forceRefresh: () => Promise<void>
   signIn: (email: string, password: string) => Promise<{ error?: any }>
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error?: any }>
   signOut: () => Promise<void>
@@ -42,46 +44,165 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [signingOut, setSigningOut] = useState(false)
+  const [profileError, setProfileError] = useState<string | null>(null)
+  const [profileRetryCount, setProfileRetryCount] = useState(0)
+  const [sessionValidated, setSessionValidated] = useState(false)
+
+  // Enhanced profile fetching with retry logic
+  const fetchProfileWithRetry = async (userId: string, retryCount = 0): Promise<UserProfile | null> => {
+    const maxRetries = 3
+    const delay = Math.pow(2, retryCount) * 1000 // Exponential backoff
+    
+    try {
+      console.log(`AuthContext: Fetching profile (attempt ${retryCount + 1}/${maxRetries + 1}) for user:`, userId)
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle()
+      
+      console.log(`AuthContext: Profile fetch attempt ${retryCount + 1} result:`, { profile, error })
+      
+      if (error) {
+        if (retryCount < maxRetries && (error.code === 'PGRST116' || error.message?.includes('JWT') || error.message?.includes('auth'))) {
+          console.log(`AuthContext: Retrying profile fetch in ${delay}ms...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          return fetchProfileWithRetry(userId, retryCount + 1)
+        }
+        throw error
+      }
+      
+      if (profile) {
+        setProfileError(null)
+        setProfileRetryCount(0)
+        return profile
+      }
+      
+      return null
+    } catch (error) {
+      console.error(`AuthContext: Profile fetch attempt ${retryCount + 1} failed:`, error)
+      
+      if (retryCount < maxRetries) {
+        console.log(`AuthContext: Retrying profile fetch in ${delay}ms...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+        return fetchProfileWithRetry(userId, retryCount + 1)
+      }
+      
+      setProfileError(error instanceof Error ? error.message : 'Failed to load user profile')
+      setProfileRetryCount(retryCount + 1)
+      throw error
+    }
+  }
+
+  // Session health check
+  const validateSession = async (session: Session): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.auth.getUser(session.access_token)
+      if (error) {
+        console.error('AuthContext: Session validation failed:', error)
+        return false
+      }
+      console.log('AuthContext: Session validated successfully')
+      return !!data.user
+    } catch (error) {
+      console.error('AuthContext: Session validation exception:', error)
+      return false
+    }
+  }
+
+  // Force refresh function
+  const forceRefresh = async () => {
+    try {
+      console.log('AuthContext: Force refreshing authentication state...')
+      setLoading(true)
+      setProfileError(null)
+      setProfileRetryCount(0)
+      
+      // Clear current state
+      setUser(null)
+      setUserProfile(null)
+      setSession(null)
+      setSessionValidated(false)
+      
+      // Force refresh session
+      const { data: { session }, error } = await supabase.auth.refreshSession()
+      
+      if (error) {
+        console.error('AuthContext: Force refresh failed:', error)
+        throw error
+      }
+      
+      if (session?.user) {
+        setSession(session)
+        setUser(session.user)
+        
+        const profile = await fetchProfileWithRetry(session.user.id)
+        
+        if (profile) {
+          setUserProfile(profile)
+        }
+        
+        setSessionValidated(true)
+      }
+    } catch (error) {
+      console.error('AuthContext: Force refresh exception:', error)
+      setProfileError('Failed to refresh authentication. Please try logging in again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     let mounted = true
     
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return
         
+        console.log('AuthContext: Auth state changed:', event, !!session)
+        
+        // Only synchronous state updates here to prevent deadlocks
         setSession(session)
         setUser(session?.user ?? null)
+        setSessionValidated(false)
         
         if (session?.user) {
-          // Fetch user profile when logged in
-          try {
-            console.log('AuthContext: Fetching profile for user:', session.user.id)
-            const { data: profile, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle()
+          // Defer profile fetching to prevent auth callback deadlocks
+          setTimeout(async () => {
+            if (!mounted) return
             
-            console.log('AuthContext: Profile fetch result:', { profile, error })
-            
-            if (error) {
-              console.error('Error fetching user profile:', error)
-            } else if (profile && mounted) {
-              console.log('AuthContext: Setting user profile:', profile)
-              setUserProfile(profile)
-            } else {
-              console.log('AuthContext: No profile found for user')
+            try {
+              const isValid = await validateSession(session)
+              if (!mounted) return
+              
+              if (isValid) {
+                setSessionValidated(true)
+                const profile = await fetchProfileWithRetry(session.user.id)
+                
+                if (mounted && profile) {
+                  setUserProfile(profile)
+                }
+              } else {
+                console.warn('AuthContext: Session validation failed, forcing refresh...')
+                await forceRefresh()
+              }
+            } catch (error) {
+              console.error('AuthContext: Profile fetch in state change failed:', error)
+              if (mounted) {
+                setProfileError('Authentication issue detected. Please refresh.')
+              }
+            } finally {
+              if (mounted) {
+                setLoading(false)
+              }
             }
-          } catch (error) {
-            console.error('Exception fetching user profile:', error)
-          }
+          }, 0)
         } else {
           setUserProfile(null)
-        }
-        
-        if (mounted) {
+          setProfileError(null)
+          setSessionValidated(false)
           setLoading(false)
         }
       }
@@ -90,39 +211,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // THEN check for existing session with timeout
     const sessionTimeout = setTimeout(() => {
       if (mounted) {
-        console.log('Session check timeout, setting loading to false')
+        console.log('AuthContext: Session check timeout, setting loading to false')
         setLoading(false)
       }
-    }, 5000) // 5 second timeout
+    }, 8000) // 8 second timeout
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
       if (!mounted) return
       clearTimeout(sessionTimeout)
+      
+      if (error) {
+        console.error('AuthContext: Error getting initial session:', error)
+        setLoading(false)
+        return
+      }
       
       setSession(session)
       setUser(session?.user ?? null)
       
       if (session?.user) {
         try {
-          console.log('AuthContext: Getting session profile for user:', session.user.id)
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle()
+          const isValid = await validateSession(session)
+          if (!mounted) return
           
-          console.log('AuthContext: Session profile fetch result:', { profile, error })
-          
-          if (error) {
-            console.error('Error fetching session profile:', error)
-          } else if (profile && mounted) {
-            console.log('AuthContext: Setting session profile:', profile)
-            setUserProfile(profile)
+          if (isValid) {
+            setSessionValidated(true)
+            const profile = await fetchProfileWithRetry(session.user.id)
+            
+            if (mounted && profile) {
+              setUserProfile(profile)
+            }
           } else {
-            console.log('AuthContext: No session profile found')
+            console.warn('AuthContext: Initial session validation failed')
+            setProfileError('Session validation failed. Please refresh or login again.')
           }
         } catch (error) {
-          console.error('Exception fetching session profile:', error)
+          console.error('AuthContext: Initial profile fetch failed:', error)
+          if (mounted) {
+            setProfileError('Failed to load user profile. Please refresh or login again.')
+          }
         }
       }
       
@@ -130,9 +257,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLoading(false)
       }
     }).catch(error => {
-      console.error('Error getting session:', error)
+      console.error('AuthContext: Exception getting initial session:', error)
       if (mounted) {
         setLoading(false)
+        setProfileError('Failed to initialize authentication. Please refresh.')
       }
     })
 
@@ -237,6 +365,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     loading,
     signingOut,
+    profileError,
+    forceRefresh,
     signIn,
     signUp,
     signOut,
