@@ -27,6 +27,7 @@ const Locations = () => {
       .order('created_at', { ascending: false })
     
     if (error) {
+      console.error('Failed to fetch locations:', error)
       toast({
         title: 'Error',
         description: 'Failed to fetch locations',
@@ -122,9 +123,13 @@ const Locations = () => {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-muted-foreground">City: {location.cities?.name}</span>
                 </div>
-                {location.coordinates && (
+                {(location.latitude || location.longitude) && (
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-muted-foreground">Coordinates: {location.coordinates}</span>
+                    <span className="text-muted-foreground">
+                      Location: {location.latitude && location.longitude 
+                        ? `${location.latitude}, ${location.longitude}` 
+                        : location.Coordinates || 'Coordinates available'}
+                    </span>
                   </div>
                 )}
                 <div className="flex gap-2 pt-2">

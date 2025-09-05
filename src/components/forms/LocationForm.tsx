@@ -17,7 +17,9 @@ const locationSchema = z.object({
   organization_id: z.string().min(1, 'Organization is required'),
   address: z.string().min(1, 'Address is required'),
   city_id: z.string().min(1, 'City is required'),
-  coordinates: z.string().optional(),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  Coordinates: z.string().optional(),
 })
 
 type LocationFormData = z.infer<typeof locationSchema>
@@ -30,7 +32,9 @@ interface LocationFormProps {
     organization_id: string
     address: string
     city_id: string
-    coordinates?: string
+    latitude?: string
+    longitude?: string
+    Coordinates?: string
   }
 }
 
@@ -47,7 +51,9 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
       organization_id: editData?.organization_id || '',
       address: editData?.address || '',
       city_id: editData?.city_id || '',
-      coordinates: editData?.coordinates || '',
+      latitude: editData?.latitude || '',
+      longitude: editData?.longitude || '',
+      Coordinates: editData?.Coordinates || '',
     },
   })
 
@@ -85,7 +91,9 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
             organization_id: data.organization_id,
             address: data.address,
             city_id: data.city_id,
-            coordinates: data.coordinates || null,
+            latitude: data.latitude ? parseFloat(data.latitude) : null,
+            longitude: data.longitude ? parseFloat(data.longitude) : null,
+            Coordinates: data.Coordinates || null,
           })
           .eq('id', editData.id)
 
@@ -104,8 +112,9 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
             organization_id: data.organization_id,
             address: data.address,
             city_id: data.city_id,
-            coordinates: data.coordinates || null,
-            created_by: user.id,
+            latitude: data.latitude ? parseFloat(data.latitude) : null,
+            longitude: data.longitude ? parseFloat(data.longitude) : null,
+            Coordinates: data.Coordinates || null,
           })
 
         if (error) throw error
@@ -215,14 +224,44 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSuccess, editData 
               )}
             />
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 28.6139" type="number" step="any" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 77.2090" type="number" step="any" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="coordinates"
+              name="Coordinates"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Coordinates (Optional)</FormLabel>
+                  <FormLabel>Coordinates Text (Optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 40.7128,-74.0060" {...field} />
+                    <Input placeholder="e.g., Near Metro Station, Sector 18" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
