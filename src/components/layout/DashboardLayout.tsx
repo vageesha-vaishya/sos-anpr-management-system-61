@@ -41,7 +41,7 @@ interface DashboardLayoutProps {
 }
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { userProfile, signOut } = useAuth()
+  const { userProfile, signOut, signingOut } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const navRef = useRef<HTMLElement>(null)
@@ -239,9 +239,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               variant="ghost"
               className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               onClick={signOut}
+              disabled={signingOut}
             >
               <LogOut className="w-5 h-5 mr-3" />
-              Sign Out
+              {signingOut ? "Signing Out..." : "Sign Out"}
             </Button>
           </div>
         </div>

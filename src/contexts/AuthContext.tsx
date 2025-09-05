@@ -19,6 +19,7 @@ interface AuthContextType {
   userProfile: UserProfile | null
   session: Session | null
   loading: boolean
+  signingOut: boolean
   signIn: (email: string, password: string) => Promise<{ error?: any }>
   signUp: (email: string, password: string, fullName?: string) => Promise<{ error?: any }>
   signOut: () => Promise<void>
@@ -40,6 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -174,10 +176,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const signOut = async () => {
+    if (signingOut) return // Prevent multiple simultaneous logout attempts
+    
+    setSigningOut(true)
+    
     try {
-      await supabase.auth.signOut()
+      console.log('AuthContext: Starting sign out process')
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error('Sign out error:', error)
+        throw error
+      }
+      
+      console.log('AuthContext: Successfully signed out from Supabase')
+      
+      // Manually clear all state to ensure clean logout
+      setUser(null)
+      setUserProfile(null)
+      setSession(null)
+      
+      // Redirect to auth page
+      window.location.href = '/auth'
+      
     } catch (error) {
-      console.error('Sign out error:', error)
+      console.error('Sign out failed:', error)
+      // Even if there's an error, try to clear state and redirect
+      setUser(null)
+      setUserProfile(null)
+      setSession(null)
+      window.location.href = '/auth'
+    } finally {
+      setSigningOut(false)
     }
   }
 
@@ -204,6 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     userProfile,
     session,
     loading,
+    signingOut,
     signIn,
     signUp,
     signOut,
