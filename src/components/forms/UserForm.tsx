@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
+import { generateSecurePassword, validateSecureEmail, sanitizeInput } from '@/lib/security'
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -120,13 +121,25 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
           description: 'User updated successfully',
         })
       } else {
+        // Validate email for security
+        if (!validateSecureEmail(data.email)) {
+          throw new Error('Invalid email format')
+        }
+
+        // Sanitize input data
+        const sanitizedFullName = sanitizeInput(data.full_name)
+        
+        // Generate secure temporary password
+        const temporaryPassword = generateSecurePassword(16)
+        
         // Create new user via Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: data.email,
-          password: 'TempPass123!', // Temporary password - user should change on first login
+          password: temporaryPassword,
           options: {
             data: {
-              full_name: data.full_name,
+              full_name: sanitizedFullName,
+              requires_password_change: true, // Force password change on first login
             },
             emailRedirectTo: `${window.location.origin}/auth`,
           }
@@ -149,7 +162,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
 
           toast({
             title: 'Success',
-            description: `User created successfully. Confirmation email sent to ${data.email}`,
+            description: `User created successfully. They will receive an email with login instructions and must set a new password on first login.`,
           })
         }
       }

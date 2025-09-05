@@ -64,11 +64,6 @@ export default function Auth() {
     }
   }
 
-  const handleTestLogin = () => {
-    setEmail('bahuguna.vimal@gmail.com')
-    setPassword('Vimal@1234')
-    setIsLogin(true)
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -156,25 +151,7 @@ export default function Auth() {
                 {isLogin ? 'Need an account? Sign Up' : 'Already have an account? Sign In'}
               </Button>
 
-              {isLogin && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full"
-                  onClick={handleTestLogin}
-                >
-                  Use Demo Admin Account
-                </Button>
-              )}
             </div>
-
-              {isLogin && (
-                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  <strong>Admin Credentials:</strong><br />
-                  Email: bahuguna.vimal@gmail.com<br />
-                  Password: Vimal@1234
-                </div>
-              )}
           </CardContent>
         </Card>
       </div>

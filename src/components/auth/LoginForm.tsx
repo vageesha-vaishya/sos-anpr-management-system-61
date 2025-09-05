@@ -9,8 +9,8 @@ import { AlertCircle, Shield } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState('Bahuguna.vimal@gmail.com')
-  const [password, setPassword] = useState('Vimal@1234')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { signIn } = useAuth()
@@ -96,13 +96,6 @@ export const LoginForm = () => {
             </Button>
           </form>
 
-          <div className="mt-6 p-4 bg-secondary/50 rounded-md">
-            <p className="text-sm text-muted-foreground">
-              <strong>Demo Credentials:</strong><br />
-              Email: Bahuguna.vimal@gmail.com<br />
-              Password: Vimal@1234
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
