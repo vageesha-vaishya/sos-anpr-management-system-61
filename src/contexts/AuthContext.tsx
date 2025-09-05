@@ -42,9 +42,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let mounted = true
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return
+        
         setSession(session)
         setUser(session?.user ?? null)
         
@@ -55,9 +59,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
-              .single()
+              .maybeSingle()
             
-            if (profile) {
+            if (profile && mounted) {
               setUserProfile(profile)
             }
           } catch (error) {
@@ -67,12 +71,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUserProfile(null)
         }
         
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
       }
     )
 
-    // THEN check for existing session
+    // THEN check for existing session with timeout
+    const sessionTimeout = setTimeout(() => {
+      if (mounted) {
+        console.log('Session check timeout, setting loading to false')
+        setLoading(false)
+      }
+    }, 5000) // 5 second timeout
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return
+      clearTimeout(sessionTimeout)
+      
       setSession(session)
       setUser(session?.user ?? null)
       
@@ -82,9 +98,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
-            .single()
+            .maybeSingle()
           
-          if (profile) {
+          if (profile && mounted) {
             setUserProfile(profile)
           }
         } catch (error) {
@@ -92,10 +108,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       
-      setLoading(false)
+      if (mounted) {
+        setLoading(false)
+      }
+    }).catch(error => {
+      console.error('Error getting session:', error)
+      if (mounted) {
+        setLoading(false)
+      }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      clearTimeout(sessionTimeout)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {

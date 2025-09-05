@@ -70,11 +70,11 @@ export default function HelpDesk() {
   const loadTickets = async () => {
     try {
       setLoading(true)
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('helpdesk_tickets')
         .select(`
           *,
-          created_by_profile:profiles!helpdesk_tickets_created_by_fkey(full_name, email),
+          created_by_profile:profiles(full_name, email),
           assigned_staff:staff_members(full_name, position)
         `)
         .order('created_at', { ascending: false })

@@ -451,6 +451,38 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/announcements" 
+              element={
+                <ProtectedRoute>
+                  <Announcements />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/residents" 
+              element={
+                <ProtectedRoute>
+                  <Residents />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin-portal" 
+              element={
+                <ProtectedRoute>
+                  <AdminPortal />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/home-services" 
+              element={
+                <ProtectedRoute>
+                  <HomeServices />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
