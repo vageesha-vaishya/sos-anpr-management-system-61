@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext'
 const alertSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   message: z.string().min(1, 'Message is required'),
-  type: z.string().min(1, 'Alert type is required'),
+  alert_type: z.enum(['system', 'security', 'maintenance', 'detection']),
   severity: z.enum(['low', 'medium', 'high', 'critical']),
   camera_id: z.string().optional(),
 })
@@ -36,7 +36,7 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
     defaultValues: {
       title: '',
       message: '',
-      type: 'system',
+      alert_type: 'system',
       severity: 'medium',
       camera_id: '',
     },
@@ -70,11 +70,10 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
         .insert({
           title: data.title,
           message: data.message,
-          alert_type: data.type as "system" | "security" | "maintenance" | "detection",
-          severity: data.severity as "low" | "medium" | "high" | "critical",
-          camera_id: data.camera_id === 'none' ? null : data.camera_id || null,
+          alert_type: data.alert_type,
+          severity: data.severity,
+          created_by: userProfile.id,
           organization_id: userProfile.organization_id,
-          status: 'unread',
         })
 
       if (error) throw error
@@ -135,7 +134,7 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="type"
+                name="alert_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Alert Type</FormLabel>
@@ -148,9 +147,7 @@ export const AlertForm: React.FC<AlertFormProps> = ({ onSuccess }) => {
                       <SelectContent>
                         <SelectItem value="system">System Alert</SelectItem>
                         <SelectItem value="security">Security Alert</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
-                        <SelectItem value="camera">Camera Issue</SelectItem>
-                        <SelectItem value="network">Network Issue</SelectItem>
+                        <SelectItem value="maintenance">Maintenance Alert</SelectItem>
                         <SelectItem value="detection">Detection Alert</SelectItem>
                       </SelectContent>
                     </Select>

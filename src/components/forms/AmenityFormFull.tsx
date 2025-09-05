@@ -55,10 +55,18 @@ export const AmenityFormFull: React.FC<AmenityFormProps> = ({ onSuccess, editDat
   }, [])
 
   const fetchBuildings = async () => {
+    if (!userProfile?.organization_id) return
+    
     try {
       const { data, error } = await supabase
         .from('buildings')
-        .select('id, name')
+        .select(`
+          id, 
+          name,
+          location_id,
+          locations!inner(organization_id)
+        `)
+        .eq('locations.organization_id', userProfile.organization_id)
         .eq('is_active', true)
 
       if (error) throw error
@@ -74,6 +82,15 @@ export const AmenityFormFull: React.FC<AmenityFormProps> = ({ onSuccess, editDat
   }
 
   const onSubmit = async (data: AmenityFormData) => {
+    if (!userProfile?.organization_id) {
+      toast({
+        title: "Error",
+        description: "User organization not found. Please log in again.",
+        variant: "destructive"
+      })
+      return
+    }
+
     try {
       const operatingHours = data.operating_hours ? JSON.parse(data.operating_hours) : null
       const pricing = data.pricing ? JSON.parse(data.pricing) : null

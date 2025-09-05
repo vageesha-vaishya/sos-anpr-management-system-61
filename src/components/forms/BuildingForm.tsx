@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast'
 const buildingSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   location_id: z.string().min(1, 'Location is required'),
-  type: z.string().min(1, 'Building type is required'),
+  building_type: z.enum(['office', 'residential', 'commercial', 'industrial']),
   floors: z.number().min(1, 'At least 1 floor required'),
 })
 
@@ -32,7 +32,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
     defaultValues: {
       name: '',
       location_id: '',
-      type: 'office',
+      building_type: 'office',
       floors: 1,
     },
   })
@@ -56,7 +56,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
         .insert({
           name: data.name,
           location_id: data.location_id,
-          building_type: data.type as any,
+          building_type: data.building_type,
           floors: data.floors,
         })
 
@@ -130,7 +130,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="type"
+                name="building_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Building Type</FormLabel>
@@ -145,8 +145,6 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess }) => {
                         <SelectItem value="residential">Residential</SelectItem>
                         <SelectItem value="commercial">Commercial</SelectItem>
                         <SelectItem value="industrial">Industrial</SelectItem>
-                        <SelectItem value="mixed">Mixed Use</SelectItem>
-                        <SelectItem value="parking">Parking Structure</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

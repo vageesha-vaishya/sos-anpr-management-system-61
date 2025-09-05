@@ -14,11 +14,10 @@ const cameraSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   entry_gate_id: z.string().min(1, 'Entry gate is required'),
   ip_address: z.string().min(1, 'IP address is required'),
-  rtsp_url: z.string().min(1, 'RTSP URL is required'),
-  model: z.string().min(1, 'Model is required'),
-  resolution: z.string().min(1, 'Resolution is required'),
-  fps: z.number().min(1, 'FPS must be at least 1'),
-  status: z.enum(['online', 'offline', 'maintenance']),
+  rtsp_url: z.string().optional(),
+  username: z.string().optional(),
+  password: z.string().optional(),
+  is_active: z.boolean().default(true),
 })
 
 type CameraFormData = z.infer<typeof cameraSchema>
@@ -30,11 +29,10 @@ interface CameraFormProps {
     name: string
     entry_gate_id: string
     ip_address: string
-    rtsp_url: string
-    model: string
-    resolution: string
-    fps: number
-    status: string
+    rtsp_url?: string
+    username?: string
+    password?: string
+    is_active: boolean
   }
 }
 
@@ -49,10 +47,9 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
       entry_gate_id: editData?.entry_gate_id || '',
       ip_address: editData?.ip_address || '',
       rtsp_url: editData?.rtsp_url || '',
-      model: editData?.model || '',
-      resolution: editData?.resolution || '1920x1080',
-      fps: editData?.fps || 30,
-      status: (editData?.status as any) || 'offline',
+      username: editData?.username || '',
+      password: editData?.password || '',
+      is_active: editData?.is_active ?? true,
     },
   })
 
@@ -78,11 +75,10 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
             name: data.name,
             entry_gate_id: data.entry_gate_id,
             ip_address: data.ip_address,
-            rtsp_url: data.rtsp_url,
-            model: data.model,
-            resolution: data.resolution,
-            fps: data.fps,
-            status: data.status,
+            rtsp_url: data.rtsp_url || null,
+            username: data.username || null,
+            password: data.password || null,
+            is_active: data.is_active,
           })
           .eq('id', editData.id)
 
@@ -100,11 +96,10 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
             name: data.name,
             entry_gate_id: data.entry_gate_id,
             ip_address: data.ip_address,  
-            rtsp_url: data.rtsp_url,
-            model: data.model,
-            resolution: data.resolution,
-            fps: data.fps,
-            status: data.status,
+            rtsp_url: data.rtsp_url || null,
+            username: data.username || null,
+            password: data.password || null,
+            is_active: data.is_active,
           })
 
         if (error) throw error
@@ -175,15 +170,43 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="ip_address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>IP Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="192.168.1.100" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="rtsp_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>RTSP URL (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="rtsp://admin:password@192.168.1.100:554/stream" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="ip_address"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>IP Address</FormLabel>
+                    <FormLabel>Username (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="192.168.1.100" {...field} />
+                      <Input placeholder="admin" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -192,12 +215,12 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
 
               <FormField
                 control={form.control}
-                name="model"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Camera Model</FormLabel>
+                    <FormLabel>Password (Optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Hikvision DS-2CD2043G0-I" {...field} />
+                      <Input type="password" placeholder="password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -207,85 +230,25 @@ export const CameraForm: React.FC<CameraFormProps> = ({ onSuccess, editData }) =
 
             <FormField
               control={form.control}
-              name="rtsp_url"
+              name="is_active"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>RTSP URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="rtsp://admin:password@192.168.1.100:554/stream" {...field} />
-                  </FormControl>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={(value) => field.onChange(value === 'true')} defaultValue={field.value ? 'true' : 'false'}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="true">Active</SelectItem>
+                      <SelectItem value="false">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <div className="grid grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="resolution"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Resolution</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="1920x1080">1920x1080 (Full HD)</SelectItem>
-                        <SelectItem value="1280x720">1280x720 (HD)</SelectItem>
-                        <SelectItem value="2560x1440">2560x1440 (QHD)</SelectItem>
-                        <SelectItem value="3840x2160">3840x2160 (4K)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="fps"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>FPS</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="30" 
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="online">Online</SelectItem>
-                        <SelectItem value="offline">Offline</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <Button type="submit" className="w-full">
               {editData ? 'Update Camera' : 'Register Camera'}

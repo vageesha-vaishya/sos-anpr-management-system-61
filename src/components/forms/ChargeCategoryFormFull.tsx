@@ -44,6 +44,15 @@ export const ChargeCategoryFormFull: React.FC<ChargeCategoryFormProps> = ({ onSu
   })
 
   const onSubmit = async (data: ChargeCategoryFormData) => {
+    if (!userProfile?.organization_id) {
+      toast({
+        title: "Error",
+        description: "User organization not found. Please log in again.",
+        variant: "destructive"
+      })
+      return
+    }
+
     try {
       if (editData) {
         const { error } = await supabase
@@ -54,7 +63,7 @@ export const ChargeCategoryFormFull: React.FC<ChargeCategoryFormProps> = ({ onSu
             charge_type: data.charge_type,
             base_amount: data.base_amount,
             billing_cycle: data.billing_cycle,
-            organization_id: userProfile?.organization_id
+            organization_id: userProfile.organization_id
           })
           .eq('id', editData.id)
 
@@ -68,7 +77,7 @@ export const ChargeCategoryFormFull: React.FC<ChargeCategoryFormProps> = ({ onSu
             charge_type: data.charge_type,
             base_amount: data.base_amount,
             billing_cycle: data.billing_cycle,
-            organization_id: userProfile?.organization_id
+            organization_id: userProfile.organization_id
           })
 
         if (error) throw error

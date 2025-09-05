@@ -13,8 +13,8 @@ import { useToast } from '@/hooks/use-toast'
 const entryGateSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   building_id: z.string().min(1, 'Building is required'),
-  type: z.string().min(1, 'Gate type is required'),
-  status: z.enum(['active', 'inactive', 'maintenance']),
+  gate_type: z.enum(['main', 'visitor', 'service', 'emergency']),
+  is_active: z.boolean().default(true),
 })
 
 type EntryGateFormData = z.infer<typeof entryGateSchema>
@@ -32,8 +32,8 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
     defaultValues: {
       name: '',
       building_id: '',
-      type: 'main',
-      status: 'active',
+      gate_type: 'main',
+      is_active: true,
     },
   })
 
@@ -56,8 +56,8 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
         .insert({
           name: data.name,
           building_id: data.building_id,
-          gate_type: data.type as any,
-          is_active: data.status === 'active',
+          gate_type: data.gate_type,
+          is_active: data.is_active,
         })
 
       if (error) throw error
@@ -130,7 +130,7 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="type"
+                name="gate_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Gate Type</FormLabel>
@@ -145,8 +145,6 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
                         <SelectItem value="visitor">Visitor Gate</SelectItem>
                         <SelectItem value="service">Service Gate</SelectItem>
                         <SelectItem value="emergency">Emergency Exit</SelectItem>
-                        <SelectItem value="vip">VIP Entrance</SelectItem>
-                        <SelectItem value="staff">Staff Entrance</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -156,20 +154,19 @@ export const EntryGateForm: React.FC<EntryGateFormProps> = ({ onSuccess }) => {
 
               <FormField
                 control={form.control}
-                name="status"
+                name="is_active"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={(value) => field.onChange(value === 'true')} defaultValue={field.value ? 'true' : 'false'}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="true">Active</SelectItem>
+                        <SelectItem value="false">Inactive</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
