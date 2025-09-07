@@ -46,6 +46,12 @@ import RoutineManagement from "@/pages/RoutineManagement";
 import SocietyManagementNew from "@/pages/SocietyManagementNew";
 import SocietyBooksManagement from "@/pages/SocietyBooksManagement";
 import GatekeeperModule from "@/pages/GatekeeperModule";
+import GeneralLedger from "@/pages/GeneralLedger";
+import IncomeTracker from "@/pages/IncomeTracker";
+import ExpenseTracker from "@/pages/ExpenseTracker";
+import BankCash from "@/pages/BankCash";
+import UtilityTracker from "@/pages/UtilityTracker";
+import AdvancedAmenityBooking from "@/pages/AdvancedAmenityBooking";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PlatformAdminDashboard } from "@/components/dashboard/PlatformAdminDashboard";
 import { FranchiseAdminDashboard } from "@/components/dashboard/FranchiseAdminDashboard";
@@ -541,6 +547,62 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <HomeServices />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/society-books-management" 
+              element={
+                <ProtectedRoute>
+                  <SocietyBooksManagement />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/general-ledger" 
+              element={
+                <ProtectedRoute>
+                  <GeneralLedger />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/income-tracker" 
+              element={
+                <ProtectedRoute>
+                  <IncomeTracker />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/expense-tracker" 
+              element={
+                <ProtectedRoute>
+                  <ExpenseTracker />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/bank-cash" 
+              element={
+                <ProtectedRoute>
+                  <BankCash />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/utility-tracker" 
+              element={
+                <ProtectedRoute>
+                  <UtilityTracker />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/advanced-amenity-booking" 
+              element={
+                <ProtectedRoute>
+                  <AdvancedAmenityBooking />
                 </ProtectedRoute>
               } 
             />
