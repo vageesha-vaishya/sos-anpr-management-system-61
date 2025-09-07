@@ -12,28 +12,10 @@ import {
   PieChart
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { DataTable } from "@/components/tables/DataTable"
-import { supabase } from "@/integrations/supabase/client"
 
 const ExpenseTracker = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("expenses")
-
-  const expensesColumns = [
-    { accessorKey: "expense_date", header: "Date" },
-    { accessorKey: "vendor_name", header: "Vendor" },
-    { accessorKey: "description", header: "Description" },
-    { accessorKey: "amount", header: "Amount" },
-    { accessorKey: "payment_status", header: "Status" },
-    { accessorKey: "due_date", header: "Due Date" }
-  ]
-
-  const expenseCategoriesColumns = [
-    { accessorKey: "category_name", header: "Category" },
-    { accessorKey: "category_type", header: "Type" },
-    { accessorKey: "budget_amount", header: "Budget" },
-    { accessorKey: "is_active", header: "Active" }
-  ]
 
   const statsCards = [
     {
@@ -129,22 +111,14 @@ const ExpenseTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={expensesColumns}
-                searchKey="vendor_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('expenses')
-                    .select(`
-                      *,
-                      expense_categories!inner(category_name, category_type)
-                    `)
-                    .order('expense_date', { ascending: false })
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <CreditCard className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Expense Records</h3>
+                <p className="text-muted-foreground mb-4">
+                  Expense data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Expense Tracking</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -165,19 +139,14 @@ const ExpenseTracker = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <DataTable
-                  data={[]}
-                  columns={expenseCategoriesColumns}
-                  searchKey="category_name"
-                  onRefresh={() => {}}
-                  fetchData={async () => {
-                    const { data } = await supabase
-                      .from('expense_categories')
-                      .select('*')
-                      .order('category_name')
-                    return data || []
-                  }}
-                />
+                <div className="text-center py-12">
+                  <TrendingDown className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Expense Categories</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Configure expense categories and budget allocations
+                  </p>
+                  <Button variant="outline">Setup Categories</Button>
+                </div>
               </CardContent>
             </Card>
 

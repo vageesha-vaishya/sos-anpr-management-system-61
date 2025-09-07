@@ -13,29 +13,10 @@ import {
   TrendingUp
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { DataTable } from "@/components/tables/DataTable"
-import { supabase } from "@/integrations/supabase/client"
 
 const UtilityTracker = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("utility-bills")
-
-  const utilityBillsColumns = [
-    { accessorKey: "utility_type", header: "Utility Type" },
-    { accessorKey: "provider_name", header: "Provider" },
-    { accessorKey: "bill_month", header: "Bill Month" },
-    { accessorKey: "total_amount", header: "Amount" },
-    { accessorKey: "total_consumption", header: "Consumption" },
-    { accessorKey: "due_date", header: "Due Date" },
-    { accessorKey: "bill_status", header: "Status" }
-  ]
-
-  const utilityAllocationsColumns = [
-    { accessorKey: "unit_number", header: "Unit Number" },
-    { accessorKey: "allocated_consumption", header: "Consumption" },
-    { accessorKey: "allocated_amount", header: "Amount" },
-    { accessorKey: "allocation_method", header: "Method" }
-  ]
 
   const utilityTypes = [
     {
@@ -182,19 +163,14 @@ const UtilityTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={utilityBillsColumns}
-                searchKey="provider_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('utility_bills')
-                    .select('*')
-                    .order('bill_month', { ascending: false })
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <Zap className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Utility Bills</h3>
+                <p className="text-muted-foreground mb-4">
+                  Utility bill data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Utility Tracking</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -252,22 +228,14 @@ const UtilityTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={utilityAllocationsColumns}
-                searchKey="unit_number"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('utility_allocations')
-                    .select(`
-                      *,
-                      utility_bills!inner(utility_type, provider_name, bill_month)
-                    `)
-                    .order('unit_number')
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Unit Allocation</h3>
+                <p className="text-muted-foreground mb-4">
+                  Unit allocation data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Unit Allocation</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

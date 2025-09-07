@@ -14,39 +14,10 @@ import {
   BarChart3
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { DataTable } from "@/components/tables/DataTable"
-import { supabase } from "@/integrations/supabase/client"
 
 const AdvancedAmenityBooking = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("revenue-tracking")
-
-  const revenueColumns = [
-    { accessorKey: "booking_date", header: "Date" },
-    { accessorKey: "amenity_name", header: "Amenity" },
-    { accessorKey: "customer_name", header: "Customer" },
-    { accessorKey: "booking_hours", header: "Duration" },
-    { accessorKey: "revenue_amount", header: "Revenue" },
-    { accessorKey: "booking_status", header: "Status" }
-  ]
-
-  const pricingModelsColumns = [
-    { accessorKey: "amenity_name", header: "Amenity" },
-    { accessorKey: "pricing_type", header: "Pricing Type" },
-    { accessorKey: "base_price", header: "Base Price" },
-    { accessorKey: "peak_hour_multiplier", header: "Peak Multiplier" },
-    { accessorKey: "weekend_multiplier", header: "Weekend Multiplier" },
-    { accessorKey: "is_active", header: "Active" }
-  ]
-
-  const promotionalOffersColumns = [
-    { accessorKey: "offer_name", header: "Offer Name" },
-    { accessorKey: "discount_type", header: "Type" },
-    { accessorKey: "discount_value", header: "Discount" },
-    { accessorKey: "valid_from", header: "Valid From" },
-    { accessorKey: "valid_to", header: "Valid To" },
-    { accessorKey: "usage_count", header: "Used" }
-  ]
 
   const revenueStats = [
     {
@@ -195,16 +166,14 @@ const AdvancedAmenityBooking = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={revenueColumns}
-                searchKey="customer_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  // This would connect to an amenity_bookings or revenue_records table
-                  return []
-                }}
-              />
+              <div className="text-center py-12">
+                <DollarSign className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Revenue Tracking</h3>
+                <p className="text-muted-foreground mb-4">
+                  Revenue data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Revenue Tracking</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -224,16 +193,14 @@ const AdvancedAmenityBooking = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={pricingModelsColumns}
-                searchKey="amenity_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  // This would connect to a pricing_models table
-                  return []
-                }}
-              />
+              <div className="text-center py-12">
+                <Settings className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Pricing Models</h3>
+                <p className="text-muted-foreground mb-4">
+                  Pricing model data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Pricing Models</Button>
+              </div>
             </CardContent>
           </Card>
 
@@ -300,16 +267,14 @@ const AdvancedAmenityBooking = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={promotionalOffersColumns}
-                searchKey="offer_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  // This would connect to a promotional_offers table
-                  return []
-                }}
-              />
+              <div className="text-center py-12">
+                <Tag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Promotional Offers</h3>
+                <p className="text-muted-foreground mb-4">
+                  Promotional offer data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Promotions</Button>
+              </div>
             </CardContent>
           </Card>
 

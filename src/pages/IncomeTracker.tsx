@@ -12,29 +12,10 @@ import {
   Calendar
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { DataTable } from "@/components/tables/DataTable"
-import { supabase } from "@/integrations/supabase/client"
 
 const IncomeTracker = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("income-records")
-
-  const incomeRecordsColumns = [
-    { accessorKey: "received_date", header: "Date" },
-    { accessorKey: "customer_name", header: "Customer" },
-    { accessorKey: "customer_unit", header: "Unit" },
-    { accessorKey: "amount", header: "Amount" },
-    { accessorKey: "payment_method", header: "Payment Method" },
-    { accessorKey: "status", header: "Status" }
-  ]
-
-  const incomeSourcesColumns = [
-    { accessorKey: "source_name", header: "Source Name" },
-    { accessorKey: "source_type", header: "Type" },
-    { accessorKey: "default_amount", header: "Default Amount" },
-    { accessorKey: "billing_frequency", header: "Frequency" },
-    { accessorKey: "is_active", header: "Active" }
-  ]
 
   const statsCards = [
     {
@@ -123,22 +104,14 @@ const IncomeTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={incomeRecordsColumns}
-                searchKey="customer_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('income_records')
-                    .select(`
-                      *,
-                      income_sources!inner(source_name, source_type)
-                    `)
-                    .order('received_date', { ascending: false })
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <DollarSign className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Income Records</h3>
+                <p className="text-muted-foreground mb-4">
+                  Income data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Income Tracking</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -158,19 +131,14 @@ const IncomeTracker = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={incomeSourcesColumns}
-                searchKey="source_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('income_sources')
-                    .select('*')
-                    .order('source_name')
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Income Sources</h3>
+                <p className="text-muted-foreground mb-4">
+                  Configure income source categories and billing frequencies
+                </p>
+                <Button variant="outline">Setup Income Sources</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

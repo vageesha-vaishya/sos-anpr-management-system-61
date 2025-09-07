@@ -12,28 +12,10 @@ import {
   TrendingUp
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { DataTable } from "@/components/tables/DataTable"
-import { supabase } from "@/integrations/supabase/client"
 
 const GeneralLedger = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("chart-of-accounts")
-
-  const chartOfAccountsColumns = [
-    { key: "account_code", accessorKey: "account_code", header: "Account Code" },
-    { key: "account_name", accessorKey: "account_name", header: "Account Name" },
-    { key: "account_type", accessorKey: "account_type", header: "Type" },
-    { key: "account_category", accessorKey: "account_category", header: "Category" },
-    { key: "description", accessorKey: "description", header: "Description" }
-  ]
-
-  const journalEntriesColumns = [
-    { key: "entry_number", accessorKey: "entry_number", header: "Entry #" },
-    { key: "entry_date", accessorKey: "entry_date", header: "Date" },
-    { key: "description", accessorKey: "description", header: "Description" },
-    { key: "total_amount", accessorKey: "total_amount", header: "Amount" },
-    { key: "status", accessorKey: "status", header: "Status" }
-  ]
 
   const modules = [
     {
@@ -124,23 +106,14 @@ const GeneralLedger = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={chartOfAccountsColumns}
-                searchKey="account_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  try {
-                    const { data } = await supabase
-                      .from('chart_of_accounts')
-                      .select('*')
-                      .order('account_code')
-                    return data || []
-                  } catch (error) {
-                    return []
-                  }
-                }}
-              />
+              <div className="text-center py-12">
+                <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Chart of Accounts</h3>
+                <p className="text-muted-foreground mb-4">
+                  Financial data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Setup Chart of Accounts</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -160,19 +133,14 @@ const GeneralLedger = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={journalEntriesColumns}
-                searchKey="description"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('journal_entries')
-                    .select('*')
-                    .order('entry_date', { ascending: false })
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Journal Entries</h3>
+                <p className="text-muted-foreground mb-4">
+                  Transaction data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Create Journal Entry</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -13,40 +13,10 @@ import {
   ArrowUpDown
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { DataTable } from "@/components/tables/DataTable"
-import { supabase } from "@/integrations/supabase/client"
 
 const BankCash = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState("bank-accounts")
-
-  const bankAccountsColumns = [
-    { accessorKey: "account_name", header: "Account Name" },
-    { accessorKey: "bank_name", header: "Bank" },
-    { accessorKey: "account_number", header: "Account Number" },
-    { accessorKey: "account_type", header: "Type" },
-    { accessorKey: "current_balance", header: "Balance" },
-    { accessorKey: "is_active", header: "Status" }
-  ]
-
-  const bankTransactionsColumns = [
-    { accessorKey: "transaction_date", header: "Date" },
-    { accessorKey: "description", header: "Description" },
-    { accessorKey: "reference_number", header: "Reference" },
-    { accessorKey: "debit_amount", header: "Debit" },
-    { accessorKey: "credit_amount", header: "Credit" },
-    { accessorKey: "balance", header: "Balance" },
-    { accessorKey: "is_reconciled", header: "Reconciled" }
-  ]
-
-  const paymentVouchersColumns = [
-    { accessorKey: "voucher_number", header: "Voucher #" },
-    { accessorKey: "payment_date", header: "Date" },
-    { accessorKey: "payee_name", header: "Payee" },
-    { accessorKey: "amount", header: "Amount" },
-    { accessorKey: "payment_method", header: "Method" },
-    { accessorKey: "approval_status", header: "Status" }
-  ]
 
   const accountSummary = [
     {
@@ -154,19 +124,14 @@ const BankCash = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <DataTable
-                  data={[]}
-                  columns={bankAccountsColumns}
-                  searchKey="account_name"
-                  onRefresh={() => {}}
-                  fetchData={async () => {
-                    const { data } = await supabase
-                      .from('bank_accounts')
-                      .select('*')
-                      .order('account_name')
-                    return data || []
-                  }}
-                />
+                <div className="text-center py-12">
+                  <CreditCard className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Bank Accounts</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Bank account data will appear here once the database types are updated
+                  </p>
+                  <Button variant="outline">Setup Bank Accounts</Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -210,22 +175,14 @@ const BankCash = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={bankTransactionsColumns}
-                searchKey="description"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('bank_transactions')
-                    .select(`
-                      *,
-                      bank_accounts!inner(account_name, bank_name)
-                    `)
-                    .order('transaction_date', { ascending: false })
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <ArrowUpDown className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Bank Transactions</h3>
+                <p className="text-muted-foreground mb-4">
+                  Transaction data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Import Transactions</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -270,19 +227,14 @@ const BankCash = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <DataTable
-                data={[]}
-                columns={paymentVouchersColumns}
-                searchKey="payee_name"
-                onRefresh={() => {}}
-                fetchData={async () => {
-                  const { data } = await supabase
-                    .from('payment_vouchers')
-                    .select('*')
-                    .order('payment_date', { ascending: false })
-                  return data || []
-                }}
-              />
+              <div className="text-center py-12">
+                <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Payment Vouchers</h3>
+                <p className="text-muted-foreground mb-4">
+                  Payment voucher data will appear here once the database types are updated
+                </p>
+                <Button variant="outline">Create Payment Voucher</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
