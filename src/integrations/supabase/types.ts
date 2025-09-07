@@ -1671,6 +1671,7 @@ export type Database = {
         Row: {
           address: string
           city_id: string | null
+          Coordinates: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -1683,6 +1684,7 @@ export type Database = {
         Insert: {
           address: string
           city_id?: string | null
+          Coordinates?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -1695,6 +1697,7 @@ export type Database = {
         Update: {
           address?: string
           city_id?: string | null
+          Coordinates?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
