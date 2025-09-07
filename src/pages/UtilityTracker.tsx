@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { DataTable } from "@/components/tables/DataTable"
 import { 
   Zap, 
   Plus, 
@@ -80,6 +81,30 @@ const UtilityTracker = () => {
     }
   ]
 
+  const utilityColumns = [
+    { key: "service_provider", header: "Provider" },
+    { key: "service_type", header: "Type" },
+    { key: "billing_period", header: "Period" },
+    { key: "amount", header: "Amount" },
+    { key: "status", header: "Status" }
+  ]
+
+  const meterColumns = [
+    { key: "meter_number", header: "Meter #" },
+    { key: "service_type", header: "Type" },
+    { key: "location", header: "Location" },
+    { key: "last_reading", header: "Last Reading" },
+    { key: "status", header: "Status" }
+  ]
+
+  // Mock form component for now
+  const MockForm = ({ onSuccess }: { onSuccess: () => void }) => (
+    <div className="p-4">
+      <p>Form component will be implemented here.</p>
+      <Button onClick={onSuccess} className="mt-4">Mock Save</Button>
+    </div>
+  )
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
@@ -149,30 +174,13 @@ const UtilityTracker = () => {
         </TabsList>
 
         <TabsContent value="utility-bills" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Utility Bills</CardTitle>
-                  <CardDescription>Track all utility bills and payments</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Bill
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Zap className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Utility Bills</h3>
-                <p className="text-muted-foreground mb-4">
-                  Utility bill data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Utility Tracking</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Utility Bills"
+            tableName="organizations"
+            columns={utilityColumns}
+            FormComponent={MockForm}
+            searchFields={["service_provider", "service_type"]}
+          />
         </TabsContent>
 
         <TabsContent value="consumption" className="space-y-6">
@@ -194,22 +202,13 @@ const UtilityTracker = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Meter Readings</CardTitle>
-                <CardDescription>Record and track meter readings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Meter Reading System</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Record monthly meter readings for accurate billing
-                  </p>
-                  <Button variant="outline">Record Readings</Button>
-                </div>
-              </CardContent>
-            </Card>
+            <DataTable
+              title="Meter Readings"
+              tableName="organizations"
+              columns={meterColumns}
+              FormComponent={MockForm}
+              searchFields={["meter_number", "service_type"]}
+            />
           </div>
         </TabsContent>
 

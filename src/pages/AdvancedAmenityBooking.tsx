@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { DataTable } from "@/components/tables/DataTable"
 import { 
   Calendar, 
   Plus, 
@@ -56,6 +57,38 @@ const AdvancedAmenityBooking = () => {
     { name: "Gym", revenue: "₹8,900", bookings: 28, utilization: "56%" },
     { name: "Tennis Court", revenue: "₹5,500", bookings: 15, utilization: "42%" }
   ]
+
+  const bookingColumns = [
+    { key: "date", header: "Date" },
+    { key: "time_slot", header: "Time" },
+    { key: "amenity", header: "Amenity" },
+    { key: "resident", header: "Resident" },
+    { key: "status", header: "Status" }
+  ]
+
+  const ruleColumns = [
+    { key: "name", header: "Rule Name" },
+    { key: "amenity", header: "Amenity" },
+    { key: "type", header: "Type" },
+    { key: "value", header: "Value" },
+    { key: "status", header: "Status" }
+  ]
+
+  const waitlistColumns = [
+    { key: "date", header: "Date" },
+    { key: "amenity", header: "Amenity" },
+    { key: "resident", header: "Resident" },
+    { key: "priority", header: "Priority" },
+    { key: "status", header: "Status" }
+  ]
+
+  // Mock form component for now
+  const MockForm = ({ onSuccess }: { onSuccess: () => void }) => (
+    <div className="p-4">
+      <p>Form component will be implemented here.</p>
+      <Button onClick={onSuccess} className="mt-4">Mock Save</Button>
+    </div>
+  )
 
   return (
     <div className="container mx-auto p-6">
@@ -152,57 +185,23 @@ const AdvancedAmenityBooking = () => {
             </Card>
           </div>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Revenue Transactions</CardTitle>
-                  <CardDescription>Detailed revenue tracking from amenity bookings</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Record Revenue
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <DollarSign className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Revenue Tracking</h3>
-                <p className="text-muted-foreground mb-4">
-                  Revenue data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Revenue Tracking</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Revenue Transactions"
+            tableName="organizations"
+            columns={bookingColumns}
+            FormComponent={MockForm}
+            searchFields={["amenity", "resident"]}
+          />
         </TabsContent>
 
         <TabsContent value="pricing-models" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Dynamic Pricing Models</CardTitle>
-                  <CardDescription>Configure pricing rules for different scenarios</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Pricing Model
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Settings className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Pricing Models</h3>
-                <p className="text-muted-foreground mb-4">
-                  Pricing model data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Pricing Models</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Dynamic Pricing Models"
+            tableName="organizations"
+            columns={ruleColumns}
+            FormComponent={MockForm}
+            searchFields={["name", "amenity"]}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card>
@@ -253,30 +252,13 @@ const AdvancedAmenityBooking = () => {
         </TabsContent>
 
         <TabsContent value="promotions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Promotional Offers</CardTitle>
-                  <CardDescription>Manage discounts and special offers</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Create Offer
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Tag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Promotional Offers</h3>
-                <p className="text-muted-foreground mb-4">
-                  Promotional offer data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Promotions</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Promotional Offers"
+            tableName="organizations"
+            columns={waitlistColumns}
+            FormComponent={MockForm}
+            searchFields={["amenity"]}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card>

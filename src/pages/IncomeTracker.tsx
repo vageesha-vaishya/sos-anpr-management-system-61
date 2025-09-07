@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { DataTable } from "@/components/tables/DataTable"
 import { 
   TrendingUp, 
   Plus, 
@@ -48,6 +49,30 @@ const IncomeTracker = () => {
     }
   ]
 
+  const incomeColumns = [
+    { key: "date", header: "Date" },
+    { key: "amount", header: "Amount" },
+    { key: "source", header: "Source" },
+    { key: "description", header: "Description" },
+    { key: "status", header: "Status" }
+  ]
+
+  const sourceColumns = [
+    { key: "name", header: "Source Name" },
+    { key: "type", header: "Type" },
+    { key: "frequency", header: "Frequency" },
+    { key: "amount", header: "Amount" },
+    { key: "status", header: "Status" }
+  ]
+
+  // Mock form component for now
+  const MockForm = ({ onSuccess }: { onSuccess: () => void }) => (
+    <div className="p-4">
+      <p>Form component will be implemented here.</p>
+      <Button onClick={onSuccess} className="mt-4">Mock Save</Button>
+    </div>
+  )
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
@@ -90,57 +115,23 @@ const IncomeTracker = () => {
         </TabsList>
 
         <TabsContent value="income-records" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Income Records</CardTitle>
-                  <CardDescription>All received payments and income transactions</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Record Income
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <DollarSign className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Income Records</h3>
-                <p className="text-muted-foreground mb-4">
-                  Income data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Income Tracking</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Income Records"
+            tableName="organizations"
+            columns={incomeColumns}
+            FormComponent={MockForm}
+            searchFields={["name"]}
+          />
         </TabsContent>
 
         <TabsContent value="income-sources" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Income Sources</CardTitle>
-                  <CardDescription>Configure different types of income streams</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Income Source
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Income Sources</h3>
-                <p className="text-muted-foreground mb-4">
-                  Configure income source categories and billing frequencies
-                </p>
-                <Button variant="outline">Setup Income Sources</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Income Sources"
+            tableName="organizations"
+            columns={sourceColumns}
+            FormComponent={MockForm}
+            searchFields={["name"]}
+          />
         </TabsContent>
 
         <TabsContent value="maintenance-fees" className="space-y-6">

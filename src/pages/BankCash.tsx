@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { DataTable } from "@/components/tables/DataTable"
 import { 
   CreditCard, 
   Plus, 
@@ -66,6 +67,38 @@ const BankCash = () => {
     }
   ]
 
+  const accountColumns = [
+    { key: "account_name", header: "Account Name" },
+    { key: "bank_name", header: "Bank" },
+    { key: "account_number", header: "Account Number" },
+    { key: "current_balance", header: "Balance" },
+    { key: "account_type", header: "Type" }
+  ]
+
+  const transactionColumns = [
+    { key: "date", header: "Date" },
+    { key: "description", header: "Description" },
+    { key: "type", header: "Type" },
+    { key: "amount", header: "Amount" },
+    { key: "balance", header: "Balance" }
+  ]
+
+  const voucherColumns = [
+    { key: "voucher_number", header: "Voucher #" },
+    { key: "date", header: "Date" },
+    { key: "payee", header: "Payee" },
+    { key: "amount", header: "Amount" },
+    { key: "status", header: "Status" }
+  ]
+
+  // Mock form component for now
+  const MockForm = ({ onSuccess }: { onSuccess: () => void }) => (
+    <div className="p-4">
+      <p>Form component will be implemented here.</p>
+      <Button onClick={onSuccess} className="mt-4">Mock Save</Button>
+    </div>
+  )
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
@@ -110,30 +143,13 @@ const BankCash = () => {
 
         <TabsContent value="bank-accounts" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Bank Accounts</CardTitle>
-                    <CardDescription>Manage organization bank accounts</CardDescription>
-                  </div>
-                  <Button className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Account
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <CreditCard className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Bank Accounts</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Bank account data will appear here once the database types are updated
-                  </p>
-                  <Button variant="outline">Setup Bank Accounts</Button>
-                </div>
-              </CardContent>
-            </Card>
+            <DataTable
+              title="Bank Accounts"
+              tableName="bank_accounts"
+              columns={accountColumns}
+              FormComponent={MockForm}
+              searchFields={["account_name", "bank_name"]}
+            />
 
             <Card>
               <CardHeader>
@@ -161,30 +177,13 @@ const BankCash = () => {
         </TabsContent>
 
         <TabsContent value="transactions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Bank Transactions</CardTitle>
-                  <CardDescription>All bank account transactions and statements</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Import Statement
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <ArrowUpDown className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Bank Transactions</h3>
-                <p className="text-muted-foreground mb-4">
-                  Transaction data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Import Transactions</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Bank Transactions"
+            tableName="organizations"
+            columns={transactionColumns}
+            FormComponent={MockForm}
+            searchFields={["description"]}
+          />
         </TabsContent>
 
         <TabsContent value="reconciliation" className="space-y-6">
@@ -213,30 +212,13 @@ const BankCash = () => {
         </TabsContent>
 
         <TabsContent value="vouchers" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Payment Vouchers</CardTitle>
-                  <CardDescription>Authorization and tracking of all payments</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Create Voucher
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Payment Vouchers</h3>
-                <p className="text-muted-foreground mb-4">
-                  Payment voucher data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Create Payment Voucher</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Payment Vouchers"
+            tableName="organizations"
+            columns={voucherColumns}
+            FormComponent={MockForm}
+            searchFields={["voucher_number", "payee"]}
+          />
         </TabsContent>
 
         <TabsContent value="cash-flow" className="space-y-6">

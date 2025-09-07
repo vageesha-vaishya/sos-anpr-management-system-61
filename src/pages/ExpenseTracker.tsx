@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { DataTable } from "@/components/tables/DataTable"
 import { 
   TrendingDown, 
   Plus, 
@@ -55,6 +56,30 @@ const ExpenseTracker = () => {
     { name: "Cleaning", amount: "₹6,700", percentage: "10%" }
   ]
 
+  const expenseColumns = [
+    { key: "date", header: "Date" },
+    { key: "amount", header: "Amount" },
+    { key: "category", header: "Category" },
+    { key: "description", header: "Description" },
+    { key: "status", header: "Status" }
+  ]
+
+  const categoryColumns = [
+    { key: "name", header: "Category Name" },
+    { key: "budget", header: "Monthly Budget" },
+    { key: "spent", header: "Amount Spent" },
+    { key: "remaining", header: "Remaining" },
+    { key: "status", header: "Status" }
+  ]
+
+  // Mock form component for now
+  const MockForm = ({ onSuccess }: { onSuccess: () => void }) => (
+    <div className="p-4">
+      <p>Form component will be implemented here.</p>
+      <Button onClick={onSuccess} className="mt-4">Mock Save</Button>
+    </div>
+  )
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
@@ -97,58 +122,24 @@ const ExpenseTracker = () => {
         </TabsList>
 
         <TabsContent value="expenses" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Expense Records</CardTitle>
-                  <CardDescription>All expense transactions and vendor payments</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Expense
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <CreditCard className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Expense Records</h3>
-                <p className="text-muted-foreground mb-4">
-                  Expense data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Expense Tracking</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Expense Records"
+            tableName="organizations"
+            columns={expenseColumns}
+            FormComponent={MockForm}
+            searchFields={["name"]}
+          />
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Expense Categories</CardTitle>
-                    <CardDescription>Manage expense categorization and budgets</CardDescription>
-                  </div>
-                  <Button className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Category
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <TrendingDown className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Expense Categories</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Configure expense categories and budget allocations
-                  </p>
-                  <Button variant="outline">Setup Categories</Button>
-                </div>
-              </CardContent>
-            </Card>
+            <DataTable
+              title="Expense Categories"
+              tableName="organizations"
+              columns={categoryColumns}
+              FormComponent={MockForm}
+              searchFields={["name"]}
+            />
 
             <Card>
               <CardHeader>

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { DataTable } from "@/components/tables/DataTable"
 import { 
   BookOpen, 
   Plus, 
@@ -48,6 +49,34 @@ const GeneralLedger = () => {
     }
   ]
 
+  const chartColumns = [
+    { key: "account_code", header: "Account Code" },
+    { key: "account_name", header: "Account Name" },
+    { key: "account_type", header: "Type" },
+    { key: "account_category", header: "Category" },
+    { key: "is_active", header: "Status", render: (value: boolean) => (
+      <Badge variant={value ? "default" : "secondary"}>
+        {value ? "Active" : "Inactive"}
+      </Badge>
+    )}
+  ]
+
+  const journalColumns = [
+    { key: "entry_date", header: "Date" },
+    { key: "reference", header: "Reference" },
+    { key: "description", header: "Description" },
+    { key: "total_amount", header: "Amount" },
+    { key: "status", header: "Status" }
+  ]
+
+  // Mock form component for now
+  const MockForm = ({ onSuccess }: { onSuccess: () => void }) => (
+    <div className="p-4">
+      <p>Form component will be implemented here.</p>
+      <Button onClick={onSuccess} className="mt-4">Mock Save</Button>
+    </div>
+  )
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
@@ -92,57 +121,23 @@ const GeneralLedger = () => {
         </TabsList>
 
         <TabsContent value="chart-of-accounts" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Chart of Accounts</CardTitle>
-                  <CardDescription>Manage your accounting structure and categories</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Account
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Chart of Accounts</h3>
-                <p className="text-muted-foreground mb-4">
-                  Financial data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Setup Chart of Accounts</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Chart of Accounts"
+            tableName="chart_of_accounts"
+            columns={chartColumns}
+            FormComponent={MockForm}
+            searchFields={["account_name", "account_code"]}
+          />
         </TabsContent>
 
         <TabsContent value="journal-entries" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Journal Entries</CardTitle>
-                  <CardDescription>Double-entry bookkeeping transactions</CardDescription>
-                </div>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  New Entry
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Journal Entries</h3>
-                <p className="text-muted-foreground mb-4">
-                  Transaction data will appear here once the database types are updated
-                </p>
-                <Button variant="outline">Create Journal Entry</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <DataTable
+            title="Journal Entries"
+            tableName="organizations"
+            columns={journalColumns}
+            FormComponent={MockForm}
+            searchFields={["description", "reference"]}
+          />
         </TabsContent>
 
         <TabsContent value="trial-balance" className="space-y-6">
