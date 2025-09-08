@@ -45,6 +45,7 @@ import DocumentManagement from "@/pages/DocumentManagement";
 import RoutineManagement from "@/pages/RoutineManagement";
 import SocietyManagementNew from "@/pages/SocietyManagementNew";
 import SocietyManagementEnhanced from "@/pages/SocietyManagementEnhanced";
+import SocietyMemberManagement from "@/pages/SocietyMemberManagement";
 import SocietyBooksManagement from "@/pages/SocietyBooksManagement";
 import GatekeeperModule from "@/pages/GatekeeperModule";
 import GeneralLedger from "@/pages/GeneralLedger";
@@ -214,6 +215,13 @@ const DashboardRouter = () => {
     case 'customer_admin':
     case 'operator':
     case 'resident':
+    case 'society_president':
+    case 'society_secretary':
+    case 'society_treasurer':
+    case 'society_committee_member':
+    case 'tenant':
+    case 'owner':
+    case 'family_member':
       return <CustomerDashboard />;
     default:
       console.error('DashboardRouter: Invalid role:', userProfile.role);
@@ -508,6 +516,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <SocietyManagementEnhanced />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/society-member-management" 
+              element={
+                <ProtectedRoute>
+                  <SocietyMemberManagement />
                 </ProtectedRoute>
               } 
             />

@@ -1745,6 +1745,79 @@ export type Database = {
           },
         ]
       }
+      household_members: {
+        Row: {
+          access_permissions: Json | null
+          age: number | null
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          is_emergency_contact: boolean | null
+          organization_id: string
+          phone_number: string | null
+          primary_resident_id: string | null
+          relationship: string
+          unit_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_permissions?: Json | null
+          age?: number | null
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          is_emergency_contact?: boolean | null
+          organization_id: string
+          phone_number?: string | null
+          primary_resident_id?: string | null
+          relationship: string
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_permissions?: Json | null
+          age?: number | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_emergency_contact?: boolean | null
+          organization_id?: string
+          phone_number?: string | null
+          primary_resident_id?: string | null
+          relationship?: string
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_primary_resident_id_fkey"
+            columns: ["primary_resident_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_members_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "society_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           created_at: string | null
@@ -3149,10 +3222,13 @@ export type Database = {
           monthly_flat_rate: number | null
           monthly_maintenance: number | null
           monthly_rate_per_sqft: number | null
+          owner_details: Json | null
           owner_email: string | null
           owner_name: string | null
           owner_phone: string | null
           parking_slots: number | null
+          primary_resident_id: string | null
+          secondary_residents: Json | null
           status: string | null
           tenant_email: string | null
           tenant_name: string | null
@@ -3173,10 +3249,13 @@ export type Database = {
           monthly_flat_rate?: number | null
           monthly_maintenance?: number | null
           monthly_rate_per_sqft?: number | null
+          owner_details?: Json | null
           owner_email?: string | null
           owner_name?: string | null
           owner_phone?: string | null
           parking_slots?: number | null
+          primary_resident_id?: string | null
+          secondary_residents?: Json | null
           status?: string | null
           tenant_email?: string | null
           tenant_name?: string | null
@@ -3197,10 +3276,13 @@ export type Database = {
           monthly_flat_rate?: number | null
           monthly_maintenance?: number | null
           monthly_rate_per_sqft?: number | null
+          owner_details?: Json | null
           owner_email?: string | null
           owner_name?: string | null
           owner_phone?: string | null
           parking_slots?: number | null
+          primary_resident_id?: string | null
+          secondary_residents?: Json | null
           status?: string | null
           tenant_email?: string | null
           tenant_name?: string | null
@@ -3215,6 +3297,13 @@ export type Database = {
             columns: ["building_id"]
             isOneToOne: false
             referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "society_units_primary_resident_id_fkey"
+            columns: ["primary_resident_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -3364,6 +3453,79 @@ export type Database = {
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "financial_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unit_assignments: {
+        Row: {
+          assignment_type: string
+          created_at: string | null
+          end_date: string | null
+          id: string
+          is_primary: boolean | null
+          move_in_date: string | null
+          move_out_date: string | null
+          notes: string | null
+          organization_id: string
+          resident_id: string | null
+          start_date: string | null
+          status: string | null
+          unit_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_type?: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_primary?: boolean | null
+          move_in_date?: string | null
+          move_out_date?: string | null
+          notes?: string | null
+          organization_id: string
+          resident_id?: string | null
+          start_date?: string | null
+          status?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_type?: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          is_primary?: boolean | null
+          move_in_date?: string | null
+          move_out_date?: string | null
+          notes?: string | null
+          organization_id?: string
+          resident_id?: string | null
+          start_date?: string | null
+          status?: string | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_assignments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_assignments_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_assignments_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "society_units"
             referencedColumns: ["id"]
           },
         ]
@@ -3985,6 +4147,10 @@ export type Database = {
         | "operator"
         | "resident"
         | "tenant"
+        | "society_treasurer"
+        | "society_committee_member"
+        | "owner"
+        | "family_member"
       user_status: "active" | "inactive" | "suspended"
       vehicle_type: "car" | "motorcycle" | "truck" | "van" | "bus"
     }
@@ -4135,6 +4301,10 @@ export const Constants = {
         "operator",
         "resident",
         "tenant",
+        "society_treasurer",
+        "society_committee_member",
+        "owner",
+        "family_member",
       ],
       user_status: ["active", "inactive", "suspended"],
       vehicle_type: ["car", "motorcycle", "truck", "van", "bus"],

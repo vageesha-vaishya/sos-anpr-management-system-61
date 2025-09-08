@@ -16,7 +16,7 @@ import { generateSecurePassword, validateSecureEmail, sanitizeInput } from '@/li
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
   full_name: z.string().min(1, 'Full name is required'),
-  role: z.enum(['platform_admin', 'franchise_admin', 'franchise_user', 'customer_admin', 'customer_user']),
+  role: z.string(),
   status: z.enum(['active', 'inactive', 'pending']),
   organization_id: z.string().min(1, 'Organization is required'),
   phone_number: z.string().optional(),
@@ -24,6 +24,8 @@ const userSchema = z.object({
   active_until: z.string().optional(),
   two_factor_enabled: z.boolean().optional(),
   preferred_2fa_method: z.enum(['email', 'sms', 'whatsapp']).optional(),
+  unit_id: z.string().optional(),
+  assignment_type: z.enum(['owner', 'tenant', 'family_member']).optional(),
 })
 
 type UserFormData = z.infer<typeof userSchema>
@@ -42,6 +44,8 @@ interface UserFormProps {
     active_until?: string
     two_factor_enabled?: boolean
     preferred_2fa_method?: string
+    unit_id?: string
+    assignment_type?: string
   }
 }
 
@@ -49,6 +53,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const { userProfile } = useAuth()
   const [organizations, setOrganizations] = useState<any[]>([])
+  const [societyUnits, setSocietyUnits] = useState<any[]>([])
   
   const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
@@ -63,36 +68,45 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
       active_until: editData?.active_until || '',
       two_factor_enabled: editData?.two_factor_enabled || false,
       preferred_2fa_method: (editData?.preferred_2fa_method as any) || 'email',
+      unit_id: editData?.unit_id || '',
+      assignment_type: (editData?.assignment_type as any) || 'owner',
     },
   })
 
   useEffect(() => {
-    const fetchOrganizations = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch organizations
+        const { data: orgsData, error: orgsError } = await supabase
           .from('organizations')
           .select('id, name')
           .order('name')
         
-        if (error) {
-          console.error('Error fetching organizations:', error)
-          // Fallback to demo organization
+        if (orgsError) {
+          console.error('Error fetching organizations:', orgsError)
           setOrganizations([
             { id: '00000000-0000-0000-0000-000000000003', name: 'Demo Organization' }
           ])
-        } else if (data) {
-          setOrganizations(data)
+        } else if (orgsData) {
+          setOrganizations(orgsData)
         }
+
+        // Fetch society units for unit assignment
+        const { data: unitsData } = await supabase
+          .from('society_units')
+          .select('id, unit_number, unit_type, floor, building_id')
+          .order('unit_number')
+
+        setSocietyUnits(unitsData || [])
       } catch (err) {
-        console.error('Exception fetching organizations:', err)
-        // Fallback to demo organization
+        console.error('Exception fetching data:', err)
         setOrganizations([
           { id: '00000000-0000-0000-0000-000000000003', name: 'Demo Organization' }
         ])
       }
     }
     
-    fetchOrganizations()
+    fetchData()
   }, [])
 
   const onSubmit = async (data: UserFormData) => {
@@ -152,13 +166,28 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
           const { error: profileError } = await supabase
             .from('profiles')
             .update({
-          role: data.role === 'franchise_user' ? 'operator' : data.role as any,
-          status: data.status === 'pending' ? 'active' : data.status as any,
+              role: data.role as any,
+              status: data.status as any,
               organization_id: data.organization_id,
             })
             .eq('id', authData.user.id)
 
           if (profileError) throw profileError
+
+          // Create unit assignment if unit and assignment type provided
+          if (data.unit_id && data.assignment_type) {
+            const { error: assignmentError } = await supabase
+              .from('unit_assignments')
+              .insert({
+                unit_id: data.unit_id,
+                resident_id: authData.user.id,
+                assignment_type: data.assignment_type,
+                is_primary: true,
+                organization_id: data.organization_id,
+              })
+
+            if (assignmentError) console.warn('Unit assignment error:', assignmentError)
+          }
 
           toast({
             title: 'Success',
@@ -234,6 +263,14 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
                       <SelectItem value="franchise_user">Franchise User</SelectItem>
                       <SelectItem value="customer_admin">Customer Admin</SelectItem>
                       <SelectItem value="customer_user">Customer User</SelectItem>
+                      <SelectItem value="society_president">Society President</SelectItem>
+                      <SelectItem value="society_secretary">Society Secretary</SelectItem>
+                      <SelectItem value="society_treasurer">Society Treasurer</SelectItem>
+                      <SelectItem value="society_committee_member">Committee Member</SelectItem>
+                      <SelectItem value="resident">Resident</SelectItem>
+                      <SelectItem value="tenant">Tenant</SelectItem>
+                      <SelectItem value="owner">Owner</SelectItem>
+                      <SelectItem value="family_member">Family Member</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -390,6 +427,62 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
               </FormItem>
             )}
           />
+
+          {/* Unit Assignment Section for Society Members */}
+          {(form.watch('role') === 'resident' || form.watch('role') === 'tenant' || form.watch('role') === 'owner') && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+              <h3 className="font-semibold">Unit Assignment</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="unit_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Unit</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select unit" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {societyUnits.map((unit) => (
+                            <SelectItem key={unit.id} value={unit.id}>
+                              Unit {unit.unit_number} - {unit.unit_type} (Floor {unit.floor})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="assignment_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assignment Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="owner">Owner</SelectItem>
+                          <SelectItem value="tenant">Tenant</SelectItem>
+                          <SelectItem value="family_member">Family Member</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
 
           <Button type="submit" className="w-full">
             {editData ? 'Update User' : 'Create User'}

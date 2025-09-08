@@ -85,10 +85,11 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { name: 'Dashboard Hub', href: '/dashboard', icon: LayoutDashboard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
     
     // 🚀 Enhanced Phase 1 Features
-    { name: '⭐ Enhanced Society Mgmt', href: '/society-management-enhanced', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
-    { name: '💰 Financial Management', href: '/society-books', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
-    { name: '📢 Communication Hub', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
-    { name: '📊 Analytics Dashboard', href: '/analytics', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
+    { name: '⭐ Enhanced Society Mgmt', href: '/society-management-enhanced', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'], isNew: true },
+    { name: '👥 Member Management', href: '/society-member-management', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'], isNew: true },
+    { name: '💰 Financial Management', href: '/society-books', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_treasurer'], isNew: true },
+    { name: '📢 Communication Hub', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'], isNew: true },
+    { name: '📊 Analytics Dashboard', href: '/analytics', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president'], isNew: true },
     
     // Core Society Management Modules
     { name: '🏠 Routine Management', href: '/routine-management', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
@@ -118,7 +119,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     { name: 'Locations', href: '/locations', icon: MapPin, roles: ['platform_admin', 'franchise_admin'] },
     { name: 'Cameras', href: '/cameras', icon: Camera, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: 'Vehicles', href: '/vehicles', icon: Shield, roles: ['franchise_admin', 'customer_admin'] },
-    { name: 'Users', href: '/users', icon: Users, roles: ['platform_admin', 'franchise_admin'] },
+    { name: 'Users', href: '/users', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'] },
     { name: 'Alerts', href: '/alerts', icon: Bell, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     
     // VMS Navigation Items

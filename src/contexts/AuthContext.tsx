@@ -7,7 +7,7 @@ type UserProfile = {
   organization_id: string
   email: string
   full_name: string
-  role: 'platform_admin' | 'franchise_admin' | 'society_president' | 'society_secretary' | 'treasurer' | 'property_manager' | 'security_staff' | 'maintenance_staff' | 'committee_member' | 'customer_admin' | 'operator' | 'resident' | 'tenant'
+  role: 'platform_admin' | 'franchise_admin' | 'society_president' | 'society_secretary' | 'society_treasurer' | 'society_committee_member' | 'treasurer' | 'property_manager' | 'security_staff' | 'maintenance_staff' | 'committee_member' | 'customer_admin' | 'operator' | 'resident' | 'tenant' | 'owner' | 'family_member'
   permissions: string[]
   status: 'active' | 'inactive' | 'suspended'
   last_login: string | null
