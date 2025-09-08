@@ -82,12 +82,17 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+    { name: 'Dashboard Hub', href: '/dashboard', icon: LayoutDashboard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
     
-    // 🚀 Core Society Management Modules (NEW)
+    // 🚀 Enhanced Phase 1 Features
+    { name: '⭐ Enhanced Society Mgmt', href: '/society-management-enhanced', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
+    { name: '💰 Financial Management', href: '/society-books', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
+    { name: '📢 Communication Hub', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
+    { name: '📊 Analytics Dashboard', href: '/analytics', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
+    
+    // Core Society Management Modules
     { name: '🏠 Routine Management', href: '/routine-management', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: '🏢 Society Management', href: '/society-management-new', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-    { name: '💰 Society Books', href: '/society-books', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     { name: '🛡️ Gatekeeper Module', href: '/gatekeeper', icon: Shield, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
     
     // Individual Module Access (Existing Features)
@@ -219,14 +224,19 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   key={item.name}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground relative",
                     isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
                   )}
                   asChild
                 >
                   <Link to={item.href}>
                     <item.icon className="w-5 h-5 mr-3" />
-                    {item.name}
+                    <span className="flex-1 text-left">{item.name}</span>
+                    {(item as any).isNew && (
+                      <Badge variant="secondary" className="text-[10px] px-1 py-0">
+                        NEW
+                      </Badge>
+                    )}
                   </Link>
                 </Button>
               )

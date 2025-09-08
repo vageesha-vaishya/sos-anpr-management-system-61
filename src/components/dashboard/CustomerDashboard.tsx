@@ -3,6 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
+import { NewFeatureBanner } from './NewFeatureBanner'
+import { FeatureDiscoverySection } from './FeatureDiscoverySection'
+import { QuickActionsHub } from './QuickActionsHub'
 import { 
   Camera, 
   Shield, 
@@ -121,23 +124,29 @@ export const CustomerDashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* New Feature Banner */}
+      <NewFeatureBanner />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Location Manager</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard Hub</h1>
           <p className="text-muted-foreground">
-            Building-specific monitoring, vehicle management, and visitor control
+            Comprehensive society management with enhanced Phase 1 features
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <Button variant="default" size="sm" asChild>
-            <Link to="/data-management">
+            <Link to="/society-management-enhanced">
               <Plus className="w-4 h-4 mr-2" />
-              Location Access
+              Explore Enhanced Features
             </Link>
           </Button>
         </div>
       </div>
+
+      {/* Feature Discovery Section */}
+      <FeatureDiscoverySection />
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -158,6 +167,9 @@ export const CustomerDashboard = () => {
           </Card>
         ))}
       </div>
+
+      {/* Quick Actions Hub */}
+      <QuickActionsHub />
 
       {/* Live Activity */}
       <div className="grid gap-4 md:grid-cols-2">
