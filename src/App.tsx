@@ -44,6 +44,7 @@ import ParkingManagement from "@/pages/ParkingManagement";
 import DocumentManagement from "@/pages/DocumentManagement";
 import RoutineManagement from "@/pages/RoutineManagement";
 import SocietyManagementNew from "@/pages/SocietyManagementNew";
+import SocietyManagementEnhanced from "@/pages/SocietyManagementEnhanced";
 import SocietyBooksManagement from "@/pages/SocietyBooksManagement";
 import GatekeeperModule from "@/pages/GatekeeperModule";
 import GeneralLedger from "@/pages/GeneralLedger";
@@ -499,6 +500,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <SocietyManagementNew />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/society-management-enhanced" 
+              element={
+                <ProtectedRoute>
+                  <SocietyManagementEnhanced />
                 </ProtectedRoute>
               } 
             />
