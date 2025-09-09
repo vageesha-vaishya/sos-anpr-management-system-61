@@ -54,7 +54,12 @@ import ExpenseTracker from "@/pages/ExpenseTracker";
 import BankCash from "@/pages/BankCash";
 import UtilityTracker from "@/pages/UtilityTracker";
 import AdvancedAmenityBooking from "@/pages/AdvancedAmenityBooking";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { DashboardLayoutNew } from "@/components/layout/DashboardLayoutNew";
+import SocietyManagementHub from "@/pages/hubs/SocietyManagementHub";
+import FinancialManagementHub from "@/pages/hubs/FinancialManagementHub";
+import OperationsHub from "@/pages/hubs/OperationsHub";
+import VisitorManagementHub from "@/pages/hubs/VisitorManagementHub";
+import SystemAdminHub from "@/pages/hubs/SystemAdminHub";
 import { PlatformAdminDashboard } from "@/components/dashboard/PlatformAdminDashboard";
 import { FranchiseAdminDashboard } from "@/components/dashboard/FranchiseAdminDashboard";
 import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
@@ -78,7 +83,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" replace />;
   }
   
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return <DashboardLayoutNew>{children}</DashboardLayoutNew>;
 };
 
 const DashboardRouter = () => {
@@ -628,6 +633,47 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdvancedAmenityBooking />
+                </ProtectedRoute>
+              } 
+            />
+            {/* Hub Pages */}
+            <Route 
+              path="/society-hub" 
+              element={
+                <ProtectedRoute>
+                  <SocietyManagementHub />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/financial-hub" 
+              element={
+                <ProtectedRoute>
+                  <FinancialManagementHub />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/operations-hub" 
+              element={
+                <ProtectedRoute>
+                  <OperationsHub />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/visitor-hub" 
+              element={
+                <ProtectedRoute>
+                  <VisitorManagementHub />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin-hub" 
+              element={
+                <ProtectedRoute>
+                  <SystemAdminHub />
                 </ProtectedRoute>
               } 
             />
