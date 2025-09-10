@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { usePermissions, Permission } from '@/hooks/usePermissions'
 import { Badge } from '@/components/ui/badge'
 import { Link, useLocation } from 'react-router-dom'
 import { 
@@ -45,14 +46,34 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-const MenuGroup = ({ title, items, userRole, currentPath }: {
+const MenuGroup = ({ title, items, currentPath }: {
   title: string
   items: any[]
-  userRole: string
   currentPath: string
 }) => {
   const [isOpen, setIsOpen] = useState(true)
-  const filteredItems = items.filter(item => item.roles.includes(userRole))
+  const { hasPermission, hasAnyPermission, hasMinimumRole, role } = usePermissions()
+  
+  const filteredItems = items.filter(item => {
+    // Check permissions first
+    if (item.permissions) {
+      return item.requireAll 
+        ? item.permissions.every((p: Permission) => hasPermission(p))
+        : hasAnyPermission(item.permissions)
+    }
+    
+    // Check minimum role
+    if (item.minimumRole) {
+      return hasMinimumRole(item.minimumRole)
+    }
+    
+    // Fallback to role-based filtering for backward compatibility
+    if (item.roles && role) {
+      return item.roles.includes(role)
+    }
+    
+    return false
+  })
   
   if (filteredItems.length === 0) return null
 
@@ -100,81 +121,81 @@ const AppSidebar = () => {
   const { userProfile, signOut, signingOut } = useAuth()
   const location = useLocation()
 
-  // Organized navigation structure
+  // Organized navigation structure with permission-based filtering
   const navigationGroups = {
     dashboard: {
       title: "Core Dashboards",
       items: [
-        { name: 'Dashboard Hub', href: '/dashboard', icon: LayoutDashboard, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: false },
-        { name: 'Analytics Dashboard', href: '/analytics', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president'], isNew: true },
+        { name: 'Dashboard Hub', href: '/dashboard', icon: LayoutDashboard, permissions: ['view_dashboard'], isNew: false },
+        { name: 'Analytics Dashboard', href: '/analytics', icon: TrendingUp, permissions: ['view_analytics'], isNew: true },
       ]
     },
     society: {
       title: "Society Management",
       items: [
-        { name: 'Society Hub', href: '/society-hub', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'], isNew: true },
-        { name: 'Member Management', href: '/society-member-management', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'], isNew: true },
-        { name: 'Staff Management', href: '/staff-management', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Communication Hub', href: '/community-forum', icon: MessageSquare, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president', 'society_secretary'], isNew: true },
+        { name: 'Society Hub', href: '/society-hub', icon: Home, permissions: ['manage_residents'], isNew: true },
+        { name: 'Member Management', href: '/society-member-management', icon: Users, permissions: ['manage_residents'], isNew: true },
+        { name: 'Staff Management', href: '/staff-management', icon: Users, permissions: ['manage_staff'], isNew: true },
+        { name: 'Communication Hub', href: '/community-forum', icon: MessageSquare, permissions: ['manage_residents'], isNew: true },
       ]
     },
     financial: {
       title: "Financial Management",
       items: [
-        { name: 'Financial Hub', href: '/financial-hub', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'society_treasurer'], isNew: true },
-        { name: 'Maintenance Billing', href: '/maintenance-billing', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'General Ledger', href: '/general-ledger', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Income Tracker', href: '/income-tracker', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Expense Tracker', href: '/expense-tracker', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Bank & Cash', href: '/bank-cash', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Utility Tracker', href: '/utility-tracker', icon: DollarSign, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+        { name: 'Financial Hub', href: '/financial-hub', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
+        { name: 'Maintenance Billing', href: '/maintenance-billing', icon: DollarSign, permissions: ['manage_billing'], isNew: true },
+        { name: 'General Ledger', href: '/general-ledger', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
+        { name: 'Income Tracker', href: '/income-tracker', icon: TrendingUp, permissions: ['manage_finances'], isNew: true },
+        { name: 'Expense Tracker', href: '/expense-tracker', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
+        { name: 'Bank & Cash', href: '/bank-cash', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
+        { name: 'Utility Tracker', href: '/utility-tracker', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
       ]
     },
     operations: {
       title: "Operations",
       items: [
-        { name: 'Routine Management', href: '/routine-management', icon: Shield, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Gatekeeper Module', href: '/gatekeeper', icon: Shield, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Security & Alerts', href: '/alerts', icon: Bell, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Amenity Management', href: '/amenity-management', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Event Management', href: '/events', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Asset Management', href: '/assets', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Parking Management', href: '/parking', icon: Home, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Vehicle Management', href: '/vehicles', icon: Shield, roles: ['franchise_admin', 'customer_admin'] },
+        { name: 'Routine Management', href: '/routine-management', icon: Shield, minimumRole: 'customer_admin' },
+        { name: 'Gatekeeper Module', href: '/gatekeeper', icon: Shield, minimumRole: 'customer_admin' },
+        { name: 'Security & Alerts', href: '/alerts', icon: Bell, permissions: ['manage_alerts'] },
+        { name: 'Amenity Management', href: '/amenity-management', icon: Home, permissions: ['manage_amenities'] },
+        { name: 'Event Management', href: '/events', icon: Home, permissions: ['manage_events'] },
+        { name: 'Asset Management', href: '/assets', icon: Home, minimumRole: 'customer_admin' },
+        { name: 'Parking Management', href: '/parking', icon: Home, minimumRole: 'customer_admin' },
+        { name: 'Vehicle Management', href: '/vehicles', icon: Shield, permissions: ['manage_vehicles'] },
       ]
     },
     visitors: {
       title: "Visitor Management System",
       items: [
-        { name: 'Visitor Hub', href: '/visitor-hub', icon: Monitor, roles: ['platform_admin', 'franchise_admin', 'customer_admin'], isNew: true },
-        { name: 'Visitor Dashboard', href: '/visitor-dashboard', icon: Monitor, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Check-in Kiosk', href: '/visitor-checkin', icon: UserCheck, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Hosts Management', href: '/hosts', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Pre-Registrations', href: '/pre-registrations', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Visitors', href: '/visitors', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+        { name: 'Visitor Hub', href: '/visitor-hub', icon: Monitor, permissions: ['manage_visitors'], isNew: true },
+        { name: 'Visitor Dashboard', href: '/visitor-dashboard', icon: Monitor, permissions: ['manage_visitors'] },
+        { name: 'Check-in Kiosk', href: '/visitor-checkin', icon: UserCheck, permissions: ['manage_visitors'] },
+        { name: 'Hosts Management', href: '/hosts', icon: Users, permissions: ['manage_visitors'] },
+        { name: 'Pre-Registrations', href: '/pre-registrations', icon: Users, permissions: ['manage_visitors'] },
+        { name: 'Visitors', href: '/visitors', icon: Users, permissions: ['manage_visitors'] },
       ]
     },
     admin: {
       title: "System Administration",
       items: [
-        { name: 'Admin Hub', href: '/admin-hub', icon: Globe, roles: ['platform_admin', 'franchise_admin'], isNew: true },
-        { name: 'Data Management', href: '/data-management', icon: Globe, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Master Data Management', href: '/master-data-management', icon: Globe, roles: ['platform_admin', 'franchise_admin'] },
-        { name: 'User Management', href: '/users', icon: Users, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Franchise Management', href: '/franchises', icon: Building2, roles: ['platform_admin'] },
-        { name: 'Camera Management', href: '/cameras', icon: Camera, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Location Management', href: '/locations', icon: MapPin, roles: ['platform_admin', 'franchise_admin'] },
-        { name: 'ANPR Billing', href: '/anpr-service-billing', icon: Camera, roles: ['platform_admin', 'franchise_admin'] },
-        { name: 'Advertiser Management', href: '/advertiser-management', icon: TrendingUp, roles: ['platform_admin', 'franchise_admin'] },
-        { name: 'Financial Management', href: '/billing', icon: DollarSign, roles: ['platform_admin', 'franchise_admin'] },
+        { name: 'Admin Hub', href: '/admin-hub', icon: Globe, minimumRole: 'franchise_admin', isNew: true },
+        { name: 'Data Management', href: '/data-management', icon: Globe, minimumRole: 'customer_admin' },
+        { name: 'Master Data Management', href: '/master-data-management', icon: Globe, minimumRole: 'franchise_admin' },
+        { name: 'User Management', href: '/users', icon: Users, permissions: ['manage_users'] },
+        { name: 'Franchise Management', href: '/franchises', icon: Building2, permissions: ['manage_organizations'] },
+        { name: 'Camera Management', href: '/cameras', icon: Camera, permissions: ['manage_cameras'] },
+        { name: 'Location Management', href: '/locations', icon: MapPin, permissions: ['manage_locations'] },
+        { name: 'ANPR Billing', href: '/anpr-service-billing', icon: Camera, minimumRole: 'franchise_admin' },
+        { name: 'Advertiser Management', href: '/advertiser-management', icon: TrendingUp, minimumRole: 'franchise_admin' },
+        { name: 'Financial Management', href: '/billing', icon: DollarSign, permissions: ['manage_billing'] },
       ]
     },
     support: {
       title: "Support & Documents",
       items: [
-        { name: 'Help Desk', href: '/helpdesk', icon: Headphones, roles: ['platform_admin', 'franchise_admin', 'customer_admin', 'operator', 'resident'] },
-        { name: 'Document Management', href: '/documents', icon: FileText, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
-        { name: 'Settings', href: '/settings', icon: Settings, roles: ['platform_admin', 'franchise_admin', 'customer_admin'] },
+        { name: 'Help Desk', href: '/helpdesk', icon: Headphones, permissions: ['view_dashboard'] },
+        { name: 'Document Management', href: '/documents', icon: FileText, permissions: ['manage_documents'] },
+        { name: 'Settings', href: '/settings', icon: Settings, permissions: ['manage_settings'] },
       ]
     }
   }
@@ -226,7 +247,6 @@ const AppSidebar = () => {
             key={key}
             title={group.title}
             items={group.items}
-            userRole={userProfile?.role || ''}
             currentPath={location.pathname}
           />
         ))}

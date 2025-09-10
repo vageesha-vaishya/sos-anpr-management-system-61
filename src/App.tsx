@@ -4,8 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { PermissionProvider } from "@/contexts/PermissionContext";
+import { SessionManager } from "@/components/auth/SessionManager";
 import { useState, useEffect } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { RoleProtectedRoute } from "@/components/auth/RoleProtectedRoute";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
 import { DataManagement } from "@/pages/DataManagement";
@@ -251,12 +254,14 @@ const App = () => (
         <Toaster />
         <Sonner />
         <AuthProvider>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
+          <PermissionProvider>
+            <SessionManager timeoutMinutes={30} warningMinutes={5}>
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -279,57 +284,71 @@ const App = () => (
             <Route 
               path="/master-data-management" 
               element={
-                <ProtectedRoute>
-                  <MasterDataManagement />
-                </ProtectedRoute>
+                <RoleProtectedRoute minimumRole="customer_admin">
+                  <ProtectedRoute>
+                    <MasterDataManagement />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
               path="/locations" 
               element={
-                <ProtectedRoute>
-                  <Locations />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_locations">
+                  <ProtectedRoute>
+                    <Locations />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
               path="/cameras" 
               element={
-                <ProtectedRoute>
-                  <Cameras />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_cameras">
+                  <ProtectedRoute>
+                    <Cameras />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
               path="/vehicles" 
               element={
-                <ProtectedRoute>
-                  <Vehicles />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_vehicles">
+                  <ProtectedRoute>
+                    <Vehicles />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
               path="/users" 
               element={
-                <ProtectedRoute>
-                  <Users />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_users">
+                  <ProtectedRoute>
+                    <Users />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
               path="/alerts" 
               element={
-                <ProtectedRoute>
-                  <Alerts />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_alerts">
+                  <ProtectedRoute>
+                    <Alerts />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
               path="/settings" 
               element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_settings">
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
@@ -431,9 +450,11 @@ const App = () => (
             <Route 
               path="/analytics" 
               element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="view_analytics">
+                  <ProtectedRoute>
+                    <Analytics />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
@@ -447,9 +468,11 @@ const App = () => (
             <Route 
               path="/billing" 
               element={
-                <ProtectedRoute>
-                  <Billing />
-                </ProtectedRoute>
+                <RoleProtectedRoute permission="manage_billing">
+                  <ProtectedRoute>
+                    <Billing />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
               } 
             />
             <Route 
@@ -680,7 +703,9 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
+              </BrowserRouter>
+            </SessionManager>
+          </PermissionProvider>
         </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
