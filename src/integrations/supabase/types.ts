@@ -2523,6 +2523,47 @@ export type Database = {
           },
         ]
       }
+      password_change_audit: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          organization_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          organization_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          organization_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_change_audit_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photo_albums: {
         Row: {
           album_name: string
@@ -2756,46 +2797,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_set_password: boolean | null
           created_at: string | null
           email: string
           full_name: string | null
           id: string
           last_login: string | null
+          last_password_change: string | null
           organization_id: string | null
+          password_changed_by_admin: string | null
           password_reset_expires: string | null
           password_reset_token: string | null
           permissions: string[] | null
           phone: string | null
+          requires_password_change: boolean | null
           role: Database["public"]["Enums"]["user_role"]
           status: Database["public"]["Enums"]["user_status"] | null
           updated_at: string | null
         }
         Insert: {
+          admin_set_password?: boolean | null
           created_at?: string | null
           email: string
           full_name?: string | null
           id: string
           last_login?: string | null
+          last_password_change?: string | null
           organization_id?: string | null
+          password_changed_by_admin?: string | null
           password_reset_expires?: string | null
           password_reset_token?: string | null
           permissions?: string[] | null
           phone?: string | null
+          requires_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"] | null
           updated_at?: string | null
         }
         Update: {
+          admin_set_password?: boolean | null
           created_at?: string | null
           email?: string
           full_name?: string | null
           id?: string
           last_login?: string | null
+          last_password_change?: string | null
           organization_id?: string | null
+          password_changed_by_admin?: string | null
           password_reset_expires?: string | null
           password_reset_token?: string | null
           permissions?: string[] | null
           phone?: string | null
+          requires_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"] | null
           updated_at?: string | null
@@ -4112,6 +4165,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_user_passwords: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       get_user_organization_id: {
         Args: Record<PropertyKey, never>
         Returns: string
