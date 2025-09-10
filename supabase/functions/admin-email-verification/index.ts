@@ -52,12 +52,33 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check if user has admin permissions
-    const { data: canManage, error: permError } = await supabaseAdmin.rpc('can_manage_user_passwords');
+    // Check if user has admin permissions by querying profiles directly
+    const { data: adminProfile, error: permError } = await supabaseAdmin
+      .from('profiles')
+      .select('role, organization_id')
+      .eq('id', user.id)
+      .single();
     
-    if (permError || !canManage) {
+    if (permError) {
+      console.error('Error fetching admin profile:', permError);
       return new Response(
-        JSON.stringify({ error: 'Insufficient permissions' }),
+        JSON.stringify({ error: 'Failed to verify permissions' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!adminProfile) {
+      return new Response(
+        JSON.stringify({ error: 'Admin profile not found' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if user has required role for managing user passwords/email verification
+    const allowedRoles = ['platform_admin', 'franchise_admin', 'customer_admin', 'society_president'];
+    if (!allowedRoles.includes(adminProfile.role)) {
+      return new Response(
+        JSON.stringify({ error: 'Insufficient permissions - admin role required' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
