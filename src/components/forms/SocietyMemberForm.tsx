@@ -602,9 +602,25 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Relationship</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., Spouse, Child" {...field} />
-                            </FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select relationship" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Spouse">Spouse</SelectItem>
+                                <SelectItem value="Son">Son</SelectItem>
+                                <SelectItem value="Daughter">Daughter</SelectItem>
+                                <SelectItem value="Father">Father</SelectItem>
+                                <SelectItem value="Mother">Mother</SelectItem>
+                                <SelectItem value="Brother">Brother</SelectItem>
+                                <SelectItem value="Sister">Sister</SelectItem>
+                                <SelectItem value="Grandparent">Grandparent</SelectItem>
+                                <SelectItem value="Grandchild">Grandchild</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}

@@ -84,7 +84,7 @@ const SocietyMemberManagement = () => {
           email,
           role,
           status,
-          phone_number,
+          phone,
           last_login,
           unit_assignments!left (
             unit_id,
@@ -110,7 +110,7 @@ const SocietyMemberManagement = () => {
         email: member.email,
         role: member.role,
         status: member.status,
-        phone_number: member.phone_number,
+        phone_number: member.phone,
         last_login: member.last_login,
         unit_number: member.unit_assignments?.[0]?.society_units?.unit_number,
         assignment_type: member.unit_assignments?.[0]?.assignment_type,
