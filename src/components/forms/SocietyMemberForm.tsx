@@ -156,17 +156,23 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
             unit_type,
             building_id,
             status,
+            area_sqft,
+            bedrooms,
+            bathrooms,
+            owner_name,
+            tenant_name,
             building:buildings(
               id,
               name,
               building_type,
               location:locations(
                 id,
-                name
+                name,
+                organization_id
               )
             )
           `)
-          .in('status', ['available']);
+          .in('status', ['available', 'maintenance']);
 
         // Filter units to only those in user's organization buildings
         if (filteredBuildings.length > 0) {
@@ -451,6 +457,24 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
               </TabsContent>
 
               <TabsContent value="unit" className="space-y-4">
+                {/* Unit Statistics Display */}
+                {buildings.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary">{buildings.length}</div>
+                      <div className="text-sm text-muted-foreground">Buildings Available</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">{societyUnits.filter(u => u.status === 'available').length}</div>
+                      <div className="text-sm text-muted-foreground">Available Units</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">{filteredUnits.length}</div>
+                      <div className="text-sm text-muted-foreground">Units in Selected Building</div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="space-y-4">
                   <FormField
                     control={form.control}
@@ -475,7 +499,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                           <SelectContent>
                             {buildings.map((building) => (
                               <SelectItem key={building.id} value={building.id}>
-                                {building.name} ({building.building_type})
+                                🏢 {building.name} ({building.building_type} • {building.floors} floors)
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -499,20 +523,30 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {filteredUnits.map((unit) => (
-                                <SelectItem key={unit.id} value={unit.id}>
-                                  <div className="flex flex-col text-left">
-                                    <span className="font-medium">
-                                      {unit.unit_number} - {unit.unit_type}
-                                    </span>
-                                    {unit.building && (
-                                      <span className="text-sm text-muted-foreground">
-                                        {unit.building.name} {unit.building.location && `(${unit.building.location.name})`}
-                                      </span>
-                                    )}
-                                  </div>
+                              {filteredUnits.length === 0 ? (
+                                <SelectItem disabled value="no-units">
+                                  {selectedBuildingId ? 'No available units in selected building' : 'Please select a building first'}
                                 </SelectItem>
-                              ))}
+                              ) : (
+                                filteredUnits.map((unit) => {
+                                  const buildingName = unit.building?.name || 'Unknown Building';
+                                  const locationName = unit.building?.location?.name || 'Unknown Location';
+                                  const statusIcon = unit.status === 'available' ? '✅' : unit.status === 'occupied' ? '🏠' : '🔧';
+                                  
+                                  return (
+                                    <SelectItem key={unit.id} value={unit.id}>
+                                      <div className="flex flex-col text-left">
+                                        <span className="font-medium">
+                                          {statusIcon} Unit {unit.unit_number} • {unit.unit_type}
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                          📍 {buildingName} ({locationName})
+                                        </span>
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
