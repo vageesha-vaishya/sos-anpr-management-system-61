@@ -2798,8 +2798,10 @@ export type Database = {
       profiles: {
         Row: {
           admin_set_password: boolean | null
+          confirmed_at: string | null
           created_at: string | null
           email: string
+          email_confirmed_at: string | null
           full_name: string | null
           id: string
           last_login: string | null
@@ -2817,8 +2819,10 @@ export type Database = {
         }
         Insert: {
           admin_set_password?: boolean | null
+          confirmed_at?: string | null
           created_at?: string | null
           email: string
+          email_confirmed_at?: string | null
           full_name?: string | null
           id: string
           last_login?: string | null
@@ -2836,8 +2840,10 @@ export type Database = {
         }
         Update: {
           admin_set_password?: boolean | null
+          confirmed_at?: string | null
           created_at?: string | null
           email?: string
+          email_confirmed_at?: string | null
           full_name?: string | null
           id?: string
           last_login?: string | null

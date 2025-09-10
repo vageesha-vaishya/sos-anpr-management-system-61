@@ -136,6 +136,32 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Also update the profiles table to keep it in sync
+    const profileUpdateData = action === 'verify' 
+      ? { 
+          email_confirmed_at: now,
+          confirmed_at: now,
+          updated_at: now
+        }
+      : { 
+          email_confirmed_at: null,
+          confirmed_at: null,
+          updated_at: now
+        };
+
+    console.log(`Updating profiles table for user ${userId} with data:`, profileUpdateData);
+
+    const { error: profileUpdateError } = await supabaseAdmin
+      .from('profiles')
+      .update(profileUpdateData)
+      .eq('id', userId);
+
+    if (profileUpdateError) {
+      console.error('Error updating profiles table:', profileUpdateError);
+      // Continue execution - don't fail the entire operation if profiles update fails
+      // The trigger should handle this sync automatically anyway
+    }
+
     // Log the action for audit trail
     const auditLog = {
       action_type: `email_${action}`,
