@@ -17,9 +17,9 @@ import { generateSecurePassword, validateSecureEmail, sanitizeInput } from '@/li
 const societyMemberSchema = z.object({
   email: z.string().email('Invalid email address'),
   full_name: z.string().min(1, 'Full name is required'),
+  phone: z.string().min(10, 'Valid phone number is required').regex(/^\+?[\d\s\-\(\)]+$/, 'Invalid phone number format'),
   role: z.enum(['society_president', 'society_secretary', 'society_treasurer', 'society_committee_member', 'resident', 'tenant', 'owner', 'family_member']),
   status: z.enum(['active', 'inactive', 'pending']),
-  phone_number: z.string().optional(),
   building_id: z.string().optional(),
   unit_id: z.string().optional(),
   assignment_type: z.enum(['owner', 'tenant', 'family_member']).optional(),
@@ -28,7 +28,7 @@ const societyMemberSchema = z.object({
     full_name: z.string().min(1, 'Name is required'),
     relationship: z.string().min(1, 'Relationship is required'),
     age: z.number().optional(),
-    phone_number: z.string().optional(),
+    phone_number: z.string().optional().refine((val) => !val || /^\+?[\d\s\-\(\)]+$/.test(val), 'Invalid phone number format'),
     email: z.string().email().optional().or(z.literal('')),
     is_emergency_contact: z.boolean().optional(),
   })).optional(),
@@ -78,9 +78,9 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
     defaultValues: {
       email: editData?.email || '',
       full_name: editData?.full_name || '',
+      phone: editData?.phone || '',
       role: (editData?.role as any) || 'resident',
       status: (editData?.status as any) || 'active',
-      phone_number: editData?.phone_number || '',
       building_id: editData?.building_id || '',
       unit_id: editData?.unit_id || '',
       assignment_type: (editData?.assignment_type as any) || 'owner',
@@ -204,7 +204,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
             full_name: data.full_name,
             role: data.role as any,
             status: data.status as any,
-            phone_number: data.phone_number,
+            phone: data.phone,
           })
           .eq('id', editData.id)
 
@@ -246,7 +246,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
               role: data.role as any,
               status: data.status as any,
               organization_id: userProfile?.organization_id,
-              phone_number: data.phone_number,
+              phone: data.phone,
             })
             .eq('id', authData.user.id)
 
@@ -443,12 +443,12 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
 
                 <FormField
                   control={form.control}
-                  name="phone_number"
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Phone number" {...field} />
+                        <Input placeholder="Phone number (e.g., +91-9876543210)" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
