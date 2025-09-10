@@ -21,25 +21,16 @@ interface SocietyUnit {
   parking_slots?: number | null;
   status?: string | null;
   created_at?: string;
-  building_id?: string | null;
-  floor?: number | null;
-  bedrooms?: number | null;
-  bathrooms?: number | null;
-  owner_email?: string | null;
-  owner_phone?: string | null;
-  tenant_email?: string | null;
-  tenant_phone?: string | null;
-  monthly_maintenance?: number | null;
-  is_occupied?: boolean | null;
   updated_at?: string;
 }
 
 interface SocietyUnitsTableProps {
   units: SocietyUnit[]
   onRefresh: () => void
+  organizationId?: string
 }
 
-export function SocietyUnitsTable({ units, onRefresh }: SocietyUnitsTableProps) {
+export function SocietyUnitsTable({ units, onRefresh, organizationId }: SocietyUnitsTableProps) {
   const [showForm, setShowForm] = useState(false)
   const [selectedUnit, setSelectedUnit] = useState<SocietyUnit | null>(null)
   const { toast } = useToast()
@@ -127,7 +118,7 @@ export function SocietyUnitsTable({ units, onRefresh }: SocietyUnitsTableProps) 
               </DialogHeader>
               <SocietyUnitForm
                 unit={selectedUnit}
-                organizationId=""
+                organizationId={organizationId || ""}
                 onSuccess={handleSuccess}
                 onCancel={() => {
                   setShowForm(false)

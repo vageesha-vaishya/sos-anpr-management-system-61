@@ -64,7 +64,7 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
         monthly_flat_rate: data.monthly_flat_rate,
         parking_slots: data.parking_slots,
         status: data.status,
-        organization_id: organizationId,
+        building_id: null, // Will need to be set based on the building selection
       }
 
       if (unit) {
