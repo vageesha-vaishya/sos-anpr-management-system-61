@@ -7,7 +7,8 @@ import { UserForm } from "@/components/forms/UserForm"
 import { AccountSettingsForm } from "@/components/forms/AccountSettingsForm"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { AdminPasswordForm } from "@/components/forms/AdminPasswordForm"
-import { Users as UsersIcon, Plus, Mail, Shield, MapPin, Edit, Trash2, Settings, Clock, Phone, Key, AlertTriangle } from "lucide-react"
+import { AdminEmailVerificationForm } from "@/components/forms/AdminEmailVerificationForm"
+import { Users as UsersIcon, Plus, Mail, Shield, MapPin, Edit, Trash2, Settings, Clock, Phone, Key, AlertTriangle, CheckCircle, XCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
@@ -17,9 +18,11 @@ const Users = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false)
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
+  const [isEmailVerificationDialogOpen, setIsEmailVerificationDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
   const [deletingUser, setDeletingUser] = useState<any>(null)
   const [passwordUser, setPasswordUser] = useState<any>(null)
+  const [emailVerificationUser, setEmailVerificationUser] = useState<any>(null)
   const [users, setUsers] = useState<any[]>([])
   const { toast } = useToast()
 
@@ -57,6 +60,12 @@ const Users = () => {
   const handlePasswordSuccess = () => {
     setIsPasswordDialogOpen(false)
     setPasswordUser(null)
+    fetchUsers()
+  }
+
+  const handleEmailVerificationSuccess = () => {
+    setIsEmailVerificationDialogOpen(false)
+    setEmailVerificationUser(null)
     fetchUsers()
   }
 
@@ -181,6 +190,22 @@ const Users = () => {
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="w-4 h-4" />
                   <span className="truncate">{user.email}</span>
+                  <Badge 
+                    variant={user.email_confirmed_at ? "default" : "secondary"} 
+                    className="ml-2 text-xs flex items-center gap-1"
+                  >
+                    {user.email_confirmed_at ? (
+                      <>
+                        <CheckCircle className="h-3 w-3" />
+                        Verified
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-3 w-3" />
+                        Unverified
+                      </>
+                    )}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="w-4 h-4" />
@@ -255,6 +280,17 @@ const Users = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => {
+                      setEmailVerificationUser(user)
+                      setIsEmailVerificationDialogOpen(true)
+                    }}
+                  >
+                    <Mail className="w-4 h-4 mr-1" />
+                    Email
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
                       setDeletingUser(user)
                       setIsDeleteDialogOpen(true)
                     }}
@@ -296,6 +332,13 @@ const Users = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <AdminEmailVerificationForm
+        user={emailVerificationUser}
+        open={isEmailVerificationDialogOpen}
+        onOpenChange={setIsEmailVerificationDialogOpen}
+        onSuccess={handleEmailVerificationSuccess}
+      />
     </div>
   )
 }

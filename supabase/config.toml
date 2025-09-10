@@ -2,3 +2,6 @@ project_id = "oimlpoizcfywxaahliij"
 
 [functions.admin-password-management]
 verify_jwt = true
+
+[functions.admin-email-verification]
+verify_jwt = true
