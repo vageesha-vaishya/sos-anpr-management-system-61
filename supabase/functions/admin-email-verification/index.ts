@@ -109,10 +109,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Update email verification status
+    // Update email verification status - set both required fields
+    const now = new Date().toISOString();
     const updateData = action === 'verify' 
-      ? { email_confirmed_at: new Date().toISOString() }
-      : { email_confirmed_at: null };
+      ? { 
+          email_confirmed_at: now,
+          confirmed_at: now
+        }
+      : { 
+          email_confirmed_at: null,
+          confirmed_at: null
+        };
+
+    console.log(`Updating user ${userId} with data:`, updateData);
 
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       userId,
