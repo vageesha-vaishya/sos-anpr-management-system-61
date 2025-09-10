@@ -2,14 +2,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ThemeSelector } from "@/components/theme/ThemeSelector"
 import { CustomThemeCreator } from "@/components/theme/CustomThemeCreator"
 import { ThemeEditor } from "@/components/theme/ThemeEditor"
 import { SidebarThemeEditor } from "@/components/theme/SidebarThemeEditor"
-import { Settings as SettingsIcon, Bell, Shield, Camera, Database, Users, Palette, CreditCard, Globe } from "lucide-react"
+import { Settings as SettingsIcon, Bell, Shield, Camera, Database, Users, Palette, CreditCard, Globe, Key } from "lucide-react"
 import { BadgeTemplateManager } from "@/components/badge/BadgeTemplateManager"
 import { GeographyManager } from "@/components/forms/GeographyManager"
+import { PermissionMatrixEditor } from "@/components/permissions/PermissionMatrixEditor"
+import { UserPermissionEditor } from "@/components/permissions/UserPermissionEditor"
+import { RoleManager } from "@/components/permissions/RoleManager"
+import { PermissionAuditLog } from "@/components/permissions/PermissionAuditLog"
 
 const Settings = () => {
   return (
@@ -22,11 +27,12 @@ const Settings = () => {
       </div>
 
       <Tabs defaultValue="appearance" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
+          <TabsTrigger value="permissions">Permissions</TabsTrigger>
           <TabsTrigger value="cameras">Cameras</TabsTrigger>
           <TabsTrigger value="database">Database</TabsTrigger>
           <TabsTrigger value="geography">Geography</TabsTrigger>
@@ -158,6 +164,46 @@ const Settings = () => {
                 <Button variant="outline">Reset API Keys</Button>
               </CardContent>
             </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="permissions">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Permission Management</h2>
+                <p className="text-muted-foreground">Configure roles, permissions, and access control</p>
+              </div>
+              <Badge variant="secondary" className="flex items-center gap-2">
+                <Key className="w-4 h-4" />
+                Access Control System
+              </Badge>
+            </div>
+
+            <Tabs defaultValue="matrix" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="matrix">Permission Matrix</TabsTrigger>
+                <TabsTrigger value="users">User Permissions</TabsTrigger>
+                <TabsTrigger value="roles">Role Management</TabsTrigger>
+                <TabsTrigger value="audit">Audit Log</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="matrix" className="space-y-4">
+                <PermissionMatrixEditor />
+              </TabsContent>
+
+              <TabsContent value="users" className="space-y-4">
+                <UserPermissionEditor />
+              </TabsContent>
+
+              <TabsContent value="roles" className="space-y-4">
+                <RoleManager />
+              </TabsContent>
+
+              <TabsContent value="audit" className="space-y-4">
+                <PermissionAuditLog />
+              </TabsContent>
+            </Tabs>
           </div>
         </TabsContent>
 
