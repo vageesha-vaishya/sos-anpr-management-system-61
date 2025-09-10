@@ -17,9 +17,9 @@ import { generateSecurePassword, validateSecureEmail, sanitizeInput } from '@/li
 const societyMemberSchema = z.object({
   email: z.string().email('Invalid email address'),
   full_name: z.string().min(1, 'Full name is required'),
-  phone: z.string().min(10, 'Valid phone number is required').regex(/^\+?[\d\s\-\(\)]+$/, 'Invalid phone number format'),
   role: z.enum(['society_president', 'society_secretary', 'society_treasurer', 'society_committee_member', 'resident', 'tenant', 'owner', 'family_member']),
   status: z.enum(['active', 'inactive', 'pending']),
+  phone: z.string().min(10, "Valid phone number is required").regex(/^\+?[\d\s\-\(\)]+$/, "Invalid phone number format"),
   building_id: z.string().optional(),
   unit_id: z.string().optional(),
   assignment_type: z.enum(['owner', 'tenant', 'family_member']).optional(),
@@ -28,7 +28,7 @@ const societyMemberSchema = z.object({
     full_name: z.string().min(1, 'Name is required'),
     relationship: z.string().min(1, 'Relationship is required'),
     age: z.number().optional(),
-    phone_number: z.string().optional().refine((val) => !val || /^\+?[\d\s\-\(\)]+$/.test(val), 'Invalid phone number format'),
+    phone_number: z.string().optional().refine((val) => !val || /^\+?[\d\s\-\(\)]+$/.test(val), "Invalid phone number format"),
     email: z.string().email().optional().or(z.literal('')),
     is_emergency_contact: z.boolean().optional(),
   })).optional(),
@@ -78,9 +78,9 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
     defaultValues: {
       email: editData?.email || '',
       full_name: editData?.full_name || '',
-      phone: editData?.phone || '',
       role: (editData?.role as any) || 'resident',
       status: (editData?.status as any) || 'active',
+      phone: editData?.phone || '',
       building_id: editData?.building_id || '',
       unit_id: editData?.unit_id || '',
       assignment_type: (editData?.assignment_type as any) || 'owner',
@@ -446,9 +446,9 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Phone Number *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Phone number (e.g., +91-9876543210)" {...field} />
+                        <Input {...field} placeholder="Enter phone number (e.g., +91-9876543210)" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -484,22 +484,22 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                         <FormLabel>Building</FormLabel>
                         <Select 
                           onValueChange={(value) => {
-                            field.onChange(value);
-                            setSelectedBuildingId(value);
-                            // Clear unit selection when building changes
-                            form.setValue("unit_id", "");
+                            field.onChange(value)
+                            setSelectedBuildingId(value)
+                            // Reset unit selection when building changes
+                            form.setValue('unit_id', '')
                           }} 
-                          value={field.value}
+                          defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a building first" />
+                              <SelectValue placeholder="Select building" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             {buildings.map((building) => (
                               <SelectItem key={building.id} value={building.id}>
-                                🏢 {building.name} ({building.building_type} • {building.floors} floors)
+                                {building.name} - {building.building_type} ({building.floors} floors)
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -509,80 +509,59 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="unit_id"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Unit</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value} disabled={!selectedBuildingId}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={selectedBuildingId ? "Select a unit" : "Select building first"} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {filteredUnits.length === 0 ? (
-                                <SelectItem disabled value="no-units">
-                                  {selectedBuildingId ? 'No available units in selected building' : 'Please select a building first'}
-                                </SelectItem>
-                              ) : (
-                                filteredUnits.map((unit) => {
-                                  const buildingName = unit.building?.name || 'Unknown Building';
-                                  const locationName = unit.building?.location?.name || 'Unknown Location';
-                                  const statusIcon = unit.status === 'available' ? '✅' : unit.status === 'occupied' ? '🏠' : '🔧';
-                                  
-                                  return (
-                                    <SelectItem key={unit.id} value={unit.id}>
-                                      <div className="flex flex-col text-left">
-                                        <span className="font-medium">
-                                          {statusIcon} Unit {unit.unit_number} • {unit.unit_type}
-                                        </span>
-                                        <span className="text-sm text-muted-foreground">
-                                          📍 {buildingName} ({locationName})
-                                        </span>
-                                      </div>
-                                    </SelectItem>
-                                  );
-                                })
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={form.control}
+                    name="unit_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select unit" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {filteredUnits.map((unit) => (
+                              <SelectItem key={unit.id} value={unit.id}>
+                                {unit.unit_number} - {unit.unit_type} ({unit.status})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="assignment_type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Assignment Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="owner">Owner</SelectItem>
-                              <SelectItem value="tenant">Tenant</SelectItem>
-                              <SelectItem value="family_member">Family Member</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="assignment_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Assignment Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select assignment type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="owner">Owner</SelectItem>
+                            <SelectItem value="tenant">Tenant</SelectItem>
+                            <SelectItem value="family_member">Family Member</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </TabsContent>
 
               <TabsContent value="family" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Family Members</h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Family Members</h3>
                   <Button type="button" onClick={addFamilyMember} variant="outline">
                     Add Family Member
                   </Button>
@@ -590,10 +569,10 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
 
                 {form.watch('family_members')?.map((_, index) => (
                   <div key={index} className="p-4 border rounded-lg space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex justify-between items-center">
                       <h4 className="font-medium">Family Member {index + 1}</h4>
-                      <Button 
-                        type="button" 
+                      <Button
+                        type="button"
                         onClick={() => removeFamilyMember(index)}
                         variant="destructive"
                         size="sm"
@@ -601,7 +580,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                         Remove
                       </Button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -610,7 +589,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                           <FormItem>
                             <FormLabel>Full Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Full name" {...field} />
+                              <Input placeholder="Family member name" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -623,20 +602,9 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Relationship</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select relationship" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="spouse">Spouse</SelectItem>
-                                <SelectItem value="child">Child</SelectItem>
-                                <SelectItem value="parent">Parent</SelectItem>
-                                <SelectItem value="sibling">Sibling</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <FormControl>
+                              <Input placeholder="e.g., Spouse, Child" {...field} />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -653,7 +621,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                                 type="number" 
                                 placeholder="Age" 
                                 {...field}
-                                onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -682,7 +650,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                           <FormItem>
                             <FormLabel>Email (Optional)</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="Email" {...field} />
+                              <Input type="email" placeholder="Email address" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -693,12 +661,9 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                         control={form.control}
                         name={`family_members.${index}.is_emergency_contact`}
                         render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                             <div className="space-y-0.5">
-                              <FormLabel className="text-base">Emergency Contact</FormLabel>
-                              <div className="text-sm text-muted-foreground">
-                                Mark as emergency contact
-                              </div>
+                              <FormLabel>Emergency Contact</FormLabel>
                             </div>
                             <FormControl>
                               <Switch
@@ -712,16 +677,50 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                     </div>
                   </div>
                 ))}
+
+                {(!form.watch('family_members') || form.watch('family_members')?.length === 0) && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No family members added yet. Click "Add Family Member" to get started.
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
 
-            <div className="flex gap-4">
-              <Button type="submit" className="flex-1">
-                {editData ? 'Update Member' : 'Create Member'}
-              </Button>
+            <div className="flex justify-between pt-6 border-t">
               <Button type="button" variant="outline" onClick={() => form.reset()}>
-                Reset
+                Reset Form
               </Button>
+              <div className="space-x-2">
+                {activeTab !== 'basic' && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      const tabs = ['basic', 'unit', 'family']
+                      const currentIndex = tabs.indexOf(activeTab)
+                      if (currentIndex > 0) setActiveTab(tabs[currentIndex - 1])
+                    }}
+                  >
+                    Previous
+                  </Button>
+                )}
+                {activeTab !== 'family' ? (
+                  <Button 
+                    type="button" 
+                    onClick={() => {
+                      const tabs = ['basic', 'unit', 'family']
+                      const currentIndex = tabs.indexOf(activeTab)
+                      if (currentIndex < tabs.length - 1) setActiveTab(tabs[currentIndex + 1])
+                    }}
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button type="submit">
+                    {editData ? 'Update Member' : 'Create Member'}
+                  </Button>
+                )}
+              </div>
             </div>
           </form>
         </Form>
