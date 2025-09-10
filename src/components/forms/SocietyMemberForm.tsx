@@ -20,6 +20,7 @@ const societyMemberSchema = z.object({
   role: z.enum(['society_president', 'society_secretary', 'society_treasurer', 'society_committee_member', 'resident', 'tenant', 'owner', 'family_member']),
   status: z.enum(['active', 'inactive', 'pending']),
   phone_number: z.string().optional(),
+  building_id: z.string().optional(),
   unit_id: z.string().optional(),
   assignment_type: z.enum(['owner', 'tenant', 'family_member']).optional(),
   // Family member fields
@@ -40,10 +41,36 @@ interface SocietyMemberFormProps {
   editData?: any
 }
 
+interface SocietyUnit {
+  id: string;
+  unit_number: string;
+  unit_type: string;
+  building_id: string | null;
+  status: string;
+  building?: {
+    id: string;
+    name: string;
+    building_type: string;
+    location?: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
+interface Building {
+  id: string;
+  name: string;
+  building_type: string;
+  floors: number;
+}
+
 export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess, editData }) => {
   const { toast } = useToast()
   const { userProfile } = useAuth()
-  const [societyUnits, setSocietyUnits] = useState<any[]>([])
+  const [societyUnits, setSocietyUnits] = useState<SocietyUnit[]>([])
+  const [buildings, setBuildings] = useState<Building[]>([])
+  const [selectedBuildingId, setSelectedBuildingId] = useState<string>("")
   const [activeTab, setActiveTab] = useState('basic')
   
   const form = useForm<SocietyMemberFormData>({
@@ -54,6 +81,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
       role: (editData?.role as any) || 'resident',
       status: (editData?.status as any) || 'active',
       phone_number: editData?.phone_number || '',
+      building_id: editData?.building_id || '',
       unit_id: editData?.unit_id || '',
       assignment_type: (editData?.assignment_type as any) || 'owner',
       family_members: editData?.family_members || [],
@@ -61,21 +89,103 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
   })
 
   useEffect(() => {
-    const fetchSocietyUnits = async () => {
+    const fetchBuildingsAndUnits = async () => {
       try {
-        const { data, error } = await supabase
-          .from('society_units')
-          .select('id, unit_number, unit_type, floor, building_id, occupancy_status')
-          .order('unit_number')
+        // Get current user's organization
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-        if (error) throw error
-        setSocietyUnits(data || [])
-      } catch (err) {
-        console.error('Error fetching society units:', err)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('organization_id, role')
+          .eq('id', user.id)
+          .single();
+
+        if (!profile) return;
+
+        // Fetch buildings based on organization hierarchy
+        let buildingsQuery = supabase
+          .from('buildings')
+          .select(`
+            id,
+            name,
+            building_type,
+            floors,
+            location:locations(
+              id,
+              name,
+              organization_id
+            )
+          `)
+          .eq('is_active', true);
+
+        // Apply organization filtering based on user role
+        if (profile.role !== 'platform_admin') {
+          // Filter by organization for non-platform admins
+          buildingsQuery = buildingsQuery.eq('locations.organization_id', profile.organization_id);
+        }
+
+        const { data: buildingsData, error: buildingsError } = await buildingsQuery;
+
+        if (buildingsError) {
+          console.error('Error fetching buildings:', buildingsError);
+          return;
+        }
+
+        // Filter buildings to only include those in user's organization scope
+        const filteredBuildings = buildingsData?.filter(building => 
+          building.location && (
+            profile.role === 'platform_admin' || 
+            building.location.organization_id === profile.organization_id
+          )
+        ) || [];
+
+        setBuildings(filteredBuildings.map(b => ({
+          id: b.id,
+          name: b.name,
+          building_type: b.building_type,
+          floors: b.floors
+        })));
+
+        // Fetch units with building and location context
+        let unitsQuery = supabase
+          .from('society_units')
+          .select(`
+            id,
+            unit_number,
+            unit_type,
+            building_id,
+            status,
+            building:buildings(
+              id,
+              name,
+              building_type,
+              location:locations(
+                id,
+                name
+              )
+            )
+          `)
+          .in('status', ['available']);
+
+        // Filter units to only those in user's organization buildings
+        if (filteredBuildings.length > 0) {
+          unitsQuery = unitsQuery.in('building_id', filteredBuildings.map(b => b.id));
+        }
+
+        const { data: unitsData, error: unitsError } = await unitsQuery;
+
+        if (unitsError) {
+          console.error('Error fetching units:', unitsError);
+        } else {
+          setSocietyUnits(unitsData || []);
+        }
+      } catch (error) {
+        console.error('Error in fetchBuildingsAndUnits:', error);
       }
-    }
-    
-    fetchSocietyUnits()
+    };
+
+    fetchBuildingsAndUnits();
   }, [])
 
   const onSubmit = async (data: SocietyMemberFormData) => {
@@ -215,6 +325,11 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
     ])
   }
 
+  // Filter units based on selected building
+  const filteredUnits = selectedBuildingId 
+    ? societyUnits.filter(unit => unit.building_id === selectedBuildingId)
+    : societyUnits;
+
   const removeFamilyMember = (index: number) => {
     const currentMembers = form.getValues('family_members') || []
     form.setValue('family_members', currentMembers.filter((_, i) => i !== index))
@@ -336,24 +451,31 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
               </TabsContent>
 
               <TabsContent value="unit" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="unit_id"
+                    name="building_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormLabel>Building</FormLabel>
+                        <Select 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedBuildingId(value);
+                            // Clear unit selection when building changes
+                            form.setValue("unit_id", "");
+                          }} 
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select unit" />
+                              <SelectValue placeholder="Select a building first" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {societyUnits.map((unit) => (
-                              <SelectItem key={unit.id} value={unit.id}>
-                                Unit {unit.unit_number} - {unit.unit_type} (Floor {unit.floor})
-                                {unit.occupancy_status === 'occupied' && ' - Occupied'}
+                            {buildings.map((building) => (
+                              <SelectItem key={building.id} value={building.id}>
+                                {building.name} ({building.building_type})
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -363,28 +485,64 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="assignment_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Assignment Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="owner">Owner</SelectItem>
-                            <SelectItem value="tenant">Tenant</SelectItem>
-                            <SelectItem value="family_member">Family Member</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="unit_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value} disabled={!selectedBuildingId}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={selectedBuildingId ? "Select a unit" : "Select building first"} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {filteredUnits.map((unit) => (
+                                <SelectItem key={unit.id} value={unit.id}>
+                                  <div className="flex flex-col text-left">
+                                    <span className="font-medium">
+                                      {unit.unit_number} - {unit.unit_type}
+                                    </span>
+                                    {unit.building && (
+                                      <span className="text-sm text-muted-foreground">
+                                        {unit.building.name} {unit.building.location && `(${unit.building.location.name})`}
+                                      </span>
+                                    )}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="assignment_type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Assignment Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="owner">Owner</SelectItem>
+                              <SelectItem value="tenant">Tenant</SelectItem>
+                              <SelectItem value="family_member">Family Member</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               </TabsContent>
 
