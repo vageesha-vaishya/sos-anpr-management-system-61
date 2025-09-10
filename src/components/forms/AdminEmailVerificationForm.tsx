@@ -45,13 +45,22 @@ export function AdminEmailVerificationForm({
     }
 
     setLoading(true);
+    console.log(`Starting email verification ${action} for user:`, user.id, user.email);
 
     try {
       const { data: session } = await supabase.auth.getSession();
+      console.log('Session check:', { hasSession: !!session.session, hasToken: !!session.session?.access_token });
       
       if (!session.session?.access_token) {
         throw new Error('No valid session found');
       }
+
+      console.log('Calling admin-email-verification function with:', {
+        userId: user.id,
+        action,
+        reason: reason.trim(),
+        notifyUser: false
+      });
 
       const response = await supabase.functions.invoke('admin-email-verification', {
         body: {
@@ -65,9 +74,19 @@ export function AdminEmailVerificationForm({
         },
       });
 
+      console.log('Edge function response:', response);
+
       if (response.error) {
+        console.error('Edge function error:', response.error);
         throw new Error(response.error.message || 'Failed to update email verification');
       }
+
+      if (response.data?.error) {
+        console.error('Edge function returned error:', response.data.error);
+        throw new Error(response.data.error || 'Failed to update email verification');
+      }
+
+      console.log('Email verification successful:', response.data);
 
       toast({
         title: "Success",
