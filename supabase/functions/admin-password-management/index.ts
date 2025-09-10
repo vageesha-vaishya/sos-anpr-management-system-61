@@ -1,14 +1,26 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.56.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@2.0.0";
 
-// Initialize clients
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const resendApiKey = Deno.env.get('RESEND_API_KEY')!;
+// Initialize clients with fallback values
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://oimlpoizcfywxaahliij.supabase.co';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-const resend = new Resend(resendApiKey);
+if (!supabaseServiceKey) {
+  console.error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+}
+if (!resendApiKey) {
+  console.error('RESEND_API_KEY is not configured');
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey || '', {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -247,6 +259,9 @@ async function logPasswordAction(
 }
 
 async function sendResetEmail(email: string, resetUrl: string, token: string): Promise<void> {
+  if (!resend) {
+    throw new Error('Email service not configured');
+  }
   try {
     await resend.emails.send({
       from: 'ANPR Management <no-reply@anpr.lovable.dev>',
@@ -289,6 +304,11 @@ async function sendResetWhatsApp(phone: string, token: string): Promise<void> {
 }
 
 async function sendPasswordChangeNotification(user: any, action: string, adminEmail: string): Promise<void> {
+  if (!resend) {
+    console.log('Email service not configured, skipping notification');
+    return;
+  }
+
   const actionTexts = {
     reset_link: 'A password reset link has been sent to you',
     temporary_password: 'A temporary password has been set for your account. You will be required to change it on your next login',
