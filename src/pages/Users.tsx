@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { UserForm } from "@/components/forms/UserForm"
 import { AccountSettingsForm } from "@/components/forms/AccountSettingsForm"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { Users as UsersIcon, Plus, Mail, Shield, MapPin, Edit, Trash2, Settings, Clock, Phone } from "lucide-react"
+import { AdminPasswordForm } from "@/components/forms/AdminPasswordForm"
+import { Users as UsersIcon, Plus, Mail, Shield, MapPin, Edit, Trash2, Settings, Clock, Phone, Key, AlertTriangle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
@@ -15,8 +16,10 @@ const Users = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isAccountDialogOpen, setIsAccountDialogOpen] = useState(false)
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<any>(null)
   const [deletingUser, setDeletingUser] = useState<any>(null)
+  const [passwordUser, setPasswordUser] = useState<any>(null)
   const [users, setUsers] = useState<any[]>([])
   const { toast } = useToast()
 
@@ -48,6 +51,12 @@ const Users = () => {
   const handleSuccess = () => {
     setIsDialogOpen(false)
     setEditingUser(null)
+    fetchUsers()
+  }
+
+  const handlePasswordSuccess = () => {
+    setIsPasswordDialogOpen(false)
+    setPasswordUser(null)
     fetchUsers()
   }
 
@@ -208,10 +217,39 @@ const Users = () => {
                     </Badge>
                   )}
                 </div>
+                {/* Password Status Indicators */}
+                {(user.requires_password_change || user.admin_set_password) && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {user.requires_password_change && (
+                      <Badge variant="outline" className="text-orange-600 text-xs">
+                        <AlertTriangle className="w-3 h-3 mr-1" />
+                        Requires Password Change
+                      </Badge>
+                    )}
+                    {user.admin_set_password && (
+                      <Badge variant="outline" className="text-blue-600 text-xs">
+                        <Shield className="w-3 h-3 mr-1" />
+                        Admin Set Password
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex gap-2 pt-2">
                   <Button variant="outline" size="sm" onClick={() => handleEdit(user)}>
                     <Edit className="w-4 h-4 mr-1" />
                     Edit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setPasswordUser(user)
+                      setIsPasswordDialogOpen(true)
+                    }}
+                  >
+                    <Key className="w-4 h-4 mr-1" />
+                    Password
                   </Button>
                   <Button 
                     variant="outline" 
@@ -240,6 +278,24 @@ const Users = () => {
         confirmText="Delete"
         variant="destructive"
       />
+
+      <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+        setIsPasswordDialogOpen(open)
+        if (!open) setPasswordUser(null)
+      }}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Password Management</DialogTitle>
+          </DialogHeader>
+          {passwordUser && (
+            <AdminPasswordForm
+              user={passwordUser}
+              onSuccess={handlePasswordSuccess}
+              onCancel={() => setIsPasswordDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
