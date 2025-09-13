@@ -1635,15 +1635,20 @@ export type Database = {
           category: string
           created_at: string | null
           created_by: string | null
+          customer_satisfaction_rating: number | null
           description: string
+          due_date: string | null
+          escalation_level: number | null
           id: string
           organization_id: string | null
           priority: string | null
           resolution: string | null
           resolved_at: string | null
           status: string | null
+          tags: Json | null
           ticket_number: string
           title: string
+          total_time_spent: number | null
           updated_at: string | null
         }
         Insert: {
@@ -1651,15 +1656,20 @@ export type Database = {
           category: string
           created_at?: string | null
           created_by?: string | null
+          customer_satisfaction_rating?: number | null
           description: string
+          due_date?: string | null
+          escalation_level?: number | null
           id?: string
           organization_id?: string | null
           priority?: string | null
           resolution?: string | null
           resolved_at?: string | null
           status?: string | null
+          tags?: Json | null
           ticket_number: string
           title: string
+          total_time_spent?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -1667,15 +1677,20 @@ export type Database = {
           category?: string
           created_at?: string | null
           created_by?: string | null
+          customer_satisfaction_rating?: number | null
           description?: string
+          due_date?: string | null
+          escalation_level?: number | null
           id?: string
           organization_id?: string | null
           priority?: string | null
           resolution?: string | null
           resolved_at?: string | null
           status?: string | null
+          tags?: Json | null
           ticket_number?: string
           title?: string
+          total_time_spent?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -3488,6 +3503,163 @@ export type Database = {
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_action_history: {
+        Row: {
+          action_by: string
+          action_description: string
+          action_type: string
+          created_at: string
+          id: string
+          is_internal: boolean | null
+          new_value: Json | null
+          previous_value: Json | null
+          resolution_details: string | null
+          ticket_id: string
+          time_spent_minutes: number | null
+        }
+        Insert: {
+          action_by: string
+          action_description: string
+          action_type: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          new_value?: Json | null
+          previous_value?: Json | null
+          resolution_details?: string | null
+          ticket_id: string
+          time_spent_minutes?: number | null
+        }
+        Update: {
+          action_by?: string
+          action_description?: string
+          action_type?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          new_value?: Json | null
+          previous_value?: Json | null
+          resolution_details?: string | null
+          ticket_id?: string
+          time_spent_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_action_history_action_by_fkey"
+            columns: ["action_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_action_history_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "helpdesk_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_comments: {
+        Row: {
+          attachments: Json | null
+          author_id: string
+          author_type: string
+          comment_text: string
+          created_at: string
+          id: string
+          is_internal: boolean | null
+          ticket_id: string
+        }
+        Insert: {
+          attachments?: Json | null
+          author_id: string
+          author_type?: string
+          comment_text: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          ticket_id: string
+        }
+        Update: {
+          attachments?: Json | null
+          author_id?: string
+          author_type?: string
+          comment_text?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_comments_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_comments_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "helpdesk_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_escalations: {
+        Row: {
+          created_at: string
+          escalated_by: string
+          escalated_to: string
+          escalation_level: number | null
+          escalation_reason: string
+          id: string
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          escalated_by: string
+          escalated_to: string
+          escalation_level?: number | null
+          escalation_reason: string
+          id?: string
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          escalated_by?: string
+          escalated_to?: string
+          escalation_level?: number | null
+          escalation_reason?: string
+          id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_escalations_escalated_by_fkey"
+            columns: ["escalated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_escalations_escalated_to_fkey"
+            columns: ["escalated_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_escalations_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "helpdesk_tickets"
             referencedColumns: ["id"]
           },
         ]

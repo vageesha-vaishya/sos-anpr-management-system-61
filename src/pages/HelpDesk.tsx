@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/integrations/supabase/client'
 import { HelpDeskTicketForm } from '@/components/forms/HelpDeskTicketForm'
+import { TicketDetailDialog } from '@/components/helpdesk/TicketDetailDialog'
 import { 
   Table, 
   TableBody, 
@@ -65,6 +66,8 @@ export default function HelpDesk() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null)
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false)
   const { toast } = useToast()
 
   const loadTickets = async () => {
@@ -486,6 +489,14 @@ export default function HelpDesk() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Ticket Detail Dialog */}
+      <TicketDetailDialog
+        ticketId={selectedTicketId}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        onTicketUpdated={loadTickets}
+      />
     </div>
   )
 }

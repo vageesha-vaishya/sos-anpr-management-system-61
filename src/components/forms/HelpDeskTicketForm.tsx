@@ -17,8 +17,9 @@ const ticketFormSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   category: z.string().min(1, 'Category is required'),
-  priority: z.enum(['low', 'medium', 'high']),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']),
   assigned_to: z.string().optional(),
+  due_date: z.string().optional(),
 })
 
 type TicketFormValues = z.infer<typeof ticketFormSchema>
@@ -53,6 +54,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
       category: ticket?.category || undefined,
       priority: ticket?.priority || 'medium',
       assigned_to: ticket?.assigned_to || undefined,
+      due_date: ticket?.due_date ? new Date(ticket.due_date).toISOString().split('T')[0] : '',
     },
   })
 
@@ -129,6 +131,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
         organization_id: profile.organization_id,
         ticket_number: ticket?.ticket_number || generateTicketNumber(),
         status: ticket?.status || 'open',
+        due_date: values.due_date ? new Date(values.due_date).toISOString() : null,
       }
       
       console.log('Ticket data prepared:', ticketData)
@@ -151,13 +154,28 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
         })
       } else {
         console.log('Creating new ticket...')
-        const { error } = await supabase
+        const { data: newTicket, error } = await supabase
           .from('helpdesk_tickets')
           .insert(ticketData)
+          .select()
+          .single()
 
         if (error) {
           console.error('Insert error:', error)
           throw error
+        }
+
+        // Log ticket creation action
+        if (newTicket) {
+          await supabase
+            .from('ticket_action_history')
+            .insert({
+              ticket_id: newTicket.id,
+              action_by: userData.user.id,
+              action_type: 'created',
+              action_description: `Ticket created with priority: ${values.priority}`,
+              new_value: { status: 'open', priority: values.priority }
+            })
         }
         
         toast({
@@ -285,17 +303,32 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
                               <SelectValue placeholder="Select priority" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                          </SelectContent>
+                           <SelectContent>
+                             <SelectItem value="low">Low</SelectItem>
+                             <SelectItem value="medium">Medium</SelectItem>
+                             <SelectItem value="high">High</SelectItem>
+                             <SelectItem value="urgent">Urgent</SelectItem>
+                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="due_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Due Date (Optional)</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
