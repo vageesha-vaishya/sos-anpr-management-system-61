@@ -70,22 +70,47 @@ export default function HelpDesk() {
   const loadTickets = async () => {
     try {
       setLoading(true)
+      
+      // Check if user is authenticated
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        toast({
+          title: 'Authentication Required',
+          description: 'Please log in to view help desk tickets',
+          variant: 'destructive',
+        })
+        return
+      }
+
       const { data, error } = await supabase
         .from('helpdesk_tickets')
         .select(`
           *,
-          created_by_profile:profiles(full_name, email),
-          assigned_staff:staff_members(full_name, position)
+          created_by_profile:profiles!helpdesk_tickets_created_by_fkey(full_name, email),
+          assigned_staff:staff_members!helpdesk_tickets_assigned_to_fkey(full_name, position)
         `)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('Database error:', error)
+        if (error.code === 'PGRST116') {
+          toast({
+            title: 'Access Denied',
+            description: 'You do not have permission to view help desk tickets. Please contact your administrator.',
+            variant: 'destructive',
+          })
+        } else {
+          throw error
+        }
+        return
+      }
+      
       setTickets(data as any || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading tickets:', error)
       toast({
         title: 'Error',
-        description: 'Failed to load tickets',
+        description: error.message || 'Failed to load tickets. Please try again or contact support.',
         variant: 'destructive',
       })
     } finally {
