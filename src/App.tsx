@@ -69,6 +69,7 @@ import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
 import { Button } from "@/components/ui/button"
 import NotFound from "@/pages/NotFound"
 import { NavigationProvider } from "@/contexts/NavigationContext"
+import FinancialReports from "@/pages/FinancialReports"
 
 const queryClient = new QueryClient();
 

@@ -13,7 +13,10 @@ import { ChargeCategoryForm } from "@/components/forms/ChargeCategoryForm"
 import { ServiceTypeForm } from "@/components/forms/ServiceTypeForm"
 import { AmenityForm } from "@/components/forms/AmenityForm"
 import { GeographyManager } from "@/components/forms/GeographyManager"
-import { Plus, Settings, Trash2, Edit, Database, Globe } from "lucide-react"
+import { Plus, Settings, Trash2, Edit, Database, Globe, Building, DollarSign, Shield, Phone } from "lucide-react"
+import { BankAccountsTable } from "@/components/tables/BankAccountsTable"
+import { DepartmentsTable } from "@/components/tables/DepartmentsTable"
+import { EmergencyContactsTable } from "@/components/tables/EmergencyContactsTable"
 
 interface ChargeCategory {
   id: string
@@ -233,10 +236,13 @@ export default function MasterDataManagement() {
       </div>
 
       <Tabs defaultValue="categories" className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="categories">Charge Categories</TabsTrigger>
           <TabsTrigger value="services">Service Types</TabsTrigger>
           <TabsTrigger value="amenities">Amenities</TabsTrigger>
+          <TabsTrigger value="departments">Departments</TabsTrigger>
+          <TabsTrigger value="banking">Banking</TabsTrigger>
+          <TabsTrigger value="emergency">Emergency</TabsTrigger>
           <TabsTrigger value="geography">Geography</TabsTrigger>
         </TabsList>
 
@@ -490,6 +496,18 @@ export default function MasterDataManagement() {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="departments" className="space-y-4">
+          <DepartmentsTable />
+        </TabsContent>
+
+        <TabsContent value="banking" className="space-y-4">
+          <BankAccountsTable />
+        </TabsContent>
+
+        <TabsContent value="emergency" className="space-y-4">
+          <EmergencyContactsTable />
         </TabsContent>
 
         <TabsContent value="geography" className="space-y-4">

@@ -380,7 +380,7 @@ export default function StaffManagement() {
                 className="max-w-sm"
               />
             </div>
-            <DepartmentForm onSuccess={loadDepartments} />
+            <DepartmentForm onSuccess={loadDepartments} onCancel={() => {}} />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -401,16 +401,10 @@ export default function StaffManagement() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DepartmentForm
-                          department={department}
-                          onSuccess={loadDepartments}
-                          trigger={
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                          }
-                        />
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => handleDeleteDepartment(department.id)}
                           className="text-red-600"

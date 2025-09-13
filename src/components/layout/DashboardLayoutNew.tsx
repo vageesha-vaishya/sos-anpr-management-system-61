@@ -59,6 +59,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { usePermissions } from '@/hooks/usePermissions'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { Database } from 'lucide-react'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -82,7 +83,7 @@ const navigationGroups = [
       { name: 'Security & Monitoring', href: '/cameras', icon: Camera, minimumRole: 'society_admin' },
       { name: 'Access Control', href: '/vehicles', icon: Car, minimumRole: 'society_admin' },
       { name: 'Alert Management', href: '/alerts', icon: Bell, minimumRole: 'society_admin' },
-      { name: 'Emergency Response', href: '/help-desk', icon: Zap, minimumRole: 'society_admin' },
+      { name: 'Emergency Response', href: '/helpdesk', icon: Zap, minimumRole: 'society_admin' },
     ]
   },
   {
@@ -92,7 +93,7 @@ const navigationGroups = [
       { name: 'Member Management', href: '/residents', icon: Users, minimumRole: 'society_admin' },
       { name: 'Staff Management', href: '/staff-management', icon: UserCog, minimumRole: 'society_admin' },
       { name: 'Communication Hub', href: '/announcements', icon: MessageCircle, minimumRole: 'society_admin' },
-      { name: 'Event Management', href: '/event-management', icon: Calendar, minimumRole: 'society_admin' },
+      { name: 'Event Management', href: '/events', icon: Calendar, minimumRole: 'society_admin' },
       { name: 'Amenity Management', href: '/amenity-management', icon: Gamepad2, minimumRole: 'society_admin' },
     ]
   },
@@ -124,7 +125,8 @@ const navigationGroups = [
       { name: 'User Management', href: '/users', icon: Users, minimumRole: 'platform_admin' },
       { name: 'Organization Setup', href: '/locations', icon: Building, minimumRole: 'platform_admin' },
       { name: 'Settings & Configuration', href: '/settings', icon: Settings, minimumRole: 'customer' },
-      { name: 'Support & Help', href: '/help-desk', icon: HelpCircle, minimumRole: 'customer' },
+      { name: 'Master Data Management', href: '/master-data-management', icon: Database, minimumRole: 'platform_admin' },
+      { name: 'Support & Help', href: '/helpdesk', icon: HelpCircle, minimumRole: 'customer' },
     ]
   }
 ]
