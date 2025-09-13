@@ -58,16 +58,24 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
 
   const loadStaffMembers = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      console.log('Loading staff members...')
+      const { data, error } = await supabase
         .from('staff_members')
         .select('id, full_name, position')
-        .eq('is_active', true)
+        .eq('status', 'active')
         .order('full_name')
 
-      if (error) throw error
+      if (error) {
+        console.error('Staff members query error:', error)
+        throw error
+      }
+      
+      console.log('Staff members loaded:', data?.length || 0)
       setStaffMembers(data || [])
     } catch (error) {
       console.error('Error loading staff members:', error)
+      // Continue without staff members - form should still work
+      setStaffMembers([])
     }
   }
 
@@ -85,39 +93,73 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
   const onSubmit = async (values: TicketFormValues) => {
     setLoading(true)
     try {
-      const { data: userData } = await supabase.auth.getUser()
-      const { data: profile } = await supabase
+      console.log('Starting ticket submission...', values)
+      
+      const { data: userData, error: userError } = await supabase.auth.getUser()
+      if (userError || !userData.user) {
+        throw new Error('Not authenticated. Please log in again.')
+      }
+      
+      console.log('User authenticated:', userData.user.id)
+      
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id')
-        .eq('id', userData.user?.id)
+        .eq('id', userData.user.id)
         .single()
 
+      if (profileError) {
+        console.error('Profile fetch error:', profileError)
+        throw new Error('Unable to fetch user profile. Please try again.')
+      }
+      
+      if (!profile?.organization_id) {
+        throw new Error('User organization not found. Please contact support.')
+      }
+      
+      console.log('Profile found, organization_id:', profile.organization_id)
+
       const ticketData = {
-        ...values,
+        title: values.title,
+        description: values.description,
+        category: values.category,
+        priority: values.priority,
         assigned_to: values.assigned_to || null,
-        created_by: userData.user?.id,
-        organization_id: profile?.organization_id,
+        created_by: userData.user.id,
+        organization_id: profile.organization_id,
         ticket_number: ticket?.ticket_number || generateTicketNumber(),
         status: ticket?.status || 'open',
       }
+      
+      console.log('Ticket data prepared:', ticketData)
 
       if (ticket?.id) {
-        const { error } = await (supabase as any)
+        console.log('Updating existing ticket:', ticket.id)
+        const { error } = await supabase
           .from('helpdesk_tickets')
           .update(ticketData)
           .eq('id', ticket.id)
 
-        if (error) throw error
+        if (error) {
+          console.error('Update error:', error)
+          throw error
+        }
+        
         toast({
           title: 'Success',
           description: 'Ticket updated successfully',
         })
       } else {
-        const { error } = await (supabase as any)
+        console.log('Creating new ticket...')
+        const { error } = await supabase
           .from('helpdesk_tickets')
-          .insert([ticketData])
+          .insert(ticketData)
 
-        if (error) throw error
+        if (error) {
+          console.error('Insert error:', error)
+          throw error
+        }
+        
         toast({
           title: 'Success',
           description: 'Ticket created successfully',
@@ -131,7 +173,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
       console.error('Error saving ticket:', error)
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save ticket',
+        description: error.message || 'Failed to save ticket. Please try again.',
         variant: 'destructive',
       })
     } finally {
