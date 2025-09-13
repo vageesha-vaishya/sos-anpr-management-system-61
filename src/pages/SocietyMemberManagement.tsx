@@ -186,6 +186,10 @@ const SocietyMemberManagement = () => {
     fetchMembers()
   }
 
+  const handleFamilyUpdated = () => {
+    fetchMembers()
+  }
+
   const handleEdit = (member: Member) => {
     setEditingMember(member)
   }
@@ -598,6 +602,14 @@ const SocietyMemberManagement = () => {
         description={`Are you sure you want to delete ${deletingMember?.full_name}? This action cannot be undone.`}
         confirmText="Delete"
         variant="destructive"
+      />
+
+      {/* Family Member Detail Dialog */}
+      <FamilyMemberDetailDialog
+        open={!!viewingFamilyMember}
+        onOpenChange={() => setViewingFamilyMember(null)}
+        member={viewingFamilyMember}
+        onFamilyUpdated={handleFamilyUpdated}
       />
     </div>
   )
