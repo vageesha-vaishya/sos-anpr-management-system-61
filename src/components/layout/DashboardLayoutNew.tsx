@@ -91,6 +91,8 @@ const navigationGroups = [
     icon: Building2,
     items: [
       { name: 'Member Management', href: '/residents', icon: Users, minimumRole: 'society_admin' },
+      { name: 'Society Members', href: '/society-member-management', icon: Users, minimumRole: 'society_admin' },
+      { name: 'Society Members', href: '/society-member-management', icon: Users, minimumRole: 'society_admin' },
       { name: 'Staff Management', href: '/staff-management', icon: UserCog, minimumRole: 'society_admin' },
       { name: 'Communication Hub', href: '/announcements', icon: MessageCircle, minimumRole: 'society_admin' },
       { name: 'Event Management', href: '/events', icon: Calendar, minimumRole: 'society_admin' },

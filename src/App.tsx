@@ -503,6 +503,44 @@ const App = () => (
               } 
             />
             <Route 
+              path="/platform-admin" 
+              element={
+                <RoleProtectedRoute minimumRole="platform_admin">
+                  <ProtectedRoute>
+                    <PlatformAdminDashboard />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/financial-reports" 
+              element={
+                <RoleProtectedRoute permission="view_analytics">
+                  <ProtectedRoute>
+                    <FinancialReports />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/society-member-management" 
+              element={
+                <RoleProtectedRoute permission="manage_residents">
+                  <ProtectedRoute>
+                    <SocietyMemberManagement />
+                  </ProtectedRoute>
+                </RoleProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/announcements" 
+              element={
+                <ProtectedRoute>
+                  <Announcements />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/assets" 
               element={
                 <ProtectedRoute>
@@ -551,14 +589,6 @@ const App = () => (
               } 
             />
             <Route 
-              path="/society-member-management" 
-              element={
-                <ProtectedRoute>
-                  <SocietyMemberManagement />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
               path="/society-books" 
               element={
                 <ProtectedRoute>
@@ -571,14 +601,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <GatekeeperModule />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/announcements" 
-              element={
-                <ProtectedRoute>
-                  <Announcements />
                 </ProtectedRoute>
               } 
             />
