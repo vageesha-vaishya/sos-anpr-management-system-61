@@ -50,9 +50,9 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
     defaultValues: {
       title: ticket?.title || '',
       description: ticket?.description || '',
-      category: ticket?.category || '',
+      category: ticket?.category || undefined,
       priority: ticket?.priority || 'medium',
-      assigned_to: ticket?.assigned_to || '',
+      assigned_to: ticket?.assigned_to || undefined,
     },
   })
 
@@ -254,7 +254,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select category" />
@@ -303,7 +303,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assign To (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value ?? undefined}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select staff member" />
