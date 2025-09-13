@@ -23,11 +23,13 @@ import {
   Trash2,
   Download,
   Upload,
+  Eye,
   Building2
 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { useAuth } from '@/contexts/AuthContext'
+import { FamilyMemberDetailDialog } from '@/components/forms/FamilyMemberDetailDialog'
 
 interface Member {
   id: string
@@ -67,6 +69,7 @@ const SocietyMemberManagement = () => {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [editingMember, setEditingMember] = useState<Member | null>(null)
   const [deletingMember, setDeletingMember] = useState<Member | null>(null)
+  const [viewingFamilyMember, setViewingFamilyMember] = useState<Member | null>(null)
   const [activeTab, setActiveTab] = useState('members')
   const { toast } = useToast()
   const { userProfile } = useAuth()
@@ -463,9 +466,20 @@ const SocietyMemberManagement = () => {
                   )}
                   
                   {member.family_count > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Heart className="w-4 h-4 text-muted-foreground" />
-                      <span>{member.family_count} family member{member.family_count !== 1 ? 's' : ''}</span>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <Heart className="w-4 h-4 text-muted-foreground" />
+                        <span>{member.family_count} family member{member.family_count !== 1 ? 's' : ''}</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setViewingFamilyMember(member)}
+                        className="text-xs px-2 py-1 h-auto"
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
                     </div>
                   )}
                   
