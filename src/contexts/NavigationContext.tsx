@@ -33,14 +33,25 @@ const STORAGE_KEY = 'sos_navigation_state';
 export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const [navigationState, setNavigationState] = useState<NavigationState>(() => {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {
+    const defaultState: NavigationState = {
       breadcrumbs: [],
       previousPage: null,
       formStates: {},
       filterStates: {}
-    };
-  });
+    }
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (parsed && typeof parsed === 'object') {
+          return { ...defaultState, ...parsed }
+        }
+      }
+    } catch (e) {
+      console.warn('NavigationProvider: failed to parse stored state, resetting.', e)
+    }
+    return defaultState
+  })
 
   // Save to session storage whenever state changes
   useEffect(() => {

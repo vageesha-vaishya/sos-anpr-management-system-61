@@ -68,6 +68,7 @@ import { FranchiseAdminDashboard } from "@/components/dashboard/FranchiseAdminDa
 import { CustomerDashboard } from "@/components/dashboard/CustomerDashboard";
 import { Button } from "@/components/ui/button"
 import NotFound from "@/pages/NotFound"
+import { NavigationProvider } from "@/contexts/NavigationContext"
 
 const queryClient = new QueryClient();
 
@@ -262,6 +263,7 @@ const App = () => (
                   v7_relativeSplatPath: true,
                 }}
               >
+                <NavigationProvider>
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -703,6 +705,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
+                </NavigationProvider>
               </BrowserRouter>
             </SessionManager>
           </PermissionProvider>

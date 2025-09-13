@@ -58,6 +58,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext'
 import { usePermissions } from '@/hooks/usePermissions'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -137,15 +138,19 @@ const MenuGroup: React.FC<{
   const location = useLocation()
   const [isOpen, setIsOpen] = useState(true)
   
-  // Filter items based on user permissions
-  const accessibleItems = group.items.filter(item => 
-    hasMinimumRole(item.minimumRole as any)
+  // Filter items based on user permissions (memoized)
+  const accessibleItems = React.useMemo(() =>
+    group.items.filter(item => hasMinimumRole(item.minimumRole as any)),
+    [group.items, hasMinimumRole]
   )
   
-  // Check if any item in this group is active
-  const isGroupActive = accessibleItems.some(item => 
-    location.pathname === item.href || 
-    (item.href !== '/' && location.pathname.startsWith(item.href))
+  // Check if any item in this group is active (memoized)
+  const isGroupActive = React.useMemo(() =>
+    accessibleItems.some(item => 
+      location.pathname === item.href || 
+      (item.href !== '/' && location.pathname.startsWith(item.href))
+    ),
+    [accessibleItems, location.pathname]
   )
 
   // Auto-expand if group has active item
@@ -256,7 +261,7 @@ const AppSidebar: React.FC = () => {
       <SidebarContent className="overflow-y-auto">
         {navigationGroups.map((group, index) => (
           <MenuGroup
-            key={index}
+            key={group.label}
             group={group}
             isCollapsed={collapsed}
           />
@@ -281,10 +286,14 @@ export const DashboardLayoutNew = ({ children }: DashboardLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar />
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <ErrorBoundary>
+          <AppSidebar />
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <main className="flex-1 overflow-auto">
+            {children}
+          </main>
+        </ErrorBoundary>
       </div>
     </SidebarProvider>
   )
