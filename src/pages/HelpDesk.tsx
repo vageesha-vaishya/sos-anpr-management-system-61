@@ -52,7 +52,7 @@ interface HelpDeskTicket {
   created_by_profile: {
     full_name: string
     email: string
-  }
+  } | null
   assigned_staff: {
     full_name: string
     position: string
@@ -82,17 +82,17 @@ export default function HelpDesk() {
         return
       }
 
-      // Try embedded query first
+      // Try embedded query first with correct relationship hints
       const { data, error } = await supabase
         .from('helpdesk_tickets')
         .select(`
           *,
-          created_by_profile:profiles!helpdesk_tickets_created_by_fkey(full_name, email),
-          assigned_staff:staff_members!helpdesk_tickets_assigned_to_fkey(full_name, position)
+          created_by_profile:profiles!fk_helpdesk_tickets_created_by(full_name, email),
+          assigned_staff:staff_members!fk_helpdesk_tickets_assigned_to(full_name, position)
         `)
         .order('created_at', { ascending: false })
 
-      if (error && error.message?.includes('could not find a relationship')) {
+      if (error && (error.code === 'PGRST200' || error.message?.toLowerCase().includes('could not find a relationship'))) {
         // Fallback: fetch tickets and manually join profiles/staff
         console.log('Falling back to manual joins due to missing relationships')
         
@@ -239,7 +239,7 @@ export default function HelpDesk() {
       ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.ticket_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.created_by_profile?.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+      (ticket.created_by_profile?.full_name || '').toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter
@@ -419,12 +419,16 @@ export default function HelpDesk() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">
-                      <div>{ticket.created_by_profile?.full_name}</div>
-                      <div className="text-muted-foreground">
-                        {ticket.created_by_profile?.email}
-                      </div>
-                    </div>
+                     {ticket.created_by_profile ? (
+                       <div className="text-sm">
+                         <div>{ticket.created_by_profile.full_name}</div>
+                         <div className="text-muted-foreground">
+                           {ticket.created_by_profile.email}
+                         </div>
+                       </div>
+                     ) : (
+                       <span className="text-muted-foreground">Unknown</span>
+                     )}
                   </TableCell>
                   <TableCell>
                     {ticket.assigned_staff ? (
