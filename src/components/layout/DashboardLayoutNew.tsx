@@ -90,7 +90,7 @@ const navigationGroups = [
     label: "Society Administration",
     icon: Building2,
     items: [
-      { name: 'Member Management', href: '/residents', icon: Users, minimumRole: 'society_admin' },
+      { name: 'Resident Directory', href: '/residents', icon: Users, minimumRole: 'society_admin' },
       { name: 'Society Members', href: '/society-member-management', icon: Users, minimumRole: 'society_admin' },
       { name: 'Staff Management', href: '/staff-management', icon: UserCog, minimumRole: 'society_admin' },
       { name: 'Communication Hub', href: '/announcements', icon: MessageCircle, minimumRole: 'society_admin' },

@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client"
 
 interface SocietyUnit {
   id: string;
+  building_id?: string | null;
+  floor?: number | null;
   unit_number: string;
   unit_type?: string | null;
   owner_name?: string | null;
@@ -22,6 +24,9 @@ interface SocietyUnit {
   status?: string | null;
   created_at?: string;
   updated_at?: string;
+  buildings?: {
+    name: string;
+  };
 }
 
 interface SocietyUnitsTableProps {
@@ -133,7 +138,8 @@ export function SocietyUnitsTable({ units, onRefresh, organizationId }: SocietyU
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Unit</TableHead>
+              <TableHead>Building & Unit</TableHead>
+              <TableHead>Floor</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Owner/Tenant</TableHead>
               <TableHead>Area</TableHead>
@@ -148,7 +154,20 @@ export function SocietyUnitsTable({ units, onRefresh, organizationId }: SocietyU
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {getUnitTypeIcon(unit.unit_type)}
-                    <div className="font-medium">{unit.unit_number}</div>
+                    <div>
+                      <div className="font-medium">{unit.unit_number}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {unit.buildings?.name || "No Building"}
+                      </div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">
+                    {unit.floor !== null && unit.floor !== undefined 
+                      ? (unit.floor === 0 ? "Ground Floor" : `Floor ${unit.floor}`)
+                      : "Not Set"
+                    }
                   </div>
                 </TableCell>
                 <TableCell className="capitalize">{unit.unit_type}</TableCell>

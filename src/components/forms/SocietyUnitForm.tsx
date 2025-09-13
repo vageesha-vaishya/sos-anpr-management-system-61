@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 const societyUnitSchema = z.object({
+  building_id: z.string().min(1, "Building is required"),
+  floor: z.number().min(0, "Floor must be positive").default(0),
   unit_number: z.string().min(1, "Unit number is required"),
   unit_type: z.enum(["residential", "commercial", "parking"]),
   owner_name: z.string().optional(),
@@ -34,11 +36,15 @@ interface SocietyUnitFormProps {
 
 export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: SocietyUnitFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [buildings, setBuildings] = useState<any[]>([])
+  const [selectedBuilding, setSelectedBuilding] = useState<any>(null)
   const { toast } = useToast()
 
   const form = useForm<SocietyUnitFormData>({
     resolver: zodResolver(societyUnitSchema),
     defaultValues: {
+      building_id: unit?.building_id || "",
+      floor: unit?.floor || 0,
       unit_number: unit?.unit_number || "",
       unit_type: unit?.unit_type || "residential",
       owner_name: unit?.owner_name || "",
@@ -51,10 +57,53 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
     },
   })
 
+  // Fetch buildings for the organization
+  useEffect(() => {
+    const fetchBuildings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("buildings")
+          .select("*, locations!inner(*)")
+          .eq("locations.organization_id", organizationId)
+          .eq("is_active", true)
+
+        if (error) throw error
+        setBuildings(data || [])
+
+        // Set selected building if editing
+        if (unit?.building_id) {
+          const building = data?.find(b => b.id === unit.building_id)
+          setSelectedBuilding(building)
+        }
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch buildings",
+          variant: "destructive",
+        })
+      }
+    }
+
+    if (organizationId) {
+      fetchBuildings()
+    }
+  }, [organizationId, unit?.building_id, toast])
+
+  // Watch building selection to update selected building
+  const watchedBuildingId = form.watch("building_id")
+  useEffect(() => {
+    if (watchedBuildingId) {
+      const building = buildings.find(b => b.id === watchedBuildingId)
+      setSelectedBuilding(building)
+    }
+  }, [watchedBuildingId, buildings])
+
   const onSubmit = async (data: SocietyUnitFormData) => {
     setIsLoading(true)
     try {
       const unitData = {
+        building_id: data.building_id,
+        floor: data.floor,
         unit_number: data.unit_number,
         unit_type: data.unit_type,
         owner_name: data.owner_name || null,
@@ -64,7 +113,6 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
         monthly_flat_rate: data.monthly_flat_rate,
         parking_slots: data.parking_slots,
         status: data.status,
-        building_id: null, // Will need to be set based on the building selection
       }
 
       if (unit) {
@@ -108,6 +156,60 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="building_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Building</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select building" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {buildings.map((building) => (
+                          <SelectItem key={building.id} value={building.id}>
+                            {building.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="floor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Floor</FormLabel>
+                    <Select 
+                      onValueChange={(value) => field.onChange(parseInt(value))} 
+                      defaultValue={field.value?.toString()}
+                      disabled={!selectedBuilding}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={selectedBuilding ? "Select floor" : "Select building first"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {selectedBuilding && Array.from({ length: selectedBuilding.floors || 1 }, (_, i) => (
+                          <SelectItem key={i} value={i.toString()}>
+                            {i === 0 ? "Ground Floor" : `Floor ${i}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="unit_number"

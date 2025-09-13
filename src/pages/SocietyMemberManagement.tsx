@@ -137,6 +137,8 @@ const SocietyMemberManagement = () => {
         .from('society_units')
         .select(`
           id,
+          building_id,
+          floor,
           unit_number,
           unit_type,
           owner_name,
@@ -147,7 +149,10 @@ const SocietyMemberManagement = () => {
           parking_slots,
           status,
           created_at,
-          updated_at
+          updated_at,
+          buildings (
+            name
+          )
         `)
         .order('unit_number')
 
