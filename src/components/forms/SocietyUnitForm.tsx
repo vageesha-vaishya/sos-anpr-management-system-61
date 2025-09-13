@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Info } from "lucide-react"
 
 const societyUnitSchema = z.object({
   building_id: z.string().min(1, "Building is required"),
@@ -22,7 +24,7 @@ const societyUnitSchema = z.object({
   monthly_rate_per_sqft: z.number().min(0, "Rate per sqft must be positive"),
   monthly_flat_rate: z.number().min(0, "Flat rate must be positive"),
   parking_slots: z.number().min(0, "Parking slots must be positive").default(0),
-  status: z.enum(["occupied", "vacant", "maintenance"]).default("occupied"),
+  status: z.enum(["occupied", "available", "vacant", "maintenance"]).default("occupied"),
 })
 
 type SocietyUnitFormData = z.infer<typeof societyUnitSchema>
@@ -358,7 +360,24 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel className="flex items-center gap-2">
+                      Status
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-sm">
+                            <div className="space-y-2 text-sm">
+                              <div><strong>Occupied:</strong> Unit is currently assigned to a member</div>
+                              <div><strong>Available:</strong> Unit is ready for assignment to society members</div>
+                              <div><strong>Vacant:</strong> Unit is empty but not ready for assignment</div>
+                              <div><strong>Under Maintenance:</strong> Unit is being repaired or renovated</div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -366,9 +385,30 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="occupied">Occupied</SelectItem>
-                        <SelectItem value="vacant">Vacant</SelectItem>
-                        <SelectItem value="maintenance">Under Maintenance</SelectItem>
+                        <SelectItem value="occupied">
+                          <div className="flex flex-col">
+                            <span>Occupied</span>
+                            <span className="text-xs text-muted-foreground">Currently assigned to a member</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="available">
+                          <div className="flex flex-col">
+                            <span>Available</span>
+                            <span className="text-xs text-muted-foreground">Ready for member assignment</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="vacant">
+                          <div className="flex flex-col">
+                            <span>Vacant</span>
+                            <span className="text-xs text-muted-foreground">Empty but not ready for assignment</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="maintenance">
+                          <div className="flex flex-col">
+                            <span>Under Maintenance</span>
+                            <span className="text-xs text-muted-foreground">Being repaired or renovated</span>
+                          </div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
