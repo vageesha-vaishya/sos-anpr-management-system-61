@@ -1680,6 +1680,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_helpdesk_tickets_assigned_to"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_helpdesk_tickets_created_by"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_helpdesk_tickets_organization_id"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "helpdesk_tickets_assigned_to_fkey"
             columns: ["assigned_to"]
             isOneToOne: false
