@@ -388,7 +388,14 @@ export default function HelpDesk() {
             </TableHeader>
             <TableBody>
               {filteredTickets.map((ticket) => (
-                <TableRow key={ticket.id}>
+                <TableRow 
+                  key={ticket.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    setSelectedTicketId(ticket.id);
+                    setDetailDialogOpen(true);
+                  }}
+                >
                   <TableCell className="font-medium">{ticket.ticket_number}</TableCell>
                   <TableCell>
                     <div className="max-w-xs">
@@ -409,7 +416,7 @@ export default function HelpDesk() {
                       value={ticket.status}
                       onValueChange={(value) => handleStatusChange(ticket.id, value)}
                     >
-                      <SelectTrigger className="w-32">
+                      <SelectTrigger className="w-32" onClick={(e) => e.stopPropagation()}>
                         <Badge variant={getStatusColor(ticket.status)}>
                           {ticket.status.replace('_', ' ')}
                         </Badge>
@@ -451,11 +458,25 @@ export default function HelpDesk() {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button 
+                          variant="ghost" 
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTicketId(ticket.id);
+                            setDetailDialogOpen(true);
+                          }}
+                        >
+                          <Ticket className="h-4 w-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
                         <HelpDeskTicketForm
                           ticket={ticket}
                           onSuccess={loadTickets}
@@ -467,7 +488,10 @@ export default function HelpDesk() {
                           }
                         />
                         <DropdownMenuItem 
-                          onClick={() => handleDeleteTicket(ticket.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTicket(ticket.id);
+                          }}
                           className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
