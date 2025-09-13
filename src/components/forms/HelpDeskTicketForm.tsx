@@ -124,7 +124,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
         description: values.description,
         category: values.category,
         priority: values.priority,
-        assigned_to: values.assigned_to || null,
+        assigned_to: values.assigned_to === 'unassigned' || !values.assigned_to ? null : values.assigned_to,
         created_by: userData.user.id,
         organization_id: profile.organization_id,
         ticket_number: ticket?.ticket_number || generateTicketNumber(),
@@ -310,7 +310,7 @@ export const HelpDeskTicketForm: React.FC<HelpDeskTicketFormProps> = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Unassigned</SelectItem>
+                          <SelectItem value="unassigned">Unassigned</SelectItem>
                           {staffMembers.map((staff) => (
                             <SelectItem key={staff.id} value={staff.id}>
                               {staff.full_name} - {staff.position}

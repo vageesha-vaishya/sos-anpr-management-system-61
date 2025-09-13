@@ -479,7 +479,7 @@ const ParkingSlotForm = ({ slot, onSuccess, organizationId, buildings, societyUn
         ...formData,
         organization_id: organizationId,
         building_id: formData.building_id || null,
-        assigned_unit_id: formData.assigned_unit_id || null,
+        assigned_unit_id: formData.assigned_unit_id === 'unassigned' || !formData.assigned_unit_id ? null : formData.assigned_unit_id,
         floor_level: formData.floor_level ? parseInt(formData.floor_level.toString()) : null,
         monthly_fee: formData.monthly_fee ? parseFloat(formData.monthly_fee.toString()) : null,
       }
@@ -598,7 +598,7 @@ const ParkingSlotForm = ({ slot, onSuccess, organizationId, buildings, societyUn
               <SelectValue placeholder="Select unit (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Unassigned</SelectItem>
+              <SelectItem value="unassigned">Unassigned</SelectItem>
               {societyUnits.map(unit => (
                 <SelectItem key={unit.id} value={unit.id}>
                   {unit.unit_number}

@@ -108,7 +108,7 @@ export const MaintenanceChargeFormFull: React.FC<MaintenanceChargeFormProps> = (
     try {
       const chargeData = {
         unit_id: data.unit_id,
-        charge_category_id: data.charge_category_id || null,
+        charge_category_id: data.charge_category_id === 'none' || !data.charge_category_id ? null : data.charge_category_id,
         amount: data.amount,
         billing_period: data.billing_period,
         due_date: data.due_date || null,
@@ -212,7 +212,7 @@ export const MaintenanceChargeFormFull: React.FC<MaintenanceChargeFormProps> = (
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {chargeCategories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
