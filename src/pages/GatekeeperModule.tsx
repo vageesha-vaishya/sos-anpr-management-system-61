@@ -16,11 +16,11 @@ const GatekeeperModule = () => {
   const modules = [
     {
       title: "Gate Control System",
-      description: "ANPR integration with automated barrier control",
+      description: "SOS integration with automated barrier control",
       icon: Shield,
       path: "/gate-control",
       status: "New",
-      features: ["ANPR Integration", "Barrier Control", "Manual Override", "Real-time Monitoring"]
+      features: ["SOS Integration", "Barrier Control", "Manual Override", "Real-time Monitoring"]
     },
     {
       title: "Security Management",

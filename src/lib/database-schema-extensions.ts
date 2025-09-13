@@ -1,4 +1,4 @@
-// Extended database schema to match ADDA functionality
+// Extended database schema to match SOS functionality
 import { supabase } from '@/integrations/supabase/client'
 
 export const extendedDatabaseSQL = `
@@ -287,7 +287,7 @@ CREATE INDEX IF NOT EXISTS idx_community_events_date ON community_events(event_d
 export const setupExtendedDatabase = async (): Promise<{ success: boolean; message: string }> => {
   try {
     console.log('Extended database schema is ready!')
-    return { success: true, message: 'Extended database schema ready with all ADDA features!' }
+    return { success: true, message: 'Extended database schema ready with all SOS features!' }
   } catch (error) {
     console.error('Extended database setup error:', error)
     return { success: false, message: `Extended database setup failed: ${error}` }

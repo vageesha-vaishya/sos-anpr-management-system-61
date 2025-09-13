@@ -87,7 +87,7 @@ export const DatabaseSetup = () => {
             <span>Database Configuration</span>
           </CardTitle>
           <CardDescription>
-            Set up the complete ADDA database schema with demo data including organizations, societies, residents, and amenities.
+            Set up the complete SOS database schema with demo data including organizations, societies, residents, and amenities.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -127,7 +127,7 @@ export const DatabaseSetup = () => {
             <Alert>
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                Database setup completed successfully! You can now use all ADDA society management features.
+                Database setup completed successfully! You can now use all SOS society management features.
               </AlertDescription>
             </Alert>
           )}
@@ -187,7 +187,7 @@ export const DatabaseSetup = () => {
             <p><strong>Geography Hierarchy:</strong> Continents → Countries → States → Cities</p>
             <p><strong>Organizations:</strong> Society management organizations with proper relationships</p>
             <p><strong>Society Management:</strong> Buildings, units, residents, amenities, and billing</p>
-            <p><strong>ANPR Features:</strong> Cameras, vehicle management, and security alerts</p>
+            <p><strong>SOS Features:</strong> Cameras, vehicle management, and security alerts</p>
             <p><strong>Demo Data:</strong> Sample societies, residents, amenities, and maintenance for testing</p>
           </div>
         </CardContent>

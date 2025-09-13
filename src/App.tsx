@@ -27,7 +27,7 @@ import AdminPortal from "@/pages/AdminPortal";
 import HomeServices from "@/pages/HomeServices";
 import SocietyManagement from "@/pages/SocietyManagement";
 import AdvertiserManagement from "@/pages/AdvertiserManagement";
-import ANPRServiceBilling from "@/pages/ANPRServiceBilling";
+import SOSServiceBilling from "@/pages/SOSServiceBilling";
 import MasterDataManagement from "@/pages/MasterDataManagement";
 import Hosts from "@/pages/Hosts";
 import PreRegistrations from "@/pages/PreRegistrations";
@@ -391,14 +391,14 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route 
-              path="/anpr-service-billing" 
-              element={
-                <ProtectedRoute>
-                  <ANPRServiceBilling />
-                </ProtectedRoute>
-              } 
-            />
+              <Route 
+                path="/sos-service-billing" 
+                element={
+                  <ProtectedRoute>
+                    <SOSServiceBilling />
+                  </ProtectedRoute>
+                } 
+              />
             <Route
               path="/hosts" 
               element={

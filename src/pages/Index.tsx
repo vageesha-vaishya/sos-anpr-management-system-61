@@ -20,7 +20,7 @@ export default function Index() {
   const features = [
     {
       icon: <Camera className="h-8 w-8" />,
-      title: "ANPR Detection",
+      title: "SOS Detection",
       description: "Automated Number Plate Recognition with real-time processing and high accuracy detection.",
       stats: "99.2% accuracy"
     },
@@ -67,7 +67,7 @@ export default function Index() {
               <Shield className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">ANPR Security</h1>
+              <h1 className="text-xl font-bold">SOS Security</h1>
               <p className="text-xs text-muted-foreground">Platform Administrator</p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Index() {
             Advanced Automatic Number Plate Recognition system
           </Badge>
           <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
-            ANPR Security System
+            SOS Security System
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
             with multi-tenant architecture, real-time processing, and role-based access control.
@@ -125,7 +125,7 @@ export default function Index() {
         <div className="text-center mb-12">
           <h3 className="text-3xl font-bold mb-4">Powerful Features</h3>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Everything you need to manage your ANPR system efficiently and securely
+            Everything you need to manage your SOS system efficiently and securely
           </p>
         </div>
         
@@ -179,10 +179,10 @@ export default function Index() {
               <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-primary" />
               </div>
-              <span className="font-semibold">ANPR Security System</span>
+              <span className="font-semibold">SOS Security System</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              &copy; 2024 ANPR Security System. Advanced security technology.
+              &copy; 2024 SOS Security System. Advanced security technology.
             </p>
           </div>
         </div>

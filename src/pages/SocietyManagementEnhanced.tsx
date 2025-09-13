@@ -177,7 +177,7 @@ const SocietyManagementEnhanced = () => {
             Society Management
           </h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Comprehensive housing society management platform with ANPR integration
+            Comprehensive housing society management platform with SOS integration
           </p>
         </div>
         <div className="flex items-center gap-4">

@@ -1,210 +1,214 @@
-import { useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { usePermissions, Permission } from '@/hooks/usePermissions'
-import { Badge } from '@/components/ui/badge'
+import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { 
-  LayoutDashboard, 
-  Settings, 
-  Users, 
-  Camera, 
-  MapPin, 
-  Shield, 
-  Bell,
-  LogOut,
-  Home,
-  DollarSign,
-  TrendingUp,
-  MessageSquare,
-  UserCheck,
-  Monitor,
-  Globe,
-  Building2,
-  Headphones,
-  FileText,
-  ChevronDown,
-  ChevronRight
-} from 'lucide-react'
 import {
-  SidebarProvider,
+  Building2,
+  Camera,
+  Car,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Grid3x3,
+  Home,
+  Megaphone,
+  Settings,
+  Shield,
+  Users,
+  Calendar,
+  HelpCircle,
+  LogOut,
+  ChevronDown,
+  Monitor,
+  MapPin,
+  Bell,
+  Gamepad2,
+  ParkingCircle,
+  UserCog,
+  Building,
+  User,
+  BarChart3,
+  Activity,
+  UserCheck,
+  MessageCircle,
+  Wrench,
+  Receipt,
+  TrendingUp,
+  UserPlus,
+  ClipboardCheck,
+  Zap,
+  Cog
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
-  SidebarHeader,
-  SidebarFooter,
+  SidebarMenuItem,
+  SidebarProvider,
   SidebarTrigger,
   useSidebar,
+  SidebarHeader,
+  SidebarFooter,
 } from '@/components/ui/sidebar'
-import { cn } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { usePermissions } from '@/hooks/usePermissions'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-const MenuGroup = ({ title, items, currentPath }: {
-  title: string
-  items: any[]
-  currentPath: string
-}) => {
-  const [isOpen, setIsOpen] = useState(true)
-  const { hasPermission, hasAnyPermission, hasMinimumRole, role } = usePermissions()
-  
-  const filteredItems = items.filter(item => {
-    // Check permissions first
-    if (item.permissions) {
-      return item.requireAll 
-        ? item.permissions.every((p: Permission) => hasPermission(p))
-        : hasAnyPermission(item.permissions)
-    }
-    
-    // Check minimum role
-    if (item.minimumRole) {
-      return hasMinimumRole(item.minimumRole)
-    }
-    
-    // Fallback to role-based filtering for backward compatibility
-    if (item.roles && role) {
-      return item.roles.includes(role)
-    }
-    
-    return false
-  })
-  
-  if (filteredItems.length === 0) return null
+// Define navigation groups with their items - SOS System Structure
+const navigationGroups = [
+  {
+    label: "SOS Dashboard",
+    icon: Home,
+    items: [
+      { name: 'Main Dashboard', href: '/', icon: Grid3x3, minimumRole: 'customer' },
+      { name: 'Analytics & Reports', href: '/analytics', icon: BarChart3, minimumRole: 'society_admin' },
+      { name: 'System Status', href: '/platform-admin', icon: Activity, minimumRole: 'platform_admin' },
+    ]
+  },
+  {
+    label: "Operations Management",
+    icon: Shield,
+    items: [
+      { name: 'Security & Monitoring', href: '/cameras', icon: Camera, minimumRole: 'society_admin' },
+      { name: 'Access Control', href: '/vehicles', icon: Car, minimumRole: 'society_admin' },
+      { name: 'Alert Management', href: '/alerts', icon: Bell, minimumRole: 'society_admin' },
+      { name: 'Emergency Response', href: '/help-desk', icon: Zap, minimumRole: 'society_admin' },
+    ]
+  },
+  {
+    label: "Society Administration",
+    icon: Building2,
+    items: [
+      { name: 'Member Management', href: '/residents', icon: Users, minimumRole: 'society_admin' },
+      { name: 'Staff Management', href: '/staff-management', icon: UserCog, minimumRole: 'society_admin' },
+      { name: 'Communication Hub', href: '/announcements', icon: MessageCircle, minimumRole: 'society_admin' },
+      { name: 'Event Management', href: '/event-management', icon: Calendar, minimumRole: 'society_admin' },
+      { name: 'Amenity Management', href: '/amenity-management', icon: Gamepad2, minimumRole: 'society_admin' },
+    ]
+  },
+  {
+    label: "Financial Management",
+    icon: DollarSign,
+    items: [
+      { name: 'Billing & Payments', href: '/billing', icon: CreditCard, minimumRole: 'society_admin' },
+      { name: 'Maintenance Charges', href: '/maintenance-billing', icon: Receipt, minimumRole: 'society_admin' },
+      { name: 'Expense Tracking', href: '/expense-tracker', icon: TrendingUp, minimumRole: 'society_admin' },
+      { name: 'Financial Reports', href: '/financial-reports', icon: FileText, minimumRole: 'society_admin' },
+      { name: 'SOS Service Billing', href: '/sos-service-billing', icon: Monitor, minimumRole: 'franchise_admin' },
+    ]
+  },
+  {
+    label: "Visitor Management",
+    icon: UserCheck,
+    items: [
+      { name: 'Visitor Registration', href: '/visitors', icon: Users, minimumRole: 'society_admin' },
+      { name: 'Check-in/Check-out', href: '/visitor-checkin', icon: ClipboardCheck, minimumRole: 'customer' },
+      { name: 'Pre-approvals', href: '/pre-registrations', icon: UserPlus, minimumRole: 'society_admin' },
+      { name: 'Host Management', href: '/hosts', icon: User, minimumRole: 'society_admin' },
+    ]
+  },
+  {
+    label: "System Administration",
+    icon: Cog,
+    items: [
+      { name: 'User Management', href: '/users', icon: Users, minimumRole: 'platform_admin' },
+      { name: 'Organization Setup', href: '/locations', icon: Building, minimumRole: 'platform_admin' },
+      { name: 'Settings & Configuration', href: '/settings', icon: Settings, minimumRole: 'customer' },
+      { name: 'Support & Help', href: '/help-desk', icon: HelpCircle, minimumRole: 'customer' },
+    ]
+  }
+]
 
-  const hasActiveItem = filteredItems.some(item => currentPath === item.href)
+// MenuGroup component for rendering collapsible menu groups
+const MenuGroup: React.FC<{
+  group: typeof navigationGroups[0]
+  isCollapsed: boolean
+}> = ({ group, isCollapsed }) => {
+  const { hasMinimumRole } = usePermissions()
+  const location = useLocation()
+  const [isOpen, setIsOpen] = useState(true)
+  
+  // Filter items based on user permissions
+  const accessibleItems = group.items.filter(item => 
+    hasMinimumRole(item.minimumRole as any)
+  )
+  
+  // Don't render group if no accessible items
+  if (accessibleItems.length === 0) return null
+  
+  // Check if any item in this group is active
+  const isGroupActive = accessibleItems.some(item => 
+    location.pathname === item.href || 
+    (item.href !== '/' && location.pathname.startsWith(item.href))
+  )
+
+  // Auto-expand if group has active item
+  React.useEffect(() => {
+    if (isGroupActive) {
+      setIsOpen(true)
+    }
+  }, [isGroupActive])
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel 
-        className="flex items-center gap-2 cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-        {title}
-        {filteredItems.some(item => item.isNew) && (
-          <Badge variant="secondary" className="text-[10px] px-1 py-0">NEW</Badge>
-        )}
-      </SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {filteredItems.map((item) => {
-            const isActive = currentPath === item.href
-            return (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild isActive={isActive}>
-                  <Link to={item.href}>
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                    {item.isNew && (
-                      <Badge variant="secondary" className="text-[10px] px-1 py-0 ml-auto">
-                        NEW
-                      </Badge>
-                    )}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )
-          })}
-        </SidebarMenu>
-      </SidebarGroupContent>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <SidebarGroupLabel className="group/label text-xs font-medium uppercase tracking-wider text-sidebar-foreground/70 hover:text-sidebar-foreground cursor-pointer flex items-center justify-between w-full p-2 rounded-md hover:bg-sidebar-accent">
+            <div className="flex items-center">
+              <group.icon className="mr-2 h-4 w-4" />
+              {!isCollapsed && group.label}
+            </div>
+            {!isCollapsed && (
+              <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]/label:rotate-180" />
+            )}
+          </SidebarGroupLabel>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="transition-all duration-200 data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {accessibleItems.map((item) => {
+                const isActive = location.pathname === item.href || 
+                  (item.href !== '/' && location.pathname.startsWith(item.href))
+                
+                return (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild isActive={isActive} className="ml-4">
+                      <Link to={item.href} className="flex items-center gap-3">
+                        <item.icon className="h-4 w-4" />
+                        {!isCollapsed && <span>{item.name}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </CollapsibleContent>
+      </Collapsible>
     </SidebarGroup>
   )
 }
 
-const AppSidebar = () => {
-  const { userProfile, signOut, signingOut } = useAuth()
-  const location = useLocation()
-
-  // Organized navigation structure with permission-based filtering
-  const navigationGroups = {
-    dashboard: {
-      title: "Core Dashboards",
-      items: [
-        { name: 'Dashboard Hub', href: '/dashboard', icon: LayoutDashboard, permissions: ['view_dashboard'], isNew: false },
-        { name: 'Analytics Dashboard', href: '/analytics', icon: TrendingUp, permissions: ['view_analytics'], isNew: true },
-      ]
-    },
-    society: {
-      title: "Society Management",
-      items: [
-        { name: 'Society Hub', href: '/society-hub', icon: Home, permissions: ['manage_residents'], isNew: true },
-        { name: 'Member Management', href: '/society-member-management', icon: Users, permissions: ['manage_residents'], isNew: true },
-        { name: 'Staff Management', href: '/staff-management', icon: Users, permissions: ['manage_staff'], isNew: true },
-        { name: 'Communication Hub', href: '/community-forum', icon: MessageSquare, permissions: ['manage_residents'], isNew: true },
-      ]
-    },
-    financial: {
-      title: "Financial Management",
-      items: [
-        { name: 'Financial Hub', href: '/financial-hub', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
-        { name: 'Maintenance Billing', href: '/maintenance-billing', icon: DollarSign, permissions: ['manage_billing'], isNew: true },
-        { name: 'General Ledger', href: '/general-ledger', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
-        { name: 'Income Tracker', href: '/income-tracker', icon: TrendingUp, permissions: ['manage_finances'], isNew: true },
-        { name: 'Expense Tracker', href: '/expense-tracker', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
-        { name: 'Bank & Cash', href: '/bank-cash', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
-        { name: 'Utility Tracker', href: '/utility-tracker', icon: DollarSign, permissions: ['manage_finances'], isNew: true },
-      ]
-    },
-    operations: {
-      title: "Operations",
-      items: [
-        { name: 'Routine Management', href: '/routine-management', icon: Shield, minimumRole: 'customer_admin' },
-        { name: 'Gatekeeper Module', href: '/gatekeeper', icon: Shield, minimumRole: 'customer_admin' },
-        { name: 'Security & Alerts', href: '/alerts', icon: Bell, permissions: ['manage_alerts'] },
-        { name: 'Amenity Management', href: '/amenity-management', icon: Home, permissions: ['manage_amenities'] },
-        { name: 'Event Management', href: '/events', icon: Home, permissions: ['manage_events'] },
-        { name: 'Asset Management', href: '/assets', icon: Home, minimumRole: 'customer_admin' },
-        { name: 'Parking Management', href: '/parking', icon: Home, minimumRole: 'customer_admin' },
-        { name: 'Vehicle Management', href: '/vehicles', icon: Shield, permissions: ['manage_vehicles'] },
-      ]
-    },
-    visitors: {
-      title: "Visitor Management System",
-      items: [
-        { name: 'Visitor Hub', href: '/visitor-hub', icon: Monitor, permissions: ['manage_visitors'], isNew: true },
-        { name: 'Visitor Dashboard', href: '/visitor-dashboard', icon: Monitor, permissions: ['manage_visitors'] },
-        { name: 'Check-in Kiosk', href: '/visitor-checkin', icon: UserCheck, permissions: ['manage_visitors'] },
-        { name: 'Hosts Management', href: '/hosts', icon: Users, permissions: ['manage_visitors'] },
-        { name: 'Pre-Registrations', href: '/pre-registrations', icon: Users, permissions: ['manage_visitors'] },
-        { name: 'Visitors', href: '/visitors', icon: Users, permissions: ['manage_visitors'] },
-      ]
-    },
-    admin: {
-      title: "System Administration",
-      items: [
-        { name: 'Admin Hub', href: '/admin-hub', icon: Globe, minimumRole: 'franchise_admin', isNew: true },
-        { name: 'Data Management', href: '/data-management', icon: Globe, minimumRole: 'customer_admin' },
-        { name: 'Master Data Management', href: '/master-data-management', icon: Globe, minimumRole: 'franchise_admin' },
-        { name: 'User Management', href: '/users', icon: Users, permissions: ['manage_users'] },
-        { name: 'Franchise Management', href: '/franchises', icon: Building2, permissions: ['manage_organizations'] },
-        { name: 'Camera Management', href: '/cameras', icon: Camera, permissions: ['manage_cameras'] },
-        { name: 'Location Management', href: '/locations', icon: MapPin, permissions: ['manage_locations'] },
-        { name: 'ANPR Billing', href: '/anpr-service-billing', icon: Camera, minimumRole: 'franchise_admin' },
-        { name: 'Advertiser Management', href: '/advertiser-management', icon: TrendingUp, minimumRole: 'franchise_admin' },
-        { name: 'Financial Management', href: '/billing', icon: DollarSign, permissions: ['manage_billing'] },
-      ]
-    },
-    support: {
-      title: "Support & Documents",
-      items: [
-        { name: 'Help Desk', href: '/helpdesk', icon: Headphones, permissions: ['view_dashboard'] },
-        { name: 'Document Management', href: '/documents', icon: FileText, permissions: ['manage_documents'] },
-        { name: 'Settings', href: '/settings', icon: Settings, permissions: ['manage_settings'] },
-      ]
-    }
-  }
+// AppSidebar component
+const AppSidebar: React.FC = () => {
+  const { userProfile, signOut } = useAuth()
+  const sidebar = useSidebar()
+  const collapsed = sidebar.state === 'collapsed'
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'platform_admin': return 'destructive'
       case 'franchise_admin': return 'default'
-      case 'customer_admin': return 'secondary'
+      case 'society_admin': return 'secondary'
       default: return 'outline'
     }
   }
@@ -221,33 +225,40 @@ const AppSidebar = () => {
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-2">
             <Shield className="w-8 h-8 text-sidebar-primary" />
-            <span className="text-lg font-bold text-sidebar-foreground">ADDA System</span>
+            <span className="text-lg font-bold text-sidebar-foreground">SOS System</span>
           </div>
           <SidebarTrigger />
         </div>
-        {/* User info */}
-        <div className="p-4 border-b border-sidebar-border">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-sidebar-foreground">
-              {userProfile?.full_name}
-            </p>
-            <p className="text-xs text-sidebar-foreground/70">
-              {userProfile?.email}
-            </p>
-            <Badge variant={getRoleBadgeVariant(userProfile?.role || '')}>
-              {formatRoleName(userProfile?.role || '')}
-            </Badge>
+        {!collapsed && userProfile && (
+          <div className="p-4 border-b border-sidebar-border">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback>
+                  {userProfile.full_name?.charAt(0).toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-sidebar-foreground">
+                  {userProfile.full_name}
+                </p>
+                <p className="text-xs text-sidebar-foreground/70">
+                  {userProfile.email}
+                </p>
+                <Badge variant={getRoleBadgeVariant(userProfile.role || '')}>
+                  {formatRoleName(userProfile.role || '')}
+                </Badge>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </SidebarHeader>
 
       <SidebarContent className="overflow-y-auto">
-        {Object.entries(navigationGroups).map(([key, group]) => (
+        {navigationGroups.map((group, index) => (
           <MenuGroup
-            key={key}
-            title={group.title}
-            items={group.items}
-            currentPath={location.pathname}
+            key={index}
+            group={group}
+            isCollapsed={collapsed}
           />
         ))}
       </SidebarContent>
@@ -255,9 +266,9 @@ const AppSidebar = () => {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={signOut} disabled={signingOut}>
-              <LogOut className="w-4 h-4" />
-              <span>{signingOut ? "Signing Out..." : "Sign Out"}</span>
+            <SidebarMenuButton onClick={signOut}>
+              <LogOut className="h-4 w-4" />
+              {!collapsed && <span>Sign Out</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

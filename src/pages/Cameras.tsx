@@ -92,7 +92,7 @@ const Cameras = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Cameras</h1>
-          <p className="text-muted-foreground">Monitor and manage ANPR camera systems</p>
+          <p className="text-muted-foreground">Monitor and manage SOS camera systems</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => {
           setIsDialogOpen(open)

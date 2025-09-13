@@ -33,7 +33,7 @@ export const LoginForm = () => {
     } else {
       toast({
         title: "Welcome back!",
-        description: "Successfully logged in to ANPR System"
+        description: "Successfully logged in to SOS System"
       })
     }
 
@@ -47,9 +47,9 @@ export const LoginForm = () => {
           <div className="mx-auto w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
             <Shield className="w-6 h-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold">ANPR System</CardTitle>
+          <CardTitle className="text-2xl font-bold">SOS System</CardTitle>
           <CardDescription>
-            Secure access to your ANPR management platform
+            Secure access to your Society Operating System
           </CardDescription>
         </CardHeader>
         <CardContent>
