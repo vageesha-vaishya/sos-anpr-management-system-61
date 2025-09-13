@@ -142,9 +142,6 @@ const MenuGroup: React.FC<{
     hasMinimumRole(item.minimumRole as any)
   )
   
-  // Don't render group if no accessible items
-  if (accessibleItems.length === 0) return null
-  
   // Check if any item in this group is active
   const isGroupActive = accessibleItems.some(item => 
     location.pathname === item.href || 
@@ -157,6 +154,9 @@ const MenuGroup: React.FC<{
       setIsOpen(true)
     }
   }, [isGroupActive])
+  
+  // Don't render group if no accessible items (after all hooks are called)
+  if (accessibleItems.length === 0) return null
 
   return (
     <SidebarGroup>
