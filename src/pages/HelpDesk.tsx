@@ -82,6 +82,7 @@ export default function HelpDesk() {
         return
       }
 
+      // Try embedded query first
       const { data, error } = await supabase
         .from('helpdesk_tickets')
         .select(`
@@ -90,6 +91,46 @@ export default function HelpDesk() {
           assigned_staff:staff_members!helpdesk_tickets_assigned_to_fkey(full_name, position)
         `)
         .order('created_at', { ascending: false })
+
+      if (error && error.message?.includes('could not find a relationship')) {
+        // Fallback: fetch tickets and manually join profiles/staff
+        console.log('Falling back to manual joins due to missing relationships')
+        
+        const { data: ticketsData, error: ticketsError } = await supabase
+          .from('helpdesk_tickets')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (ticketsError) throw ticketsError
+
+        // Get unique profile and staff IDs
+        const profileIds = [...new Set(ticketsData?.map(t => t.created_by).filter(Boolean))]
+        const staffIds = [...new Set(ticketsData?.map(t => t.assigned_to).filter(Boolean))]
+
+        // Fetch profiles and staff in parallel
+        const [profilesResult, staffResult] = await Promise.all([
+          profileIds.length > 0 
+            ? supabase.from('profiles').select('id, full_name, email').in('id', profileIds)
+            : { data: [], error: null },
+          staffIds.length > 0 
+            ? supabase.from('staff_members').select('id, full_name, position').in('id', staffIds)
+            : { data: [], error: null }
+        ])
+
+        // Create lookup maps
+        const profilesMap = new Map<string, any>((profilesResult.data || []).map(p => [p.id, p]))
+        const staffMap = new Map<string, any>((staffResult.data || []).map(s => [s.id, s]))
+
+        // Stitch data together
+        const enrichedTickets = (ticketsData || []).map(ticket => ({
+          ...ticket,
+          created_by_profile: ticket.created_by ? profilesMap.get(ticket.created_by) : null,
+          assigned_staff: ticket.assigned_to ? staffMap.get(ticket.assigned_to) : null
+        }))
+
+        setTickets(enrichedTickets as HelpDeskTicket[])
+        return
+      }
 
       if (error) {
         console.error('Database error:', error)
@@ -110,7 +151,7 @@ export default function HelpDesk() {
       console.error('Error loading tickets:', error)
       toast({
         title: 'Error',
-        description: error.message || 'Failed to load tickets. Please try again or contact support.',
+        description: 'Failed to load tickets. Please try again.',
         variant: 'destructive',
       })
     } finally {
