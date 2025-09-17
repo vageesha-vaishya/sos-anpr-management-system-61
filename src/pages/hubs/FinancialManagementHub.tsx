@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useNavigate, useSearchParams, Link } from "react-router-dom"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { 
   DollarSign, 
   TrendingUp, 
@@ -18,7 +19,9 @@ import {
   TrendingDown,
   Zap,
   Calendar,
-  ClipboardList
+  ClipboardList,
+  ArrowLeft,
+  Home
 } from "lucide-react"
 
 const FinancialManagementHub = () => {
@@ -232,26 +235,67 @@ const FinancialManagementHub = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center">
+                <Home className="w-4 h-4 mr-1" />
+                Dashboard
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Financial Management Hub</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Financial Management Hub
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Integrated financial management solution with comprehensive accounting and reporting
-        </p>
-        <div className="flex items-center gap-2 mt-4">
-          <Badge variant="secondary">Complete Financial Suite</Badge>
-          <Badge variant="outline">Accounting & Billing</Badge>
-          <Badge variant="outline">Reports & Analytics</Badge>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Financial Management Hub
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Integrated financial management solution with comprehensive accounting and reporting
+          </p>
+          <div className="flex items-center gap-2 mt-4">
+            <Badge variant="secondary">Complete Financial Suite</Badge>
+            <Badge variant="outline">Accounting & Billing</Badge>
+            <Badge variant="outline">Reports & Analytics</Badge>
+          </div>
         </div>
+        <Button variant="outline" asChild>
+          <Link to="/" className="flex items-center">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Link>
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Financial Overview</TabsTrigger>
-          <TabsTrigger value="books">Books Management</TabsTrigger>
-          <TabsTrigger value="reports">Reports & Analytics</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/50 rounded-lg p-1">
+          <TabsTrigger 
+            value="overview" 
+            className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+          >
+            💰 Financial Overview
+          </TabsTrigger>
+          <TabsTrigger 
+            value="books" 
+            className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+          >
+            📚 Books Management
+          </TabsTrigger>
+          <TabsTrigger 
+            value="reports" 
+            className="text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+          >
+            📊 Reports & Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">

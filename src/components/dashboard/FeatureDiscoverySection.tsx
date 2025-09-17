@@ -24,13 +24,13 @@ export const FeatureDiscoverySection = () => {
       features: ['Member Management', 'Unit Tracking', 'Maintenance Requests', 'Document Storage']
     },
     {
-      title: 'Advanced Financial System',
-      description: 'Comprehensive financial management with chart of accounts, transactions, and detailed reporting.',
+      title: 'Financial Management Hub',
+      description: 'Complete financial management with overview, books management, and comprehensive reporting in one unified interface.',
       icon: DollarSign,
-      href: '/society-books',
+      href: '/financial-hub',
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-      features: ['Chart of Accounts', 'Transaction History', 'Financial Reports', 'Budget Tracking']
+      features: ['Financial Overview', 'Books Management', 'Reports & Analytics', 'Multi-Tab Interface']
     },
     {
       title: 'Communication Hub',

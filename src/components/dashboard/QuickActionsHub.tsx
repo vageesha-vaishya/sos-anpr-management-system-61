@@ -27,7 +27,7 @@ export const QuickActionsHub = () => {
       title: 'Add Transaction',
       description: 'Record financial transaction',
       icon: DollarSign,
-      href: '/society-books',
+      href: '/financial-hub?tab=books',
       color: 'text-green-600',
       isNew: true
     },
