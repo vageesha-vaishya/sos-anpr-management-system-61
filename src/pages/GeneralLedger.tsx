@@ -87,7 +87,7 @@ const GeneralLedger = () => {
               Complete accounting system with chart of accounts and journal entries
             </p>
           </div>
-          <Button onClick={() => navigate("/society-books-management")}>
+          <Button onClick={() => navigate("/financial-hub?tab=books")}>
             Back to Books Management
           </Button>
         </div>

@@ -115,7 +115,7 @@ const UtilityTracker = () => {
               Consumption tracking, billing management, and unit-wise allocation
             </p>
           </div>
-          <Button onClick={() => navigate("/society-books-management")}>
+          <Button onClick={() => navigate("/financial-hub?tab=books")}>
             Back to Books Management
           </Button>
         </div>

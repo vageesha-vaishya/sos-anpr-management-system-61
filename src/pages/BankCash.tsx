@@ -109,7 +109,7 @@ const BankCash = () => {
               Bank reconciliation, cash management, and payment voucher system
             </p>
           </div>
-          <Button onClick={() => navigate("/society-books-management")}>
+          <Button onClick={() => navigate("/financial-hub?tab=books")}>
             Back to Books Management
           </Button>
         </div>

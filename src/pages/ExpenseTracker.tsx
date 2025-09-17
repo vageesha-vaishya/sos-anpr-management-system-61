@@ -90,7 +90,7 @@ const ExpenseTracker = () => {
               Comprehensive expense management and categorization with vendor tracking
             </p>
           </div>
-          <Button onClick={() => navigate("/society-books-management")}>
+          <Button onClick={() => navigate("/financial-hub?tab=books")}>
             Back to Books Management
           </Button>
         </div>

@@ -83,7 +83,7 @@ const IncomeTracker = () => {
               Track all revenue streams including maintenance fees, late fees, and amenity charges
             </p>
           </div>
-          <Button onClick={() => navigate("/society-books-management")}>
+          <Button onClick={() => navigate("/financial-hub?tab=books")}>
             Back to Books Management
           </Button>
         </div>

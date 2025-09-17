@@ -49,7 +49,6 @@ import RoutineManagement from "@/pages/RoutineManagement";
 import SocietyManagementNew from "@/pages/SocietyManagementNew";
 import SocietyManagementEnhanced from "@/pages/SocietyManagementEnhanced";
 import SocietyMemberManagement from "@/pages/SocietyMemberManagement";
-import SocietyBooksManagement from "@/pages/SocietyBooksManagement";
 import GatekeeperModule from "@/pages/GatekeeperModule";
 import GeneralLedger from "@/pages/GeneralLedger";
 import IncomeTracker from "@/pages/IncomeTracker";
@@ -590,11 +589,7 @@ const App = () => (
             />
             <Route 
               path="/society-books" 
-              element={
-                <ProtectedRoute>
-                  <SocietyBooksManagement />
-                </ProtectedRoute>
-              } 
+              element={<Navigate to="/financial-hub?tab=books" replace />}
             />
             <Route 
               path="/gatekeeper" 
@@ -630,11 +625,7 @@ const App = () => (
             />
             <Route 
               path="/society-books-management" 
-              element={
-                <ProtectedRoute>
-                  <SocietyBooksManagement />
-                </ProtectedRoute>
-              } 
+              element={<Navigate to="/financial-hub?tab=books" replace />}
             />
             <Route 
               path="/general-ledger" 

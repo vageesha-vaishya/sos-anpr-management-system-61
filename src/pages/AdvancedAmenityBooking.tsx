@@ -100,7 +100,7 @@ const AdvancedAmenityBooking = () => {
               Revenue tracking with dynamic pricing models and promotional offers
             </p>
           </div>
-          <Button onClick={() => navigate("/society-books-management")}>
+          <Button onClick={() => navigate("/financial-hub?tab=books")}>
             Back to Books Management
           </Button>
         </div>
