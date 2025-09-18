@@ -35,7 +35,8 @@ import {
   UserPlus,
   ClipboardCheck,
   Zap,
-  Cog
+  Cog,
+  BookOpen
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -102,6 +103,7 @@ const navigationGroups = [
     label: "Financial Management",
     icon: DollarSign,
     items: [
+      { name: 'Books Management', href: '/financial-hub?tab=books', icon: BookOpen, minimumRole: 'society_admin' },
       { name: 'Billing & Payments', href: '/billing', icon: CreditCard, minimumRole: 'society_admin' },
       { name: 'Maintenance Charges', href: '/maintenance-billing', icon: Receipt, minimumRole: 'society_admin' },
       { name: 'Expense Tracking', href: '/expense-tracker', icon: TrendingUp, minimumRole: 'society_admin' },

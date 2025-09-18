@@ -27,10 +27,10 @@ export const FeatureDiscoverySection = () => {
       title: 'Financial Management Hub',
       description: 'Complete financial management with overview, books management, and comprehensive reporting in one unified interface.',
       icon: DollarSign,
-      href: '/financial-hub',
+      href: '/financial-hub?tab=books',
       color: 'text-green-600',
       bgColor: 'bg-green-100',
-      features: ['Financial Overview', 'Books Management', 'Reports & Analytics', 'Multi-Tab Interface']
+      features: ['General Ledger', 'Books Management', 'Income Tracker', 'Expense Tracker']
     },
     {
       title: 'Communication Hub',

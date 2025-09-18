@@ -268,12 +268,21 @@ const FinancialManagementHub = () => {
             <Badge variant="outline">Reports & Analytics</Badge>
           </div>
         </div>
-        <Button variant="outline" asChild>
-          <Link to="/" className="flex items-center">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            onClick={() => handleTabChange('books')}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <BookOpen className="w-4 h-4 mr-2" />
+            Open Books Management
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/" className="flex items-center">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
