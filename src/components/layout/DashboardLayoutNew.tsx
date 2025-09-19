@@ -141,7 +141,27 @@ const MenuGroup: React.FC<{
 }> = ({ group, isCollapsed }) => {
   const { hasMinimumRole } = usePermissions()
   const location = useLocation()
-  const [isOpen, setIsOpen] = useState(true)
+  
+  // Get stored group state from localStorage
+  const getStoredGroupState = (groupLabel: string) => {
+    try {
+      const stored = localStorage.getItem(`sidebar-group-${groupLabel}`)
+      return stored ? JSON.parse(stored) : false // Default to collapsed
+    } catch {
+      return false
+    }
+  }
+  
+  // Set stored group state to localStorage
+  const setStoredGroupState = (groupLabel: string, isOpen: boolean) => {
+    try {
+      localStorage.setItem(`sidebar-group-${groupLabel}`, JSON.stringify(isOpen))
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+  
+  const [isOpen, setIsOpen] = useState(() => getStoredGroupState(group.label))
   
   // Filter items based on user permissions (memoized)
   const accessibleItems = React.useMemo(() =>
@@ -153,24 +173,32 @@ const MenuGroup: React.FC<{
   const isGroupActive = React.useMemo(() =>
     accessibleItems.some(item => 
       location.pathname === item.href || 
-      (item.href !== '/' && location.pathname.startsWith(item.href))
+      (item.href !== '/' && location.pathname.startsWith(item.href)) ||
+      (item.href.includes('?') && location.pathname + location.search === item.href)
     ),
-    [accessibleItems, location.pathname]
+    [accessibleItems, location.pathname, location.search]
   )
 
-  // Auto-expand if group has active item
+  // Auto-expand if group has active item, but respect user's manual preference
   React.useEffect(() => {
-    if (isGroupActive) {
+    if (isGroupActive && !isOpen) {
       setIsOpen(true)
+      setStoredGroupState(group.label, true)
     }
-  }, [isGroupActive])
+  }, [isGroupActive, isOpen, group.label])
+  
+  // Handle manual toggle
+  const handleToggle = (newState: boolean) => {
+    setIsOpen(newState)
+    setStoredGroupState(group.label, newState)
+  }
   
   // Don't render group if no accessible items (after all hooks are called)
   if (accessibleItems.length === 0) return null
 
   return (
     <SidebarGroup>
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible open={isOpen} onOpenChange={handleToggle}>
         <CollapsibleTrigger asChild>
           <SidebarGroupLabel className="group/label text-xs font-medium uppercase tracking-wider text-sidebar-foreground/70 hover:text-sidebar-foreground cursor-pointer flex items-center justify-between w-full p-2 rounded-md hover:bg-sidebar-accent">
             <div className="flex items-center">
@@ -187,7 +215,8 @@ const MenuGroup: React.FC<{
             <SidebarMenu>
               {accessibleItems.map((item) => {
                 const isActive = location.pathname === item.href || 
-                  (item.href !== '/' && location.pathname.startsWith(item.href))
+                  (item.href !== '/' && location.pathname.startsWith(item.href.split('?')[0])) ||
+                  (item.href.includes('?') && location.pathname + location.search === item.href)
                 
                 return (
                   <SidebarMenuItem key={item.name}>
