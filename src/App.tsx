@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PermissionProvider } from "@/contexts/PermissionContext";
 import { SessionManager } from "@/components/auth/SessionManager";
@@ -69,6 +69,7 @@ import { Button } from "@/components/ui/button"
 import NotFound from "@/pages/NotFound"
 import { NavigationProvider } from "@/contexts/NavigationContext"
 import FinancialReports from "@/pages/FinancialReports"
+import Setup from "@/pages/Setup"
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const DashboardRouter = () => {
   const { userProfile, loading, user, profileError, forceRefresh } = useAuth();
+  const location = useLocation();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   
@@ -100,7 +102,8 @@ const DashboardRouter = () => {
     userProfile: !!userProfile, 
     loading, 
     profileError,
-    role: userProfile?.role 
+    role: userProfile?.role,
+    currentPath: location.pathname
   });
   
   // Set timeout for loading state
@@ -216,11 +219,22 @@ const DashboardRouter = () => {
   
   console.log('DashboardRouter: Rendering dashboard for role:', userProfile.role);
   
+  // Check if we're on a nested route
+  const isNestedRoute = location.pathname !== '/dashboard';
+  
+  // If we're on a nested route, only render the Outlet
+  if (isNestedRoute) {
+    return <Outlet />;
+  }
+  
+  let dashboardComponent;
   switch (userProfile.role) {
     case 'platform_admin':
-      return <PlatformAdminDashboard />;
+      dashboardComponent = <PlatformAdminDashboard />;
+      break;
     case 'franchise_admin':
-      return <FranchiseAdminDashboard />;
+      dashboardComponent = <FranchiseAdminDashboard />;
+      break;
     case 'customer_admin':
     case 'operator':
     case 'resident':
@@ -231,7 +245,8 @@ const DashboardRouter = () => {
     case 'tenant':
     case 'owner':
     case 'family_member':
-      return <CustomerDashboard />;
+      dashboardComponent = <CustomerDashboard />;
+      break;
     default:
       console.error('DashboardRouter: Invalid role:', userProfile.role);
       return (
@@ -246,6 +261,13 @@ const DashboardRouter = () => {
         </div>
       );
   }
+
+  return (
+    <>
+      {dashboardComponent}
+      <Outlet />
+    </>
+  );
 };
 
 const App = () => (
@@ -267,6 +289,7 @@ const App = () => (
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/setup" element={<Setup />} />
             <Route 
               path="/dashboard" 
               element={
@@ -274,7 +297,12 @@ const App = () => (
                   <DashboardRouter />
                 </ProtectedRoute>
               } 
-            />
+            >
+              <Route 
+                path="setup" 
+                element={<Setup />} 
+              />
+            </Route>
             <Route 
               path="/data-management" 
               element={

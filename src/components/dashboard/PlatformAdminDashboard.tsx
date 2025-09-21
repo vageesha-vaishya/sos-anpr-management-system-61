@@ -190,6 +190,12 @@ export const PlatformAdminDashboard = () => {
             <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
             All Systems Online
           </Badge>
+          <Button variant="outline" size="lg" className="hover:scale-105 transition-transform" asChild>
+            <Link to="/dashboard/setup">
+              <Settings className="w-4 h-4 mr-2" />
+              Setup Wizard
+            </Link>
+          </Button>
           <Button variant="default" size="lg" className="hover:scale-105 transition-transform" asChild>
             <Link to="/data-management">
               <Plus className="w-4 h-4 mr-2" />
