@@ -36,6 +36,7 @@ import {
 import { useTheme, Theme } from '@/contexts/ThemeContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import { createCompleteThemeColors } from '@/lib/theme-utils'
 
 const themeEditSchema = z.object({
   name: z.string().min(1, 'Theme name is required'),
@@ -95,26 +96,46 @@ export const ThemeEditor: React.FC = () => {
     try {
       if (!selectedTheme) return
 
+      const baseColors = {
+        primary: data.primary,
+        primaryForeground: data.primaryForeground,
+        secondary: data.secondary,
+        secondaryForeground: data.secondaryForeground,
+        accent: data.accent,
+        accentForeground: data.accentForeground,
+        background: data.background,
+        foreground: data.foreground,
+        muted: data.muted,
+        mutedForeground: data.mutedForeground,
+        card: data.card,
+        cardForeground: data.cardForeground,
+        border: data.border,
+        input: data.input,
+        ring: data.ring,
+        destructive: data.destructive,
+        destructiveForeground: data.destructiveForeground,
+      }
+
+      const completeColors = createCompleteThemeColors(baseColors)
+
       const updatedTheme: Omit<Theme, 'id' | 'isDefault'> = {
         name: data.name,
-        colors: {
-          primary: data.primary,
-          primaryForeground: data.primaryForeground,
-          secondary: data.secondary,
-          secondaryForeground: data.secondaryForeground,
-          accent: data.accent,
-          accentForeground: data.accentForeground,
-          background: data.background,
-          foreground: data.foreground,
-          muted: data.muted,
-          mutedForeground: data.mutedForeground,
-          card: data.card,
-          cardForeground: data.cardForeground,
-          border: data.border,
-          input: data.input,
-          ring: data.ring,
-          destructive: data.destructive,
-          destructiveForeground: data.destructiveForeground,
+        description: data.description,
+        colors: completeColors,
+        darkColors: {
+          ...completeColors,
+          background: completeColors.background === '0 0% 100%' ? '217 33% 7%' : completeColors.background,
+          backgroundSecondary: '217 33% 10%',
+          backgroundAccent: '217 33% 12%',
+          foreground: '0 0% 100%',
+          card: '217 33% 10%',
+          cardForeground: '0 0% 100%',
+          border: '217 33% 20%',
+          input: '217 33% 20%',
+          muted: '217 33% 15%',
+          mutedForeground: '0 0% 70%',
+          secondary: '217 33% 15%',
+          secondaryForeground: '0 0% 100%',
         }
       }
 
@@ -149,34 +170,38 @@ export const ThemeEditor: React.FC = () => {
     if (!selectedTheme) return
 
     const formData = form.getValues()
+    const baseColors = {
+      primary: formData.primary,
+      primaryForeground: formData.primaryForeground,
+      secondary: formData.secondary,
+      secondaryForeground: formData.secondaryForeground,
+      accent: formData.accent,
+      accentForeground: formData.accentForeground,
+      background: formData.background,
+      foreground: formData.foreground,
+      muted: formData.muted,
+      mutedForeground: formData.mutedForeground,
+      card: formData.card,
+      cardForeground: formData.cardForeground,
+      border: formData.border,
+      input: formData.input,
+      ring: formData.ring,
+      destructive: formData.destructive,
+      destructiveForeground: formData.destructiveForeground,
+    }
+
+    const completeColors = createCompleteThemeColors(baseColors)
+
     const previewTheme: Theme = {
       ...selectedTheme,
-      colors: {
-        primary: formData.primary,
-        primaryForeground: formData.primaryForeground,
-        secondary: formData.secondary,
-        secondaryForeground: formData.secondaryForeground,
-        accent: formData.accent,
-        accentForeground: formData.accentForeground,
-        background: formData.background,
-        foreground: formData.foreground,
-        muted: formData.muted,
-        mutedForeground: formData.mutedForeground,
-        card: formData.card,
-        cardForeground: formData.cardForeground,
-        border: formData.border,
-        input: formData.input,
-        ring: formData.ring,
-        destructive: formData.destructive,
-        destructiveForeground: formData.destructiveForeground,
-      }
+      colors: completeColors,
     }
 
     // Apply preview theme
     const root = document.documentElement
     Object.entries(previewTheme.colors).forEach(([key, value]) => {
       const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
-      root.style.setProperty(cssVar, value)
+      root.style.setProperty(cssVar, value as string)
     })
 
     setIsPreviewMode(true)

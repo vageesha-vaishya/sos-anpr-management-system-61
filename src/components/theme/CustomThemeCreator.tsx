@@ -4,68 +4,59 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ColorPicker } from '@/components/ui/color-picker'
-import { Plus, Palette, Edit, Trash2, Eye } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Palette, Plus, Eye, Save, Sparkles } from 'lucide-react'
 import { useTheme, Theme } from '@/contexts/ThemeContext'
-import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/integrations/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import { createCompleteThemeColors } from '@/lib/theme-utils'
 
-const themeSchema = z.object({
+const customThemeSchema = z.object({
   name: z.string().min(1, 'Theme name is required'),
-  // Primary colors
-  primary: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format (e.g., "222.2 84% 4.9%")'),
+  description: z.string().optional(),
+  primary: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   primaryForeground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   secondary: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   secondaryForeground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   accent: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   accentForeground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
-  // Background colors
   background: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   foreground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   muted: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   mutedForeground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
-  // Card colors
   card: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   cardForeground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
-  // Border and input
   border: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   input: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   ring: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
-  // Destructive colors
   destructive: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
   destructiveForeground: z.string().regex(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/, 'Invalid HSL format'),
 })
 
-type ThemeFormData = z.infer<typeof themeSchema>
+type CustomThemeFormData = z.infer<typeof customThemeSchema>
 
 export const CustomThemeCreator: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
-  const [deletingTheme, setDeletingTheme] = useState<Theme | null>(null)
-  const { availableThemes, createCustomTheme, deleteCustomTheme, setTheme, currentTheme } = useTheme()
-  const { userProfile } = useAuth()
+  const { createCustomTheme, currentTheme, setTheme } = useTheme()
   const { toast } = useToast()
 
-  const isAdmin = userProfile?.role === 'platform_admin'
-  const customThemes = availableThemes.filter(theme => !theme.isDefault)
-
-  const form = useForm<ThemeFormData>({
-    resolver: zodResolver(themeSchema),
+  const form = useForm<CustomThemeFormData>({
+    resolver: zodResolver(customThemeSchema),
     defaultValues: {
       name: '',
-      primary: '222.2 84% 4.9%',
-      primaryForeground: '210 40% 98%',
+      description: '',
+      primary: '196 100% 47%',
+      primaryForeground: '0 0% 100%',
       secondary: '210 40% 96%',
-      secondaryForeground: '222.2 84% 4.9%',
-      accent: '210 40% 96%',
-      accentForeground: '222.2 84% 4.9%',
+      secondaryForeground: '222.2 47.4% 11.2%',
+      accent: '196 100% 47%',
+      accentForeground: '0 0% 100%',
       background: '0 0% 100%',
       foreground: '222.2 84% 4.9%',
       muted: '210 40% 96%',
@@ -74,15 +65,20 @@ export const CustomThemeCreator: React.FC = () => {
       cardForeground: '222.2 84% 4.9%',
       border: '214.3 31.8% 91.4%',
       input: '214.3 31.8% 91.4%',
-      ring: '222.2 84% 4.9%',
+      ring: '196 100% 47%',
       destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
+      destructiveForeground: '0 0% 100%',
     },
   })
 
-  const onSubmit = async (data: ThemeFormData) => {
+  const onSubmit = async (data: CustomThemeFormData) => {
     try {
-      const themeColors = {
+      toast({
+        title: 'Creating Theme...',
+        description: `Creating "${data.name}" theme`,
+      })
+
+      const baseColors = {
         primary: data.primary,
         primaryForeground: data.primaryForeground,
         secondary: data.secondary,
@@ -102,22 +98,33 @@ export const CustomThemeCreator: React.FC = () => {
         destructiveForeground: data.destructiveForeground,
       }
 
-      // Create dark colors (same as light for now - can be customized later)
-      const darkColors = { ...themeColors }
+      const completeColors = createCompleteThemeColors(baseColors)
+      const themeDarkColors = {
+        ...completeColors,
+        background: '217 33% 7%',
+        backgroundSecondary: '217 33% 10%',
+        backgroundAccent: '217 33% 12%',
+        foreground: '0 0% 100%',
+        card: '217 33% 10%',
+        cardForeground: '0 0% 100%',
+        border: '217 33% 20%',
+        input: '217 33% 20%',
+        muted: '217 33% 15%',
+        mutedForeground: '0 0% 70%',
+        secondary: '217 33% 15%',
+        secondaryForeground: '0 0% 100%',
+      }
 
-      // TODO: Implement custom theme creation
-      console.log('Creating custom theme:', data.name, themeColors)
+      await createCustomTheme({
+        name: data.name,
+        description: data.description,
+        colors: completeColors,
+        darkColors: themeDarkColors
+      })
 
       toast({
         title: 'Success',
         description: `Theme "${data.name}" created successfully`,
-      })
-
-      // Update theme context to reload available themes
-      await createCustomTheme({
-        name: data.name,
-        colors: themeColors,
-        darkColors: darkColors
       })
 
       form.reset()
@@ -132,38 +139,42 @@ export const CustomThemeCreator: React.FC = () => {
     }
   }
 
-  const handlePreview = async () => {
+  const handlePreview = () => {
     const formData = form.getValues()
+    const baseColors = {
+      primary: formData.primary,
+      primaryForeground: formData.primaryForeground,
+      secondary: formData.secondary,
+      secondaryForeground: formData.secondaryForeground,
+      accent: formData.accent,
+      accentForeground: formData.accentForeground,
+      background: formData.background,
+      foreground: formData.foreground,
+      muted: formData.muted,
+      mutedForeground: formData.mutedForeground,
+      card: formData.card,
+      cardForeground: formData.cardForeground,
+      border: formData.border,
+      input: formData.input,
+      ring: formData.ring,
+      destructive: formData.destructive,
+      destructiveForeground: formData.destructiveForeground,
+    }
+
+    const completeColors = createCompleteThemeColors(baseColors)
+
     const previewTheme: Theme = {
       id: 'preview',
       name: 'Preview',
       isDefault: false,
-      colors: {
-        primary: formData.primary,
-        primaryForeground: formData.primaryForeground,
-        secondary: formData.secondary,
-        secondaryForeground: formData.secondaryForeground,
-        accent: formData.accent,
-        accentForeground: formData.accentForeground,
-        background: formData.background,
-        foreground: formData.foreground,
-        muted: formData.muted,
-        mutedForeground: formData.mutedForeground,
-        card: formData.card,
-        cardForeground: formData.cardForeground,
-        border: formData.border,
-        input: formData.input,
-        ring: formData.ring,
-        destructive: formData.destructive,
-        destructiveForeground: formData.destructiveForeground,
-      }
+      colors: completeColors,
     }
 
     // Temporarily apply preview theme
     const root = document.documentElement
     Object.entries(previewTheme.colors).forEach(([key, value]) => {
       const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
-      root.style.setProperty(cssVar, value)
+      root.style.setProperty(cssVar, value as string)
     })
 
     setIsPreviewMode(true)
@@ -175,78 +186,36 @@ export const CustomThemeCreator: React.FC = () => {
     }, 3000)
   }
 
-  const handleDelete = async () => {
-    if (deletingTheme) {
-      await deleteCustomTheme(deletingTheme.id)
-      setDeletingTheme(null)
-    }
-  }
-
-  if (!isAdmin) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="w-5 h-5" />
-            Custom Themes
-          </CardTitle>
-          <CardDescription>
-            Admin access required to create and manage custom themes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <Palette className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
-              Only administrators can create custom themes
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  const colorFields = [
-    { name: 'primary', label: 'Primary Color', description: 'Main brand color' },
-    { name: 'primaryForeground', label: 'Primary Foreground', description: 'Text on primary color' },
-    { name: 'secondary', label: 'Secondary Color', description: 'Secondary elements' },
-    { name: 'secondaryForeground', label: 'Secondary Foreground', description: 'Text on secondary' },
-    { name: 'accent', label: 'Accent Color', description: 'Accent elements' },
-    { name: 'accentForeground', label: 'Accent Foreground', description: 'Text on accent' },
-    { name: 'background', label: 'Background', description: 'Main background' },
-    { name: 'foreground', label: 'Foreground', description: 'Main text color' },
-    { name: 'muted', label: 'Muted Background', description: 'Subtle background' },
-    { name: 'mutedForeground', label: 'Muted Foreground', description: 'Subtle text' },
-    { name: 'card', label: 'Card Background', description: 'Card backgrounds' },
-    { name: 'cardForeground', label: 'Card Foreground', description: 'Text on cards' },
-    { name: 'border', label: 'Border Color', description: 'Element borders' },
-    { name: 'input', label: 'Input Background', description: 'Form inputs' },
-    { name: 'ring', label: 'Focus Ring', description: 'Focus indicators' },
-    { name: 'destructive', label: 'Destructive Color', description: 'Error/danger color' },
-    { name: 'destructiveForeground', label: 'Destructive Foreground', description: 'Text on destructive' },
-  ]
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Palette className="w-5 h-5" />
-            Custom Theme Management
-          </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Theme
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create Custom Theme</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5" />
+          Custom Theme Creator
+        </CardTitle>
+        <CardDescription>
+          Create your own unique theme with custom colors and gradients
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full" size="lg">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Custom Theme
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Create Custom Theme
+              </DialogTitle>
+            </DialogHeader>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="name"
@@ -254,141 +223,247 @@ export const CustomThemeCreator: React.FC = () => {
                       <FormItem>
                         <FormLabel>Theme Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="My Custom Theme" {...field} />
+                          <Input placeholder="My Awesome Theme" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium">Color Configuration</h3>
-                      {isPreviewMode && (
-                        <Badge variant="outline" className="animate-pulse">
-                          Previewing... (3s)
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {colorFields.map((field) => (
-                        <FormField
-                          key={field.name}
-                          control={form.control}
-                          name={field.name as any}
-                          render={({ field: formField }) => (
-                            <FormItem>
-                              <FormLabel className="flex items-center gap-2">
-                                <div 
-                                  className="w-4 h-4 rounded border"
-                                  style={{ backgroundColor: `hsl(${formField.value})` }}
-                                />
-                                {field.label}
-                              </FormLabel>
-                              <FormControl>
-                                <ColorPicker
-                                  value={formField.value}
-                                  onChange={formField.onChange}
-                                />
-                              </FormControl>
-                              <p className="text-xs text-muted-foreground">{field.description}</p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button type="button" variant="outline" onClick={handlePreview}>
-                      <Eye className="w-4 h-4 mr-2" />
-                      Preview (3s)
-                    </Button>
-                    <Button type="submit">
-                      Create Theme
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </CardTitle>
-        <CardDescription>
-          Create and manage custom themes for your organization
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {customThemes.length === 0 ? (
-          <div className="text-center py-8">
-            <Palette className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No custom themes created yet</p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Click "Create Theme" to add your first custom theme
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {customThemes.map((theme) => (
-              <div
-                key={theme.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium">{theme.name}</h3>
-                    <Badge variant="outline">Custom</Badge>
-                  </div>
-                  <div className="flex space-x-1">
-                    <div 
-                      className="w-4 h-4 rounded-full border border-gray-200" 
-                      style={{ backgroundColor: `hsl(${theme.colors.primary})` }}
-                    />
-                    <div 
-                      className="w-4 h-4 rounded-full border border-gray-200" 
-                      style={{ backgroundColor: `hsl(${theme.colors.secondary})` }}
-                    />
-                    <div 
-                      className="w-4 h-4 rounded-full border border-gray-200" 
-                      style={{ backgroundColor: `hsl(${theme.colors.accent})` }}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="A beautiful custom theme" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setTheme(theme.id)}
-                  >
-                    Apply
+
+                <Tabs defaultValue="colors" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="colors">Core Colors</TabsTrigger>
+                    <TabsTrigger value="ui">UI Elements</TabsTrigger>
+                    <TabsTrigger value="status">Status Colors</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="colors" className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="primary"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary Color</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="primaryForeground"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Primary Foreground</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="secondary"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Secondary Color</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="secondaryForeground"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Secondary Foreground</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="accent"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Accent Color</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="accentForeground"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Accent Foreground</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="ui" className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="background"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Background</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="foreground"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Foreground</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="card"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Card Background</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="cardForeground"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Card Foreground</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="border"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Border</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="input"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Input</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="status" className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="destructive"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Destructive (Error)</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="destructiveForeground"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Destructive Foreground</FormLabel>
+                            <FormControl>
+                              <ColorPicker value={field.value} onChange={field.onChange} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <div className="flex gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={handlePreview} className="flex-1">
+                    <Eye className="h-4 w-4 mr-2" />
+                    {isPreviewMode ? 'Previewing...' : 'Preview'}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setDeletingTheme(theme)
-                      setIsDeleteDialogOpen(true)
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
+                  <Button type="submit" className="flex-1">
+                    <Save className="h-4 w-4 mr-2" />
+                    Create Theme
                   </Button>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </CardContent>
-
-      <ConfirmDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        title="Delete Custom Theme"
-        description={`Are you sure you want to delete "${deletingTheme?.name}"? This action cannot be undone.`}
-        onConfirm={handleDelete}
-        confirmText="Delete"
-        variant="destructive"
-      />
     </Card>
   )
 }
