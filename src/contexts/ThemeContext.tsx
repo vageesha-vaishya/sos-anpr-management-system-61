@@ -4,15 +4,34 @@ import { useToast } from '@/hooks/use-toast'
 export interface Theme {
   id: string
   name: string
+  description?: string
   colors: {
+    // Primary colors with shades
     primary: string
     primaryForeground: string
+    primaryLight: string
+    primaryDark: string
+    primaryGlow: string
+    
+    // Secondary colors with shades
     secondary: string
     secondaryForeground: string
+    secondaryLight: string
+    secondaryDark: string
+    
+    // Accent colors with shades
     accent: string
     accentForeground: string
+    accentLight: string
+    accentDark: string
+    
+    // Background colors with variants
     background: string
+    backgroundSecondary: string
+    backgroundAccent: string
     foreground: string
+    
+    // UI element colors
     muted: string
     mutedForeground: string
     card: string
@@ -20,18 +39,54 @@ export interface Theme {
     border: string
     input: string
     ring: string
+    
+    // Status colors
     destructive: string
     destructiveForeground: string
+    success: string
+    successForeground: string
+    warning: string
+    warningForeground: string
+    
+    // Gradients
+    gradientPrimary: string
+    gradientSecondary: string
+    gradientAccent: string
+    gradientBackground: string
+    
+    // Shadows and effects
+    shadowPrimary: string
+    shadowSecondary: string
+    glowPrimary: string
+    glowSecondary: string
   }
   darkColors?: {
+    // Primary colors with shades
     primary: string
     primaryForeground: string
+    primaryLight: string
+    primaryDark: string
+    primaryGlow: string
+    
+    // Secondary colors with shades
     secondary: string
     secondaryForeground: string
+    secondaryLight: string
+    secondaryDark: string
+    
+    // Accent colors with shades
     accent: string
     accentForeground: string
+    accentLight: string
+    accentDark: string
+    
+    // Background colors with variants
     background: string
+    backgroundSecondary: string
+    backgroundAccent: string
     foreground: string
+    
+    // UI element colors
     muted: string
     mutedForeground: string
     card: string
@@ -39,8 +94,26 @@ export interface Theme {
     border: string
     input: string
     ring: string
+    
+    // Status colors
     destructive: string
     destructiveForeground: string
+    success: string
+    successForeground: string
+    warning: string
+    warningForeground: string
+    
+    // Gradients
+    gradientPrimary: string
+    gradientSecondary: string
+    gradientAccent: string
+    gradientBackground: string
+    
+    // Shadows and effects
+    shadowPrimary: string
+    shadowSecondary: string
+    glowPrimary: string
+    glowSecondary: string
   }
   isDefault: boolean
   createdBy?: string
@@ -59,262 +132,583 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export const defaultThemes: Theme[] = [
   {
-    id: 'default',
-    name: 'Default',
+    id: 'midnight-aurora',
+    name: 'Midnight Aurora',
+    description: 'Deep purples and electric blues with aurora-like gradients',
     isDefault: true,
     colors: {
-      primary: '222.2 84% 4.9%',
-      primaryForeground: '210 40% 98%',
-      secondary: '210 40% 96%',
-      secondaryForeground: '222.2 84% 4.9%',
-      accent: '210 40% 96%',
-      accentForeground: '222.2 84% 4.9%',
+      // Primary colors with shades
+      primary: '252 100% 67%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '252 100% 77%',
+      primaryDark: '252 100% 57%',
+      primaryGlow: '252 100% 67%',
+      
+      // Secondary colors with shades
+      secondary: '270 30% 95%',
+      secondaryForeground: '270 30% 15%',
+      secondaryLight: '270 30% 98%',
+      secondaryDark: '270 30% 85%',
+      
+      // Accent colors with shades
+      accent: '285 100% 70%',
+      accentForeground: '0 0% 100%',
+      accentLight: '285 100% 80%',
+      accentDark: '285 100% 60%',
+      
+      // Background colors with variants
       background: '0 0% 100%',
-      foreground: '222.2 84% 4.9%',
-      muted: '210 40% 96%',
-      mutedForeground: '215.4 16.3% 46.9%',
+      backgroundSecondary: '270 10% 98%',
+      backgroundAccent: '270 20% 96%',
+      foreground: '270 30% 15%',
+      
+      // UI element colors
+      muted: '270 20% 96%',
+      mutedForeground: '270 15% 45%',
       card: '0 0% 100%',
-      cardForeground: '222.2 84% 4.9%',
-      border: '214.3 31.8% 91.4%',
-      input: '214.3 31.8% 91.4%',
-      ring: '222.2 84% 4.9%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
+      cardForeground: '270 30% 15%',
+      border: '270 20% 90%',
+      input: '270 20% 92%',
+      ring: '252 100% 67%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(252 100% 67%), hsl(285 100% 70%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(270 20% 96%), hsl(270 30% 90%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(285 100% 70%), hsl(252 100% 67%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(0 0% 100%), hsl(270 10% 98%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(252 100% 67% / 0.3)',
+      shadowSecondary: '0 5px 20px hsl(270 30% 15% / 0.1)',
+      glowPrimary: '0 0 30px hsl(252 100% 67% / 0.5)',
+      glowSecondary: '0 0 20px hsl(285 100% 70% / 0.3)',
     },
     darkColors: {
-      primary: '210 40% 98%',
-      primaryForeground: '222.2 84% 4.9%',
-      secondary: '217.2 32.6% 17.5%',
-      secondaryForeground: '210 40% 98%',
-      accent: '217.2 32.6% 17.5%',
-      accentForeground: '210 40% 98%',
-      background: '222.2 84% 4.9%',
-      foreground: '210 40% 98%',
-      muted: '217.2 32.6% 17.5%',
-      mutedForeground: '215 20.2% 65.1%',
-      card: '222.2 84% 4.9%',
-      cardForeground: '210 40% 98%',
-      border: '217.2 32.6% 17.5%',
-      input: '217.2 32.6% 17.5%',
-      ring: '212.7 26.8% 83.9%',
-      destructive: '0 62.8% 30.6%',
-      destructiveForeground: '210 40% 98%',
+      // Primary colors with shades
+      primary: '252 100% 67%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '252 100% 77%',
+      primaryDark: '252 100% 57%',
+      primaryGlow: '252 100% 67%',
+      
+      // Secondary colors with shades
+      secondary: '270 30% 15%',
+      secondaryForeground: '270 30% 85%',
+      secondaryLight: '270 30% 20%',
+      secondaryDark: '270 30% 10%',
+      
+      // Accent colors with shades
+      accent: '285 100% 70%',
+      accentForeground: '0 0% 100%',
+      accentLight: '285 100% 80%',
+      accentDark: '285 100% 60%',
+      
+      // Background colors with variants
+      background: '270 30% 8%',
+      backgroundSecondary: '270 30% 10%',
+      backgroundAccent: '270 30% 12%',
+      foreground: '270 30% 90%',
+      
+      // UI element colors
+      muted: '270 30% 15%',
+      mutedForeground: '270 15% 60%',
+      card: '270 30% 10%',
+      cardForeground: '270 30% 90%',
+      border: '270 30% 20%',
+      input: '270 30% 18%',
+      ring: '252 100% 67%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(252 100% 67%), hsl(285 100% 70%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(270 30% 10%), hsl(270 30% 15%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(285 100% 70%), hsl(252 100% 67%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(270 30% 8%), hsl(270 30% 12%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(252 100% 67% / 0.4)',
+      shadowSecondary: '0 5px 20px hsl(270 30% 0% / 0.3)',
+      glowPrimary: '0 0 30px hsl(252 100% 67% / 0.6)',
+      glowSecondary: '0 0 20px hsl(285 100% 70% / 0.4)',
     }
   },
   {
-    id: 'ocean',
-    name: 'Ocean Blue',
+    id: 'ocean-breeze',
+    name: 'Ocean Breeze',
+    description: 'Tranquil ocean blues with tropical accents',
     isDefault: true,
     colors: {
-      primary: '207 89% 42%',
-      primaryForeground: '210 40% 98%',
-      secondary: '207 89% 95%',
-      secondaryForeground: '207 89% 15%',
-      accent: '207 89% 90%',
-      accentForeground: '207 89% 15%',
+      // Primary colors with shades
+      primary: '195 100% 45%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '195 100% 55%',
+      primaryDark: '195 100% 35%',
+      primaryGlow: '195 100% 65%',
+      
+      // Secondary colors with shades
+      secondary: '195 30% 95%',
+      secondaryForeground: '195 30% 15%',
+      secondaryLight: '195 30% 98%',
+      secondaryDark: '195 30% 85%',
+      
+      // Accent colors with shades
+      accent: '170 100% 50%',
+      accentForeground: '0 0% 100%',
+      accentLight: '170 100% 60%',
+      accentDark: '170 100% 40%',
+      
+      // Background colors with variants
       background: '0 0% 100%',
-      foreground: '207 89% 15%',
-      muted: '207 89% 95%',
-      mutedForeground: '207 25% 45%',
+      backgroundSecondary: '195 20% 98%',
+      backgroundAccent: '195 30% 96%',
+      foreground: '195 30% 15%',
+      
+      // UI element colors
+      muted: '195 20% 96%',
+      mutedForeground: '195 15% 45%',
       card: '0 0% 100%',
-      cardForeground: '207 89% 15%',
-      border: '207 50% 85%',
-      input: '207 50% 85%',
-      ring: '207 89% 42%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
+      cardForeground: '195 30% 15%',
+      border: '195 20% 90%',
+      input: '195 20% 92%',
+      ring: '195 100% 45%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(195 100% 45%), hsl(170 100% 50%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(195 20% 96%), hsl(195 30% 90%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(170 100% 50%), hsl(195 100% 55%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(0 0% 100%), hsl(195 20% 98%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(195 100% 45% / 0.3)',
+      shadowSecondary: '0 5px 20px hsl(195 30% 15% / 0.1)',
+      glowPrimary: '0 0 30px hsl(195 100% 45% / 0.5)',
+      glowSecondary: '0 0 20px hsl(170 100% 50% / 0.3)',
+    },
+    darkColors: {
+      // Primary colors with shades
+      primary: '195 100% 55%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '195 100% 65%',
+      primaryDark: '195 100% 45%',
+      primaryGlow: '195 100% 65%',
+      
+      // Secondary colors with shades
+      secondary: '195 30% 15%',
+      secondaryForeground: '195 30% 85%',
+      secondaryLight: '195 30% 20%',
+      secondaryDark: '195 30% 10%',
+      
+      // Accent colors with shades
+      accent: '170 100% 60%',
+      accentForeground: '0 0% 100%',
+      accentLight: '170 100% 70%',
+      accentDark: '170 100% 50%',
+      
+      // Background colors with variants
+      background: '195 50% 8%',
+      backgroundSecondary: '195 40% 10%',
+      backgroundAccent: '195 30% 12%',
+      foreground: '195 30% 90%',
+      
+      // UI element colors
+      muted: '195 30% 15%',
+      mutedForeground: '195 15% 60%',
+      card: '195 40% 10%',
+      cardForeground: '195 30% 90%',
+      border: '195 30% 20%',
+      input: '195 30% 18%',
+      ring: '195 100% 55%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(195 100% 55%), hsl(170 100% 60%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(195 40% 10%), hsl(195 30% 15%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(170 100% 60%), hsl(195 100% 65%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(195 50% 8%), hsl(195 40% 12%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(195 100% 55% / 0.4)',
+      shadowSecondary: '0 5px 20px hsl(195 50% 0% / 0.3)',
+      glowPrimary: '0 0 30px hsl(195 100% 55% / 0.6)',
+      glowSecondary: '0 0 20px hsl(170 100% 60% / 0.4)',
     }
   },
   {
-    id: 'forest',
-    name: 'Forest Green',
+    id: 'forest-sanctuary',
+    name: 'Forest Sanctuary',
+    description: 'Deep emerald greens with golden accents',
     isDefault: true,
     colors: {
+      // Primary colors with shades
       primary: '142 76% 36%',
-      primaryForeground: '210 40% 98%',
-      secondary: '142 76% 95%',
-      secondaryForeground: '142 76% 15%',
-      accent: '142 76% 90%',
-      accentForeground: '142 76% 15%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '142 76% 46%',
+      primaryDark: '142 76% 26%',
+      primaryGlow: '142 76% 56%',
+      
+      // Secondary colors with shades
+      secondary: '142 30% 95%',
+      secondaryForeground: '142 30% 15%',
+      secondaryLight: '142 30% 98%',
+      secondaryDark: '142 30% 85%',
+      
+      // Accent colors with shades
+      accent: '45 100% 60%',
+      accentForeground: '0 0% 0%',
+      accentLight: '45 100% 70%',
+      accentDark: '45 100% 50%',
+      
+      // Background colors with variants
       background: '0 0% 100%',
-      foreground: '142 76% 15%',
-      muted: '142 76% 95%',
-      mutedForeground: '142 25% 45%',
+      backgroundSecondary: '142 20% 98%',
+      backgroundAccent: '142 30% 96%',
+      foreground: '142 30% 15%',
+      
+      // UI element colors
+      muted: '142 20% 96%',
+      mutedForeground: '142 15% 45%',
       card: '0 0% 100%',
-      cardForeground: '142 76% 15%',
-      border: '142 50% 85%',
-      input: '142 50% 85%',
+      cardForeground: '142 30% 15%',
+      border: '142 20% 90%',
+      input: '142 20% 92%',
       ring: '142 76% 36%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(142 76% 36%), hsl(45 100% 60%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(142 20% 96%), hsl(142 30% 90%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(45 100% 60%), hsl(142 76% 46%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(0 0% 100%), hsl(142 20% 98%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(142 76% 36% / 0.3)',
+      shadowSecondary: '0 5px 20px hsl(142 30% 15% / 0.1)',
+      glowPrimary: '0 0 30px hsl(142 76% 36% / 0.5)',
+      glowSecondary: '0 0 20px hsl(45 100% 60% / 0.3)',
+    },
+    darkColors: {
+      // Primary colors with shades
+      primary: '142 76% 46%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '142 76% 56%',
+      primaryDark: '142 76% 36%',
+      primaryGlow: '142 76% 56%',
+      
+      // Secondary colors with shades
+      secondary: '142 30% 15%',
+      secondaryForeground: '142 30% 85%',
+      secondaryLight: '142 30% 20%',
+      secondaryDark: '142 30% 10%',
+      
+      // Accent colors with shades
+      accent: '45 100% 70%',
+      accentForeground: '0 0% 0%',
+      accentLight: '45 100% 80%',
+      accentDark: '45 100% 60%',
+      
+      // Background colors with variants
+      background: '142 50% 8%',
+      backgroundSecondary: '142 40% 10%',
+      backgroundAccent: '142 30% 12%',
+      foreground: '142 30% 90%',
+      
+      // UI element colors
+      muted: '142 30% 15%',
+      mutedForeground: '142 15% 60%',
+      card: '142 40% 10%',
+      cardForeground: '142 30% 90%',
+      border: '142 30% 20%',
+      input: '142 30% 18%',
+      ring: '142 76% 46%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(142 76% 46%), hsl(45 100% 70%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(142 40% 10%), hsl(142 30% 15%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(45 100% 70%), hsl(142 76% 56%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(142 50% 8%), hsl(142 40% 12%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(142 76% 46% / 0.4)',
+      shadowSecondary: '0 5px 20px hsl(142 50% 0% / 0.3)',
+      glowPrimary: '0 0 30px hsl(142 76% 46% / 0.6)',
+      glowSecondary: '0 0 20px hsl(45 100% 70% / 0.4)',
     }
   },
   {
-    id: 'sunset',
-    name: 'Sunset Orange',
+    id: 'sunset-blaze',
+    name: 'Sunset Blaze',
+    description: 'Warm oranges and deep reds with golden highlights',
     isDefault: true,
     colors: {
-      primary: '24 95% 53%',
-      primaryForeground: '210 40% 98%',
-      secondary: '24 95% 95%',
-      secondaryForeground: '24 95% 15%',
-      accent: '24 95% 90%',
-      accentForeground: '24 95% 15%',
+      // Primary colors with shades
+      primary: '14 100% 57%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '14 100% 67%',
+      primaryDark: '14 100% 47%',
+      primaryGlow: '14 100% 77%',
+      
+      // Secondary colors with shades
+      secondary: '14 30% 95%',
+      secondaryForeground: '14 30% 15%',
+      secondaryLight: '14 30% 98%',
+      secondaryDark: '14 30% 85%',
+      
+      // Accent colors with shades
+      accent: '350 100% 65%',
+      accentForeground: '0 0% 100%',
+      accentLight: '350 100% 75%',
+      accentDark: '350 100% 55%',
+      
+      // Background colors with variants
       background: '0 0% 100%',
-      foreground: '24 95% 15%',
-      muted: '24 95% 95%',
-      mutedForeground: '24 25% 45%',
+      backgroundSecondary: '14 20% 98%',
+      backgroundAccent: '14 30% 96%',
+      foreground: '14 30% 15%',
+      
+      // UI element colors
+      muted: '14 20% 96%',
+      mutedForeground: '14 15% 45%',
       card: '0 0% 100%',
-      cardForeground: '24 95% 15%',
-      border: '24 50% 85%',
-      input: '24 50% 85%',
-      ring: '24 95% 53%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
+      cardForeground: '14 30% 15%',
+      border: '14 20% 90%',
+      input: '14 20% 92%',
+      ring: '14 100% 57%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(14 100% 57%), hsl(350 100% 65%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(14 20% 96%), hsl(14 30% 90%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(350 100% 65%), hsl(14 100% 67%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(0 0% 100%), hsl(14 20% 98%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(14 100% 57% / 0.3)',
+      shadowSecondary: '0 5px 20px hsl(14 30% 15% / 0.1)',
+      glowPrimary: '0 0 30px hsl(14 100% 57% / 0.5)',
+      glowSecondary: '0 0 20px hsl(350 100% 65% / 0.3)',
+    },
+    darkColors: {
+      // Primary colors with shades
+      primary: '14 100% 67%',
+      primaryForeground: '0 0% 100%',
+      primaryLight: '14 100% 77%',
+      primaryDark: '14 100% 57%',
+      primaryGlow: '14 100% 77%',
+      
+      // Secondary colors with shades
+      secondary: '14 30% 15%',
+      secondaryForeground: '14 30% 85%',
+      secondaryLight: '14 30% 20%',
+      secondaryDark: '14 30% 10%',
+      
+      // Accent colors with shades
+      accent: '350 100% 75%',
+      accentForeground: '0 0% 100%',
+      accentLight: '350 100% 85%',
+      accentDark: '350 100% 65%',
+      
+      // Background colors with variants
+      background: '14 50% 8%',
+      backgroundSecondary: '14 40% 10%',
+      backgroundAccent: '14 30% 12%',
+      foreground: '14 30% 90%',
+      
+      // UI element colors
+      muted: '14 30% 15%',
+      mutedForeground: '14 15% 60%',
+      card: '14 40% 10%',
+      cardForeground: '14 30% 90%',
+      border: '14 30% 20%',
+      input: '14 30% 18%',
+      ring: '14 100% 67%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(14 100% 67%), hsl(350 100% 75%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(14 40% 10%), hsl(14 30% 15%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(350 100% 75%), hsl(14 100% 77%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(14 50% 8%), hsl(14 40% 12%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(14 100% 67% / 0.4)',
+      shadowSecondary: '0 5px 20px hsl(14 50% 0% / 0.3)',
+      glowPrimary: '0 0 30px hsl(14 100% 67% / 0.6)',
+      glowSecondary: '0 0 20px hsl(350 100% 75% / 0.4)',
     }
   },
   {
-    id: 'purple',
-    name: 'Royal Purple',
+    id: 'cyberpunk-neon',
+    name: 'Cyberpunk Neon',
+    description: 'Electric cyan and magenta with dark tech aesthetics',
     isDefault: true,
     colors: {
-      primary: '263 70% 50%',
-      primaryForeground: '210 40% 98%',
-      secondary: '263 70% 95%',
-      secondaryForeground: '263 70% 15%',
-      accent: '263 70% 90%',
-      accentForeground: '263 70% 15%',
+      // Primary colors with shades
+      primary: '180 100% 50%',
+      primaryForeground: '0 0% 0%',
+      primaryLight: '180 100% 60%',
+      primaryDark: '180 100% 40%',
+      primaryGlow: '180 100% 70%',
+      
+      // Secondary colors with shades
+      secondary: '220 30% 95%',
+      secondaryForeground: '220 30% 15%',
+      secondaryLight: '220 30% 98%',
+      secondaryDark: '220 30% 85%',
+      
+      // Accent colors with shades
+      accent: '300 100% 70%',
+      accentForeground: '0 0% 100%',
+      accentLight: '300 100% 80%',
+      accentDark: '300 100% 60%',
+      
+      // Background colors with variants
       background: '0 0% 100%',
-      foreground: '263 70% 15%',
-      muted: '263 70% 95%',
-      mutedForeground: '263 25% 45%',
+      backgroundSecondary: '220 20% 98%',
+      backgroundAccent: '220 30% 96%',
+      foreground: '220 30% 15%',
+      
+      // UI element colors
+      muted: '220 20% 96%',
+      mutedForeground: '220 15% 45%',
       card: '0 0% 100%',
-      cardForeground: '263 70% 15%',
-      border: '263 50% 85%',
-      input: '263 50% 85%',
-      ring: '263 70% 50%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
-    }
-  },
-  {
-    id: 'rose',
-    name: 'Elegant Rose',
-    isDefault: true,
-    colors: {
-      primary: '330 81% 60%',
-      primaryForeground: '210 40% 98%',
-      secondary: '330 81% 95%',
-      secondaryForeground: '330 81% 15%',
-      accent: '330 81% 90%',
-      accentForeground: '330 81% 15%',
-      background: '0 0% 100%',
-      foreground: '330 81% 15%',
-      muted: '330 81% 95%',
-      mutedForeground: '330 25% 45%',
-      card: '0 0% 100%',
-      cardForeground: '330 81% 15%',
-      border: '330 50% 85%',
-      input: '330 50% 85%',
-      ring: '330 81% 60%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
-    }
-  },
-  {
-    id: 'teal',
-    name: 'Modern Teal',
-    isDefault: true,
-    colors: {
-      primary: '173 80% 40%',
-      primaryForeground: '210 40% 98%',
-      secondary: '173 80% 95%',
-      secondaryForeground: '173 80% 15%',
-      accent: '173 80% 90%',
-      accentForeground: '173 80% 15%',
-      background: '0 0% 100%',
-      foreground: '173 80% 15%',
-      muted: '173 80% 95%',
-      mutedForeground: '173 25% 45%',
-      card: '0 0% 100%',
-      cardForeground: '173 80% 15%',
-      border: '173 50% 85%',
-      input: '173 50% 85%',
-      ring: '173 80% 40%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
-    }
-  },
-  {
-    id: 'amber',
-    name: 'Warm Amber',
-    isDefault: true,
-    colors: {
-      primary: '45 93% 47%',
-      primaryForeground: '26 83% 14%',
-      secondary: '45 93% 95%',
-      secondaryForeground: '45 93% 15%',
-      accent: '45 93% 90%',
-      accentForeground: '45 93% 15%',
-      background: '0 0% 100%',
-      foreground: '45 93% 15%',
-      muted: '45 93% 95%',
-      mutedForeground: '45 25% 45%',
-      card: '0 0% 100%',
-      cardForeground: '45 93% 15%',
-      border: '45 50% 85%',
-      input: '45 50% 85%',
-      ring: '45 93% 47%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
-    }
-  },
-  {
-    id: 'slate',
-    name: 'Professional Slate',
-    isDefault: true,
-    colors: {
-      primary: '215 28% 17%',
-      primaryForeground: '210 40% 98%',
-      secondary: '215 28% 95%',
-      secondaryForeground: '215 28% 15%',
-      accent: '215 28% 90%',
-      accentForeground: '215 28% 15%',
-      background: '0 0% 100%',
-      foreground: '215 28% 15%',
-      muted: '215 28% 95%',
-      mutedForeground: '215 25% 45%',
-      card: '0 0% 100%',
-      cardForeground: '215 28% 15%',
-      border: '215 50% 85%',
-      input: '215 50% 85%',
-      ring: '215 28% 17%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
-    }
-  },
-  {
-    id: 'indigo',
-    name: 'Deep Indigo',
-    isDefault: true,
-    colors: {
-      primary: '239 84% 67%',
-      primaryForeground: '210 40% 98%',
-      secondary: '239 84% 95%',
-      secondaryForeground: '239 84% 15%',
-      accent: '239 84% 90%',
-      accentForeground: '239 84% 15%',
-      background: '0 0% 100%',
-      foreground: '239 84% 15%',
-      muted: '239 84% 95%',
-      mutedForeground: '239 25% 45%',
-      card: '0 0% 100%',
-      cardForeground: '239 84% 15%',
-      border: '239 50% 85%',
-      input: '239 50% 85%',
-      ring: '239 84% 67%',
-      destructive: '0 84.2% 60.2%',
-      destructiveForeground: '210 40% 98%',
+      cardForeground: '220 30% 15%',
+      border: '220 20% 90%',
+      input: '220 20% 92%',
+      ring: '180 100% 50%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(180 100% 50%), hsl(300 100% 70%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(220 20% 96%), hsl(220 30% 90%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(300 100% 70%), hsl(180 100% 60%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(0 0% 100%), hsl(220 20% 98%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(180 100% 50% / 0.3)',
+      shadowSecondary: '0 5px 20px hsl(220 30% 15% / 0.1)',
+      glowPrimary: '0 0 30px hsl(180 100% 50% / 0.5)',
+      glowSecondary: '0 0 20px hsl(300 100% 70% / 0.3)',
+    },
+    darkColors: {
+      // Primary colors with shades
+      primary: '180 100% 60%',
+      primaryForeground: '0 0% 0%',
+      primaryLight: '180 100% 70%',
+      primaryDark: '180 100% 50%',
+      primaryGlow: '180 100% 70%',
+      
+      // Secondary colors with shades
+      secondary: '220 30% 15%',
+      secondaryForeground: '220 30% 85%',
+      secondaryLight: '220 30% 20%',
+      secondaryDark: '220 30% 8%',
+      
+      // Accent colors with shades
+      accent: '300 100% 80%',
+      accentForeground: '0 0% 0%',
+      accentLight: '300 100% 90%',
+      accentDark: '300 100% 70%',
+      
+      // Background colors with variants
+      background: '220 50% 3%',
+      backgroundSecondary: '220 40% 5%',
+      backgroundAccent: '220 30% 8%',
+      foreground: '220 30% 90%',
+      
+      // UI element colors
+      muted: '220 30% 12%',
+      mutedForeground: '220 15% 60%',
+      card: '220 40% 5%',
+      cardForeground: '220 30% 90%',
+      border: '220 30% 15%',
+      input: '220 30% 12%',
+      ring: '180 100% 60%',
+      
+      // Status colors
+      destructive: '0 84% 60%',
+      destructiveForeground: '0 0% 100%',
+      success: '142 76% 36%',
+      successForeground: '0 0% 100%',
+      warning: '38 92% 50%',
+      warningForeground: '0 0% 0%',
+      
+      // Gradients
+      gradientPrimary: 'linear-gradient(135deg, hsl(180 100% 60%), hsl(300 100% 80%))',
+      gradientSecondary: 'linear-gradient(180deg, hsl(220 40% 5%), hsl(220 30% 12%))',
+      gradientAccent: 'linear-gradient(45deg, hsl(300 100% 80%), hsl(180 100% 70%))',
+      gradientBackground: 'linear-gradient(135deg, hsl(220 50% 3%), hsl(220 40% 8%))',
+      
+      // Shadows and effects
+      shadowPrimary: '0 10px 40px hsl(180 100% 60% / 0.4)',
+      shadowSecondary: '0 5px 20px hsl(220 50% 0% / 0.4)',
+      glowPrimary: '0 0 30px hsl(180 100% 60% / 0.7)',
+      glowSecondary: '0 0 20px hsl(300 100% 80% / 0.5)',
     }
   }
 ]
@@ -325,22 +719,59 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { toast } = useToast()
 
   const applyThemeToDOM = (theme: Theme) => {
+    const isDark = document.documentElement.classList.contains('dark')
+    const colors = isDark && theme.darkColors ? theme.darkColors : theme.colors
     const root = document.documentElement
-    const colors = theme.colors
 
-    // Apply light theme colors
-    Object.entries(colors).forEach(([key, value]) => {
-      const cssVar = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
-      root.style.setProperty(cssVar, value)
-    })
-
-    // Apply dark theme colors if available
-    if (theme.darkColors) {
-      Object.entries(theme.darkColors).forEach(([key, value]) => {
-        const cssVar = `--dark-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
-        root.style.setProperty(cssVar, value)
-      })
-    }
+    // Apply base colors
+    root.style.setProperty('--primary', colors.primary)
+    root.style.setProperty('--primary-foreground', colors.primaryForeground)
+    root.style.setProperty('--primary-light', colors.primaryLight || colors.primary)
+    root.style.setProperty('--primary-dark', colors.primaryDark || colors.primary)
+    root.style.setProperty('--primary-glow', colors.primaryGlow || colors.primary)
+    
+    root.style.setProperty('--secondary', colors.secondary)
+    root.style.setProperty('--secondary-foreground', colors.secondaryForeground)
+    root.style.setProperty('--secondary-light', colors.secondaryLight || colors.secondary)
+    root.style.setProperty('--secondary-dark', colors.secondaryDark || colors.secondary)
+    
+    root.style.setProperty('--accent', colors.accent)
+    root.style.setProperty('--accent-foreground', colors.accentForeground)
+    root.style.setProperty('--accent-light', colors.accentLight || colors.accent)
+    root.style.setProperty('--accent-dark', colors.accentDark || colors.accent)
+    
+    root.style.setProperty('--background', colors.background)
+    root.style.setProperty('--background-secondary', colors.backgroundSecondary || colors.background)
+    root.style.setProperty('--background-accent', colors.backgroundAccent || colors.background)
+    root.style.setProperty('--foreground', colors.foreground)
+    
+    root.style.setProperty('--muted', colors.muted)
+    root.style.setProperty('--muted-foreground', colors.mutedForeground)
+    root.style.setProperty('--card', colors.card)
+    root.style.setProperty('--card-foreground', colors.cardForeground)
+    root.style.setProperty('--border', colors.border)
+    root.style.setProperty('--input', colors.input)
+    root.style.setProperty('--ring', colors.ring)
+    
+    // Status colors
+    root.style.setProperty('--destructive', colors.destructive)
+    root.style.setProperty('--destructive-foreground', colors.destructiveForeground)
+    root.style.setProperty('--success', colors.success || '142 76% 36%')
+    root.style.setProperty('--success-foreground', colors.successForeground || '0 0% 100%')
+    root.style.setProperty('--warning', colors.warning || '38 92% 50%')
+    root.style.setProperty('--warning-foreground', colors.warningForeground || '0 0% 0%')
+    
+    // Gradients
+    root.style.setProperty('--gradient-primary', colors.gradientPrimary || `linear-gradient(135deg, hsl(${colors.primary}), hsl(${colors.accent}))`)
+    root.style.setProperty('--gradient-secondary', colors.gradientSecondary || `linear-gradient(180deg, hsl(${colors.secondary}), hsl(${colors.muted}))`)
+    root.style.setProperty('--gradient-accent', colors.gradientAccent || `linear-gradient(45deg, hsl(${colors.accent}), hsl(${colors.primary}))`)
+    root.style.setProperty('--gradient-background', colors.gradientBackground || `linear-gradient(135deg, hsl(${colors.background}), hsl(${colors.muted}))`)
+    
+    // Shadows and effects
+    root.style.setProperty('--shadow-primary', colors.shadowPrimary || `0 10px 40px hsl(${colors.primary} / 0.3)`)
+    root.style.setProperty('--shadow-secondary', colors.shadowSecondary || `0 5px 20px hsl(${colors.foreground} / 0.1)`)
+    root.style.setProperty('--glow-primary', colors.glowPrimary || `0 0 30px hsl(${colors.primary} / 0.5)`)
+    root.style.setProperty('--glow-secondary', colors.glowSecondary || `0 0 20px hsl(${colors.accent} / 0.3)`)
   }
 
   const setTheme = (themeId: string) => {
@@ -383,7 +814,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     // If the deleted theme is currently active, switch to default
     if (currentTheme.id === themeId) {
-      setTheme('default')
+      setTheme('midnight-aurora')
     }
 
     // Update localStorage
@@ -405,54 +836,50 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setAvailableThemes([...defaultThemes, ...customThemes])
       }
     } catch (error) {
-      console.error('Error loading custom themes:', error)
+      console.error('Failed to load custom themes:', error)
     }
   }
 
-  // Load theme preference and custom themes on mount
+  // Load saved theme on mount
   useEffect(() => {
-    // Load custom themes
     refreshThemes()
     
-    // Load selected theme
     const savedThemeId = localStorage.getItem('selectedTheme')
     if (savedThemeId) {
-      const theme = defaultThemes.find(t => t.id === savedThemeId)
-      if (theme) {
-        setCurrentTheme(theme)
-        applyThemeToDOM(theme)
+      const savedTheme = defaultThemes.find(t => t.id === savedThemeId)
+      if (savedTheme) {
+        setCurrentTheme(savedTheme)
+        applyThemeToDOM(savedTheme)
       }
+    } else {
+      // Apply default theme
+      applyThemeToDOM(defaultThemes[0])
     }
   }, [])
 
-  // Update available themes when custom themes change
+  // Apply theme when dark mode changes
   useEffect(() => {
-    try {
-      const savedCustomThemes = localStorage.getItem('customThemes')
-      if (savedCustomThemes) {
-        const customThemes = JSON.parse(savedCustomThemes)
-        setAvailableThemes([...defaultThemes, ...customThemes])
-      }
-    } catch (error) {
-      console.error('Error loading custom themes:', error)
-    }
-  }, [])
+    const observer = new MutationObserver(() => {
+      applyThemeToDOM(currentTheme)
+    })
 
-  useEffect(() => {
-    applyThemeToDOM(currentTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    return () => observer.disconnect()
   }, [currentTheme])
 
   return (
-    <ThemeContext.Provider
-      value={{
-        currentTheme,
-        availableThemes,
-        setTheme,
-        createCustomTheme,
-        deleteCustomTheme,
-        refreshThemes,
-      }}
-    >
+    <ThemeContext.Provider value={{
+      currentTheme,
+      availableThemes,
+      setTheme,
+      createCustomTheme,
+      deleteCustomTheme,
+      refreshThemes
+    }}>
       {children}
     </ThemeContext.Provider>
   )
