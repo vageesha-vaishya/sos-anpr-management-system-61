@@ -32,7 +32,7 @@ export const PROTECTED_ROUTES: RouteConfig[] = [
   { path: '/utility-tracker', permission: 'manage_finances' },
   
   // Society Management
-  { path: '/society-member-management', permission: 'manage_residents' },
+  { path: '/society-member-management', minimumRole: 'customer_admin' },
   { path: '/staff-management', permission: 'manage_staff' },
   { path: '/residents', permission: 'manage_residents' },
   

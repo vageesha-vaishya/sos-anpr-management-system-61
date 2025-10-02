@@ -552,7 +552,7 @@ const App = () => (
             <Route 
               path="/society-member-management" 
               element={
-                <RoleProtectedRoute permission="manage_residents">
+                <RoleProtectedRoute minimumRole="customer_admin">
                   <ProtectedRoute>
                     <SocietyMemberManagement />
                   </ProtectedRoute>
