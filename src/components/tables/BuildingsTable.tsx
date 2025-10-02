@@ -45,16 +45,22 @@ const columns = [
   },
 ]
 
-export const BuildingsTable: React.FC = () => {
+interface BuildingsTableProps {
+  organizationId?: string
+}
+
+export const BuildingsTable: React.FC<BuildingsTableProps> = ({ organizationId }) => {
   return (
     <DataTable
       title="Buildings"
       tableName="buildings"
       columns={columns}
       FormComponent={BuildingForm}
+      formProps={{ organizationId }}
       searchFields={['name', 'description']}
-      selectQuery="*, locations!inner(name)"
+      selectQuery="*, locations!inner(name, organization_id)"
       orderBy={{ column: 'created_at', ascending: false }}
+      additionalFilters={organizationId ? [{ column: 'locations.organization_id', value: organizationId }] : []}
     />
   )
 }

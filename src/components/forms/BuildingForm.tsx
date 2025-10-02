@@ -21,6 +21,7 @@ type BuildingFormData = z.infer<typeof buildingSchema>
 
 interface BuildingFormProps {
   onSuccess?: () => void
+  organizationId?: string
   editData?: {
     id: string
     name: string
@@ -30,7 +31,7 @@ interface BuildingFormProps {
   }
 }
 
-export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, editData }) => {
+export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, organizationId, editData }) => {
   const { toast } = useToast()
   const [locations, setLocations] = useState<any[]>([])
   
@@ -46,11 +47,17 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, editData 
 
   useEffect(() => {
     const fetchLocations = async () => {
+      if (!organizationId) {
+        console.log('No organizationId provided, skipping location fetch')
+        return
+      }
+
       try {
         console.log('Fetching locations for dropdown...')
         const { data, error } = await supabase
           .from('locations')
-          .select('id, name, organizations!inner(name)')
+          .select('id, name, organization_id, organizations!inner(name)')
+          .eq('organization_id', organizationId)
           .order('name')
         
         if (error) {
@@ -75,7 +82,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, editData 
     }
     
     fetchLocations()
-  }, [])
+  }, [organizationId, toast])
 
   const onSubmit = async (data: BuildingFormData) => {
     try {

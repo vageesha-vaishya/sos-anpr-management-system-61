@@ -22,11 +22,13 @@ interface DataTableProps {
   title: string
   tableName: string
   columns: Column[]
-  FormComponent: React.ComponentType<{ onSuccess: () => void; editData?: any }>
+  FormComponent: React.ComponentType<any>
+  formProps?: Record<string, any>
   searchFields?: string[]
   selectQuery?: string
   orderBy?: { column: string; ascending: boolean }
   pageSize?: number
+  additionalFilters?: Array<{ column: string; value: any }>
 }
 
 export const DataTable: React.FC<DataTableProps> = ({
@@ -34,10 +36,12 @@ export const DataTable: React.FC<DataTableProps> = ({
   tableName,
   columns,
   FormComponent,
+  formProps = {},
   searchFields = [],
   selectQuery = '*',
   orderBy = { column: 'created_at', ascending: false },
-  pageSize = 10
+  pageSize = 10,
+  additionalFilters = []
 }) => {
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -73,6 +77,11 @@ export const DataTable: React.FC<DataTableProps> = ({
         query = query.or(searchConditions)
         console.log(`Search conditions: ${searchConditions}`)
       }
+
+      // Add additional filters
+      additionalFilters.forEach(filter => {
+        query = query.eq(filter.column, filter.value)
+      })
 
       const { data: result, error, count } = await query
 
@@ -248,7 +257,7 @@ export const DataTable: React.FC<DataTableProps> = ({
                     {editingItem ? 'Edit' : 'Add'} {title.slice(0, -1)}
                   </DialogTitle>
                 </DialogHeader>
-                <FormComponent onSuccess={handleSuccess} editData={editingItem} />
+                <FormComponent onSuccess={handleSuccess} editData={editingItem} {...formProps} />
               </DialogContent>
             </Dialog>
           </div>

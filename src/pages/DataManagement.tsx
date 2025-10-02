@@ -9,8 +9,11 @@ import { VehicleWhitelistTable } from '@/components/tables/VehicleWhitelistTable
 import { VehicleBlacklistTable } from '@/components/tables/VehicleBlacklistTable'
 import { AlertsTable } from '@/components/tables/AlertsTable'
 import { Building, Camera, MapPin, Users, Car, DoorOpen, Database, AlertTriangle, Ban } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 export const DataManagement: React.FC = () => {
+  const { userProfile } = useAuth()
+  
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center space-x-4">
@@ -70,7 +73,7 @@ export const DataManagement: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="buildings" className="space-y-6">
-          <BuildingsTable />
+          <BuildingsTable organizationId={userProfile?.organization_id} />
         </TabsContent>
 
         <TabsContent value="gates" className="space-y-6">
