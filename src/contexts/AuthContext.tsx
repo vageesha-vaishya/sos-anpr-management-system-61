@@ -273,10 +273,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Try standard login first
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
+      
+      // If email not confirmed, try bypass login for admin-verified users
+      if (error && error.message.includes('Email not confirmed')) {
+        console.log('Email not confirmed, attempting admin bypass login...')
+        
+        try {
+          const { data: bypassData, error: bypassError } = await supabase.functions.invoke('admin-bypass-login', {
+            body: { email, password }
+          })
+
+          if (bypassError) {
+            console.error('Bypass login error:', bypassError)
+            return { error }
+          }
+
+          if (bypassData?.session) {
+            console.log('Bypass login successful, setting session')
+            // Set the session from bypass login
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token: bypassData.session.access_token,
+              refresh_token: bypassData.session.refresh_token
+            })
+            
+            if (sessionError) {
+              console.error('Error setting session:', sessionError)
+              return { error: sessionError }
+            }
+            
+            return { error: null }
+          }
+        } catch (bypassErr) {
+          console.error('Bypass login failed:', bypassErr)
+          return { error }
+        }
+      }
       
       return { error }
     } catch (error) {

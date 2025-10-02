@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.admin-email-verification]
 verify_jwt = true
+
+[functions.admin-bypass-login]
+verify_jwt = false
