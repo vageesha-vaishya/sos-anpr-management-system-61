@@ -67,7 +67,7 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
           .from("buildings")
           .select("*, locations!inner(*)")
           .eq("locations.organization_id", organizationId)
-          .eq("is_active", true)
+          .order("name")
 
         if (error) throw error
         setBuildings(data || [])
