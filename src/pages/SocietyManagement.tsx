@@ -208,7 +208,7 @@ const SocietyManagement = () => {
               <CardTitle>Society Units</CardTitle>
             </CardHeader>
             <CardContent>
-              <SocietyUnitsTable units={units} onRefresh={fetchData} />
+              <SocietyUnitsTable units={units} onRefresh={fetchData} organizationId={userProfile?.organization_id} />
             </CardContent>
           </Card>
         </TabsContent>
