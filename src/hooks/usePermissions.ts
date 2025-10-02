@@ -69,7 +69,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   'franchise_admin': [
     'view_dashboard', 'manage_organizations', 'manage_users', 'manage_locations',
     'manage_cameras', 'manage_vehicles', 'manage_alerts', 'manage_settings',
-    'view_analytics', 'manage_billing', 'view_reports'
+    'view_analytics', 'manage_billing', 'view_reports', 'manage_residents',
+    'manage_visitors', 'manage_amenities', 'manage_events', 'manage_documents',
+    'manage_staff'
   ],
   'customer_admin': [
     'view_dashboard', 'manage_users', 'manage_locations', 'manage_cameras',
