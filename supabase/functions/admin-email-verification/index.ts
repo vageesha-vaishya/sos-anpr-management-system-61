@@ -135,9 +135,19 @@ const handler = async (req: Request): Promise<Response> => {
     if (updateError) {
       console.error('Error updating email verification:', updateError);
       return new Response(
-        JSON.stringify({ error: 'Failed to update email verification status' }),
+        JSON.stringify({ error: 'Failed to update email verification status', details: updateError }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Verify the update was successful by fetching the updated user
+    const { data: updatedUser, error: verifyError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    
+    if (verifyError) {
+      console.error('Error verifying email update:', verifyError);
+    } else {
+      console.log('Verification confirmed - updated user email_confirmed_at:', updatedUser.user.email_confirmed_at);
+      console.log('Verification confirmed - updated user confirmed_at:', updatedUser.user.confirmed_at);
     }
 
     // Also update the profiles table to keep it in sync
