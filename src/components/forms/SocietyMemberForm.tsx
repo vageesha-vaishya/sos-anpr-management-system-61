@@ -179,7 +179,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
         
         // For platform admins, show all units; for others, filter by assignable statuses
         if (profile.role !== 'platform_admin') {
-          unitsQuery = unitsQuery.in('status', ['available', 'active']);
+          unitsQuery = unitsQuery.in('status', ['available', 'active', 'vacant']);
         }
 
         // Filter units to only those in user's organization buildings (non-admin)
@@ -418,7 +418,7 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                       <div className="text-sm text-muted-foreground">Buildings Available</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">{societyUnits.filter(u => u.status === 'available').length}</div>
+                      <div className="text-2xl font-bold text-green-600">{societyUnits.filter(u => ['available','vacant','active'].includes(u.status)).length}</div>
                       <div className="text-sm text-muted-foreground">Available Units</div>
                     </div>
                     <div className="text-center">
