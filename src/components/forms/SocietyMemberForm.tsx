@@ -116,13 +116,14 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
               name,
               organization_id
             )
-          `)
-          .eq('is_active', true);
+          `);
 
         // Apply organization filtering based on user role
         if (profile.role !== 'platform_admin') {
-          // Filter by organization for non-platform admins
-          buildingsQuery = buildingsQuery.eq('locations.organization_id', profile.organization_id);
+          // Non-admins: only active buildings in their organization
+          buildingsQuery = buildingsQuery
+            .eq('is_active', true)
+            .eq('locations.organization_id', profile.organization_id);
         }
 
         const { data: buildingsData, error: buildingsError } = await buildingsQuery;
@@ -178,8 +179,8 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
           unitsQuery = unitsQuery.in('status', ['available', 'active']);
         }
 
-        // Filter units to only those in user's organization buildings
-        if (filteredBuildings.length > 0) {
+        // Filter units to only those in user's organization buildings (non-admin)
+        if (profile.role !== 'platform_admin' && filteredBuildings.length > 0) {
           unitsQuery = unitsQuery.in('building_id', filteredBuildings.map(b => b.id));
         }
 
