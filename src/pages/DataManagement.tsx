@@ -73,7 +73,10 @@ export const DataManagement: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="buildings" className="space-y-6">
-          <BuildingsTable organizationId={userProfile?.organization_id} />
+          <BuildingsTable 
+            organizationId={userProfile?.organization_id} 
+            showAllOrganizations={userProfile?.role === 'platform_admin'}
+          />
         </TabsContent>
 
         <TabsContent value="gates" className="space-y-6">

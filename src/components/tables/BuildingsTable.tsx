@@ -47,20 +47,21 @@ const columns = [
 
 interface BuildingsTableProps {
   organizationId?: string
+  showAllOrganizations?: boolean
 }
 
-export const BuildingsTable: React.FC<BuildingsTableProps> = ({ organizationId }) => {
+export const BuildingsTable: React.FC<BuildingsTableProps> = ({ organizationId, showAllOrganizations = false }) => {
   return (
     <DataTable
       title="Buildings"
       tableName="buildings"
       columns={columns}
       FormComponent={BuildingForm}
-      formProps={{ organizationId }}
+      formProps={{ organizationId, showAllOrganizations }}
       searchFields={['name', 'description']}
-      selectQuery="*, locations!inner(name, organization_id)"
+      selectQuery="*, locations!inner(name, organization_id, organizations(name))"
       orderBy={{ column: 'created_at', ascending: false }}
-      additionalFilters={organizationId ? [{ column: 'locations.organization_id', value: organizationId }] : []}
+      additionalFilters={!showAllOrganizations && organizationId ? [{ column: 'locations.organization_id', value: organizationId }] : []}
     />
   )
 }

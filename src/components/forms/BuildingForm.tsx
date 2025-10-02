@@ -22,6 +22,7 @@ type BuildingFormData = z.infer<typeof buildingSchema>
 interface BuildingFormProps {
   onSuccess?: () => void
   organizationId?: string
+  showAllOrganizations?: boolean
   editData?: {
     id: string
     name: string
@@ -31,7 +32,7 @@ interface BuildingFormProps {
   }
 }
 
-export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, organizationId, editData }) => {
+export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, organizationId, showAllOrganizations = false, editData }) => {
   const { toast } = useToast()
   const [locations, setLocations] = useState<any[]>([])
   
@@ -47,18 +48,24 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, organizat
 
   useEffect(() => {
     const fetchLocations = async () => {
-      if (!organizationId) {
+      if (!showAllOrganizations && !organizationId) {
         console.log('No organizationId provided, skipping location fetch')
         return
       }
 
       try {
         console.log('Fetching locations for dropdown...')
-        const { data, error } = await supabase
+        let query = supabase
           .from('locations')
           .select('id, name, organization_id, organizations!inner(name)')
-          .eq('organization_id', organizationId)
           .order('name')
+        
+        // Only filter by organization if not showing all organizations
+        if (!showAllOrganizations && organizationId) {
+          query = query.eq('organization_id', organizationId)
+        }
+
+        const { data, error } = await query
         
         if (error) {
           console.error('Error fetching locations:', error)
@@ -82,7 +89,7 @@ export const BuildingForm: React.FC<BuildingFormProps> = ({ onSuccess, organizat
     }
     
     fetchLocations()
-  }, [organizationId, toast])
+  }, [organizationId, showAllOrganizations, toast])
 
   const onSubmit = async (data: BuildingFormData) => {
     try {

@@ -63,10 +63,10 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
   useEffect(() => {
     const fetchBuildings = async () => {
       try {
+        // Fetch all buildings with their locations
         const { data, error } = await supabase
           .from("buildings")
-          .select("*, locations!inner(*)")
-          .eq("locations.organization_id", organizationId)
+          .select("*, locations!inner(id, name, organization_id, organizations(name))")
           .order("name")
 
         if (error) throw error
@@ -86,10 +86,8 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
       }
     }
 
-    if (organizationId) {
-      fetchBuildings()
-    }
-  }, [organizationId, unit?.building_id, toast])
+    fetchBuildings()
+  }, [unit?.building_id, toast])
 
   // Watch building selection to update selected building
   const watchedBuildingId = form.watch("building_id")
@@ -173,7 +171,7 @@ export function SocietyUnitForm({ unit, organizationId, onSuccess, onCancel }: S
                       <SelectContent>
                         {buildings.map((building) => (
                           <SelectItem key={building.id} value={building.id}>
-                            {building.name}
+                            {building.name} - {building.locations?.organizations?.name || building.locations?.name || 'Unknown Location'}
                           </SelectItem>
                         ))}
                       </SelectContent>
