@@ -190,8 +190,59 @@ const SocietyMemberManagement = () => {
     fetchMembers()
   }
 
-  const handleEdit = (member: Member) => {
-    setEditingMember(member)
+  const handleEdit = async (member: Member) => {
+    try {
+      // Fetch complete member data including unit and family details
+      const { data: completeData, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          email,
+          role,
+          status,
+          phone,
+          unit_assignments!left (
+            unit_id,
+            assignment_type,
+            society_units!left (
+              id,
+              unit_number,
+              building_id
+            )
+          ),
+          household_members!primary_resident_id (
+            id,
+            full_name,
+            relationship,
+            age,
+            phone_number,
+            email,
+            is_emergency_contact
+          )
+        `)
+        .eq('id', member.id)
+        .single()
+
+      if (error) throw error
+
+      // Transform to match form expectations
+      const editData = {
+        ...completeData,
+        unit_id: completeData.unit_assignments?.[0]?.society_units?.id,
+        building_id: completeData.unit_assignments?.[0]?.society_units?.building_id,
+        assignment_type: completeData.unit_assignments?.[0]?.assignment_type,
+        family_members: completeData.household_members || [],
+      }
+
+      setEditingMember(editData)
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load member details',
+        variant: 'destructive',
+      })
+    }
   }
 
   const handleDelete = async (member: Member) => {
