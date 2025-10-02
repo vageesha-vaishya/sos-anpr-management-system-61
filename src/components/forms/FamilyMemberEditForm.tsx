@@ -88,11 +88,21 @@ export const FamilyMemberEditForm: React.FC<FamilyMemberEditFormProps> = ({
 
   const onSubmit = async (data: FamilyMemberFormData) => {
     try {
+      // Validate organization_id exists
+      if (!userProfile?.organization_id) {
+        toast({
+          title: "Error",
+          description: "Unable to determine organization. Please refresh and try again.",
+          variant: "destructive",
+        })
+        return
+      }
+
       const familyMemberData = {
         full_name: data.full_name,
         relationship: data.relationship,
         primary_resident_id: primaryResidentId,
-        organization_id: userProfile?.organization_id,
+        organization_id: userProfile.organization_id,
         email: data.email || null,
         phone_number: data.phone_number || null,
         age: data.age || null,
@@ -129,11 +139,12 @@ export const FamilyMemberEditForm: React.FC<FamilyMemberEditFormProps> = ({
       onSuccess?.()
       onOpenChange(false)
     } catch (error: any) {
+      console.error('Family member operation failed:', error)
       toast({
         title: "Error",
-        description: familyMember 
+        description: error.message || (familyMember 
           ? "Failed to update family member" 
-          : "Failed to add family member",
+          : "Failed to add family member"),
         variant: "destructive",
       })
     }
