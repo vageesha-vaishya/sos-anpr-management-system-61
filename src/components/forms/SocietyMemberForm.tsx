@@ -79,17 +79,34 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
   const form = useForm<SocietyMemberFormData>({
     resolver: zodResolver(societyMemberSchema),
     defaultValues: {
-      email: editData?.email || '',
-      full_name: editData?.full_name || '',
-      role: (editData?.role as any) || 'resident',
-      status: (editData?.status as any) || 'active',
-      phone: editData?.phone || '',
-      building_id: editData?.building_id || '',
-      unit_id: editData?.unit_id || '',
-      assignment_type: (editData?.assignment_type as any) || 'owner',
-      family_members: editData?.family_members || [],
+      email: '',
+      full_name: '',
+      role: 'resident',
+      status: 'active',
+      phone: '',
+      building_id: '',
+      unit_id: '',
+      assignment_type: 'owner',
+      family_members: [],
     },
   })
+
+  // Reset form when editData changes
+  useEffect(() => {
+    if (editData) {
+      form.reset({
+        email: editData.email || '',
+        full_name: editData.full_name || '',
+        role: (editData.role as any) || 'resident',
+        status: (editData.status as any) || 'active',
+        phone: editData.phone || '',
+        building_id: editData.building_id || '',
+        unit_id: editData.unit_id || '',
+        assignment_type: (editData.assignment_type as any) || 'owner',
+        family_members: editData.family_members || [],
+      })
+    }
+  }, [editData, form])
 
   useEffect(() => {
     const fetchBuildingsAndUnits = async () => {
