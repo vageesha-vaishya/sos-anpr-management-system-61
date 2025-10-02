@@ -171,8 +171,12 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
                 organization_id
               )
             )
-          `)
-          .in('status', ['available', 'maintenance']);
+          `);
+        
+        // For platform admins, show all units; for others, filter by assignable statuses
+        if (profile.role !== 'platform_admin') {
+          unitsQuery = unitsQuery.in('status', ['available', 'active']);
+        }
 
         // Filter units to only those in user's organization buildings
         if (filteredBuildings.length > 0) {
