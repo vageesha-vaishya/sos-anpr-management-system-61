@@ -109,12 +109,16 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Update email verification status - set both required fields
+    // Update email verification status - set all required fields including email_change fields
     const now = new Date().toISOString();
     const updateData = action === 'verify' 
       ? { 
           email_confirmed_at: now,
-          confirmed_at: now
+          confirmed_at: now,
+          // Also clear any pending email change to ensure no conflicts
+          email_change: '',
+          email_change_token_new: '',
+          email_change_token_current: ''
         }
       : { 
           email_confirmed_at: null,
