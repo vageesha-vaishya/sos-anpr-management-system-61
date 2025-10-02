@@ -29,7 +29,10 @@ const societyMemberSchema = z.object({
     relationship: z.string().min(1, 'Relationship is required'),
     age: z.number().optional(),
     phone_number: z.string().optional().refine((val) => !val || /^\+?[\d\s\-\(\)]+$/.test(val), "Invalid phone number format"),
-    email: z.string().email().optional().or(z.literal('')),
+    email: z.string().optional().refine(
+      (val) => !val || val === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
+      { message: "Invalid email format" }
+    ),
     is_emergency_contact: z.boolean().optional(),
   })).optional(),
 })
@@ -283,23 +286,35 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
 
           // Add family members if provided
           if (data.family_members && data.family_members.length > 0) {
-            const familyMembersData = data.family_members.map(member => ({
-              unit_id: data.unit_id,
-              primary_resident_id: authData.user.id,
-              full_name: member.full_name,
-              relationship: member.relationship,
-              age: member.age,
-              phone_number: member.phone_number,
-              email: member.email || null,
-              is_emergency_contact: member.is_emergency_contact || false,
-              organization_id: userProfile?.organization_id,
-            }))
+            // Only add family members if a unit is assigned
+            if (data.unit_id) {
+              const familyMembersData = data.family_members.map(member => ({
+                unit_id: data.unit_id,
+                primary_resident_id: authData.user.id,
+                full_name: sanitizeInput(member.full_name),
+                relationship: sanitizeInput(member.relationship),
+                age: member.age || null,
+                phone_number: member.phone_number || null,
+                email: member.email && member.email !== '' ? member.email : null,
+                is_emergency_contact: member.is_emergency_contact || false,
+                organization_id: userProfile?.organization_id,
+              }))
 
-            const { error: familyError } = await supabase
-              .from('household_members')
-              .insert(familyMembersData)
+              const { error: familyError } = await supabase
+                .from('household_members')
+                .insert(familyMembersData)
 
-            if (familyError) console.warn('Family members error:', familyError)
+              if (familyError) {
+                console.error('Family members error:', familyError)
+                toast({
+                  title: 'Warning',
+                  description: 'Member created but family members could not be added: ' + familyError.message,
+                  variant: 'destructive',
+                })
+              }
+            } else {
+              console.warn('Cannot add family members without unit assignment')
+            }
           }
 
           toast({
