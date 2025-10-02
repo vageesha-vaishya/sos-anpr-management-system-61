@@ -223,105 +223,38 @@ export const SocietyMemberForm: React.FC<SocietyMemberFormProps> = ({ onSuccess,
           description: 'Society member updated successfully',
         })
       } else {
-        // Create new member
+        // Create new member via Edge Function (uses service role)
         if (!validateSecureEmail(data.email)) {
           throw new Error('Invalid email format')
         }
 
-        const sanitizedFullName = sanitizeInput(data.full_name)
-        const temporaryPassword = generateSecurePassword(16)
-        
-        // Create new user via Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const payload = {
           email: data.email,
-          password: temporaryPassword,
-          options: {
-            data: {
-              full_name: sanitizedFullName,
-              requires_password_change: true,
-            },
-            emailRedirectTo: `${window.location.origin}/auth`,
-          }
+          full_name: sanitizeInput(data.full_name),
+          phone: data.phone,
+          role: data.role,
+          status: data.status,
+          unit_id: data.unit_id || undefined,
+          assignment_type: data.assignment_type || undefined,
+          family_members: (data.family_members || []).map(m => ({
+            full_name: sanitizeInput(m.full_name),
+            relationship: sanitizeInput(m.relationship),
+            age: m.age ?? null,
+            phone_number: m.phone_number || null,
+            email: m.email && m.email !== '' ? m.email : null,
+            is_emergency_contact: !!m.is_emergency_contact,
+          })),
+        };
+
+        const { data: fnData, error: fnError } = await supabase.functions.invoke('admin-create-member', {
+          body: payload,
+        });
+        if (fnError) throw fnError;
+
+        toast({
+          title: 'Success',
+          description: `Society member created successfully.`,
         })
-
-        if (authError) throw authError
-
-        if (authData.user) {
-          // Update profile with society-specific data
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({
-              role: data.role as any,
-              status: data.status as any,
-              organization_id: userProfile?.organization_id,
-              phone: data.phone,
-            })
-            .eq('id', authData.user.id)
-
-          if (profileError) throw profileError
-
-          // Create unit assignment if provided
-          if (data.unit_id && data.assignment_type) {
-            const { error: assignmentError } = await supabase
-              .from('unit_assignments')
-              .insert({
-                unit_id: data.unit_id,
-                resident_id: authData.user.id,
-                assignment_type: data.assignment_type,
-                is_primary: true,
-                organization_id: userProfile?.organization_id,
-              })
-
-            if (assignmentError) console.warn('Unit assignment error:', assignmentError)
-
-            // Update unit occupancy status
-            await supabase
-              .from('society_units')
-              .update({ 
-                occupancy_status: 'occupied',
-                primary_resident_id: authData.user.id 
-              })
-              .eq('id', data.unit_id)
-          }
-
-          // Add family members if provided
-          if (data.family_members && data.family_members.length > 0) {
-            // Only add family members if a unit is assigned
-            if (data.unit_id) {
-              const familyMembersData = data.family_members.map(member => ({
-                unit_id: data.unit_id,
-                primary_resident_id: authData.user.id,
-                full_name: sanitizeInput(member.full_name),
-                relationship: sanitizeInput(member.relationship),
-                age: member.age || null,
-                phone_number: member.phone_number || null,
-                email: member.email && member.email !== '' ? member.email : null,
-                is_emergency_contact: member.is_emergency_contact || false,
-                organization_id: userProfile?.organization_id,
-              }))
-
-              const { error: familyError } = await supabase
-                .from('household_members')
-                .insert(familyMembersData)
-
-              if (familyError) {
-                console.error('Family members error:', familyError)
-                toast({
-                  title: 'Warning',
-                  description: 'Member created but family members could not be added: ' + familyError.message,
-                  variant: 'destructive',
-                })
-              }
-            } else {
-              console.warn('Cannot add family members without unit assignment')
-            }
-          }
-
-          toast({
-            title: 'Success',
-            description: `Society member created successfully. They will receive an email with login instructions.`,
-          })
-        }
       }
       
       form.reset()
