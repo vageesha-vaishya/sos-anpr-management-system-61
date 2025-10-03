@@ -286,14 +286,18 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
                     <SelectContent>
                       <SelectItem value="platform_admin">Platform Admin</SelectItem>
                       <SelectItem value="franchise_admin">Franchise Admin</SelectItem>
-                      <SelectItem value="franchise_user">Franchise User</SelectItem>
+                      <SelectItem value="operator">Operator</SelectItem>
                       <SelectItem value="customer_admin">Customer Admin</SelectItem>
-                      <SelectItem value="customer_user">Customer User</SelectItem>
+                      <SelectItem value="resident">Resident</SelectItem>
                       <SelectItem value="society_president">Society President</SelectItem>
                       <SelectItem value="society_secretary">Society Secretary</SelectItem>
+                      <SelectItem value="treasurer">Treasurer</SelectItem>
                       <SelectItem value="society_treasurer">Society Treasurer</SelectItem>
-                      <SelectItem value="society_committee_member">Committee Member</SelectItem>
-                      <SelectItem value="resident">Resident</SelectItem>
+                      <SelectItem value="society_committee_member">Society Committee Member</SelectItem>
+                      <SelectItem value="committee_member">Committee Member</SelectItem>
+                      <SelectItem value="property_manager">Property Manager</SelectItem>
+                      <SelectItem value="security_staff">Security Staff</SelectItem>
+                      <SelectItem value="maintenance_staff">Maintenance Staff</SelectItem>
                       <SelectItem value="tenant">Tenant</SelectItem>
                       <SelectItem value="owner">Owner</SelectItem>
                       <SelectItem value="family_member">Family Member</SelectItem>
