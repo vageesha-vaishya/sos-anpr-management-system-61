@@ -60,7 +60,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
     defaultValues: {
       email: editData?.email || '',
       full_name: editData?.full_name || '',
-      role: (editData?.role as any) || 'customer_user',
+      role: (editData?.role as any) || 'resident',
       status: (editData?.status as any) || 'active',
       organization_id: editData?.organization_id || userProfile?.organization_id || '00000000-0000-0000-0000-000000000003',
       phone_number: editData?.phone_number || '',
@@ -143,6 +143,10 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
         
         // Normalize email to avoid validation issues (trim + lowercase)
         const cleanedEmail = (data.email || '').trim().toLowerCase()
+
+        // Map legacy roles/status to valid enums
+        const normalizedRole = data.role === 'customer_user' ? 'resident' : (data.role === 'franchise_user' ? 'operator' : (data.role as any))
+        const normalizedStatus = data.status === 'pending' ? 'active' : (data.status as any)
         
         // Create new user via Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -166,8 +170,8 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
             email: cleanedEmail,
             full_name: sanitizedFullName,
             phone: data.phone_number || '',
-            role: data.role as any,
-            status: data.status as any,
+            role: normalizedRole as any,
+            status: normalizedStatus as any,
             unit_id: data.unit_id || undefined,
             assignment_type: (data.assignment_type as any) || undefined,
           }
@@ -188,8 +192,8 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
           const { error: profileError } = await supabase
             .from('profiles')
             .update({
-              role: data.role as any,
-              status: data.status as any,
+              role: normalizedRole as any,
+              status: normalizedStatus as any,
               organization_id: data.organization_id,
             })
             .eq('id', authData.user.id)

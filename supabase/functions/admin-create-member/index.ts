@@ -70,6 +70,10 @@ serve(async (req) => {
 
     if (!email || !full_name || !role || !status) throw new Error('Missing required fields');
 
+    // Map legacy/invalid roles and statuses to valid enum values
+    const normalizedRole = role === 'customer_user' ? 'resident' : (role === 'franchise_user' ? 'operator' : role);
+    const normalizedStatus = status === 'pending' ? 'active' : status;
+
     // Resolve organization_id: prefer unit->building->location org, else admin org
     let targetOrgId: string | null = adminProfile.organization_id;
     if (unit_id) {
@@ -127,7 +131,7 @@ serve(async (req) => {
     // Upsert profile to ensure correct role/status/org/phone
     const { error: profUpdErr } = await supabase
       .from('profiles')
-      .upsert({ id: newUserId, email: normalizedEmail, role, status, organization_id: targetOrgId, phone, full_name }, { onConflict: 'id' });
+      .upsert({ id: newUserId, email: normalizedEmail, role: normalizedRole, status: normalizedStatus, organization_id: targetOrgId, phone, full_name }, { onConflict: 'id' });
     if (profUpdErr) throw profUpdErr;
 
     // Unit assignment
