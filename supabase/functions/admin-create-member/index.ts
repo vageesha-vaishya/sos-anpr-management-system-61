@@ -85,23 +85,49 @@ serve(async (req) => {
 
     if (!targetOrgId) throw new Error('Unable to determine organization for member');
 
-    // Create auth user with admin API
+    // Create or reuse auth user (idempotent)
+    const normalizedEmail = email.trim().toLowerCase();
     const tempPassword = generateTempPassword();
+
+    let newUserId: string | null = null;
+
     const { data: created, error: createErr } = await supabase.auth.admin.createUser({
-      email,
+      email: normalizedEmail,
       password: tempPassword,
       email_confirm: false,
       user_metadata: { full_name, phone, requires_password_change: true }
     });
-    if (createErr || !created?.user) throw new Error(createErr?.message || 'Failed to create user');
 
-    const newUserId = created.user.id;
+    if (createErr || !created?.user) {
+      // If the email already exists, find that user and continue
+      const isEmailExists = (createErr?.message || '').toLowerCase().includes('already been registered')
+        || (createErr as any)?.status === 422
+        || (createErr as any)?.code === 'email_exists';
 
-    // Update profile
+      if (!isEmailExists) throw new Error(createErr?.message || 'Failed to create user');
+
+      // Search existing users by email via pagination
+      let page = 1;
+      const perPage = 200;
+      let found = null as any;
+      while (!found) {
+        const { data: list, error: listErr } = await supabase.auth.admin.listUsers({ page, perPage });
+        if (listErr) throw listErr;
+        found = list.users.find((u: any) => (u.email || '').toLowerCase() === normalizedEmail);
+        if (found || list.users.length < perPage) break;
+        page += 1;
+      }
+
+      if (!found) throw new Error('User with this email exists but could not be located');
+      newUserId = found.id;
+    } else {
+      newUserId = created.user.id;
+    }
+
+    // Upsert profile to ensure correct role/status/org/phone
     const { error: profUpdErr } = await supabase
       .from('profiles')
-      .update({ role, status, organization_id: targetOrgId, phone })
-      .eq('id', newUserId);
+      .upsert({ id: newUserId, email: normalizedEmail, role, status, organization_id: targetOrgId, phone, full_name }, { onConflict: 'id' });
     if (profUpdErr) throw profUpdErr;
 
     // Unit assignment
