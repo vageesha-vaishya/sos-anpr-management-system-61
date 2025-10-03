@@ -2833,6 +2833,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_from: string | null
+          active_until: string | null
           admin_set_password: boolean | null
           confirmed_at: string | null
           created_at: string | null
@@ -2854,6 +2856,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          active_from?: string | null
+          active_until?: string | null
           admin_set_password?: boolean | null
           confirmed_at?: string | null
           created_at?: string | null
@@ -2875,6 +2879,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          active_from?: string | null
+          active_until?: string | null
           admin_set_password?: boolean | null
           confirmed_at?: string | null
           created_at?: string | null
