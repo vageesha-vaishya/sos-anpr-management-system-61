@@ -157,9 +157,33 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
           }
         })
 
-        if (authError) throw authError
+        if (authError) {
+          // Fallback: use admin edge function to create the user when Supabase rejects the email
+          const { data: sessionRes } = await supabase.auth.getSession()
+          const accessToken = sessionRes.session?.access_token
 
-        if (authData.user) {
+          const payload = {
+            email: cleanedEmail,
+            full_name: sanitizedFullName,
+            phone: data.phone_number || '',
+            role: data.role as any,
+            status: data.status as any,
+            unit_id: data.unit_id || undefined,
+            assignment_type: (data.assignment_type as any) || undefined,
+          }
+
+          const { data: fnData, error: fnError } = await supabase.functions.invoke('admin-create-member', {
+            body: payload,
+            headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+          })
+
+          if (fnError) throw fnError
+
+          toast({
+            title: 'Success',
+            description: 'User created successfully via admin flow.',
+          })
+        } else if (authData.user) {
           // Update the automatically created profile with additional data
           const { error: profileError } = await supabase
             .from('profiles')
