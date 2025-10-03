@@ -2851,9 +2851,11 @@ export type Database = {
           permissions: string[] | null
           phone: string | null
           phone_number: string | null
+          preferred_2fa_method: string | null
           requires_password_change: boolean | null
           role: Database["public"]["Enums"]["user_role"]
           status: Database["public"]["Enums"]["user_status"] | null
+          two_factor_enabled: boolean | null
           updated_at: string | null
         }
         Insert: {
@@ -2875,9 +2877,11 @@ export type Database = {
           permissions?: string[] | null
           phone?: string | null
           phone_number?: string | null
+          preferred_2fa_method?: string | null
           requires_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"] | null
+          two_factor_enabled?: boolean | null
           updated_at?: string | null
         }
         Update: {
@@ -2899,9 +2903,11 @@ export type Database = {
           permissions?: string[] | null
           phone?: string | null
           phone_number?: string | null
+          preferred_2fa_method?: string | null
           requires_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"] | null
+          two_factor_enabled?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
