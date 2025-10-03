@@ -141,9 +141,12 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
         // Generate secure temporary password
         const temporaryPassword = generateSecurePassword(16)
         
+        // Normalize email to avoid validation issues (trim + lowercase)
+        const cleanedEmail = (data.email || '').trim().toLowerCase()
+        
         // Create new user via Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: data.email,
+          email: cleanedEmail,
           password: temporaryPassword,
           options: {
             data: {
