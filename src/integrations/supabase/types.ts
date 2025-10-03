@@ -2850,6 +2850,7 @@ export type Database = {
           password_reset_token: string | null
           permissions: string[] | null
           phone: string | null
+          phone_number: string | null
           requires_password_change: boolean | null
           role: Database["public"]["Enums"]["user_role"]
           status: Database["public"]["Enums"]["user_status"] | null
@@ -2873,6 +2874,7 @@ export type Database = {
           password_reset_token?: string | null
           permissions?: string[] | null
           phone?: string | null
+          phone_number?: string | null
           requires_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"] | null
@@ -2896,6 +2898,7 @@ export type Database = {
           password_reset_token?: string | null
           permissions?: string[] | null
           phone?: string | null
+          phone_number?: string | null
           requires_password_change?: boolean | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: Database["public"]["Enums"]["user_status"] | null
