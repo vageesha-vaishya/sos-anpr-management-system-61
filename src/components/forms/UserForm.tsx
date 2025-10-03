@@ -135,11 +135,6 @@ export const UserForm: React.FC<UserFormProps> = ({ onSuccess, editData }) => {
           description: 'User updated successfully',
         })
       } else {
-        // Validate email for security
-        if (!validateSecureEmail(data.email)) {
-          throw new Error('Invalid email format')
-        }
-
         // Sanitize input data
         const sanitizedFullName = sanitizeInput(data.full_name)
         
