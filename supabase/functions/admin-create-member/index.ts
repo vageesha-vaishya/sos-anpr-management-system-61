@@ -138,7 +138,15 @@ serve(async (req) => {
     if (unit_id && assignment_type) {
       const { error: uaErr } = await supabase
         .from('unit_assignments')
-        .insert({ unit_id, resident_id: newUserId, assignment_type, is_primary: true, organization_id: targetOrgId });
+        .insert({ 
+          unit_id, 
+          resident_id: newUserId, 
+          assignment_type, 
+          is_primary: true, 
+          organization_id: targetOrgId,
+          start_date: new Date().toISOString().split('T')[0],
+          status: 'active'
+        });
       if (uaErr) throw uaErr;
 
       // Update unit occupancy fields
