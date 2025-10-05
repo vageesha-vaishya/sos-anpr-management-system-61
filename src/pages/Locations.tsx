@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { LocationForm } from "@/components/forms/LocationForm"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { MapPin, Plus, Building, Users, Camera, Edit, Trash2 } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MapPin, Plus, Building, Users, Camera, Edit, Trash2, ChevronUp, ChevronDown, Grid, List } from "lucide-react"
+import { useState, useEffect, useMemo } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
@@ -14,6 +17,18 @@ const Locations = () => {
   const [editingLocation, setEditingLocation] = useState<any>(null)
   const [deletingLocation, setDeletingLocation] = useState<any>(null)
   const [locations, setLocations] = useState<any[]>([])
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
+  const [filters, setFilters] = useState({
+    locationName: '',
+    organization: '',
+    address: '',
+    city: '',
+    coordinates: ''
+  })
+  const [sortConfig, setSortConfig] = useState<{
+    key: string
+    direction: 'asc' | 'desc'
+  } | null>(null)
   const { toast } = useToast()
 
   const fetchLocations = async () => {
@@ -78,6 +93,78 @@ const Locations = () => {
       })
     }
   }
+
+  // Filtering and sorting logic
+  const filteredAndSortedLocations = useMemo(() => {
+    let filtered = locations.filter(location => {
+      return (
+        location.name?.toLowerCase().includes(filters.locationName.toLowerCase()) &&
+        (location.organizations?.name || '').toLowerCase().includes(filters.organization.toLowerCase()) &&
+        (location.address || '').toLowerCase().includes(filters.address.toLowerCase()) &&
+        (location.cities?.name || '').toLowerCase().includes(filters.city.toLowerCase()) &&
+        (location.latitude && location.longitude 
+          ? `${location.latitude}, ${location.longitude}`.toLowerCase().includes(filters.coordinates.toLowerCase())
+          : (location.Coordinates || '').toLowerCase().includes(filters.coordinates.toLowerCase())
+        )
+      )
+    })
+
+    if (sortConfig) {
+      filtered.sort((a, b) => {
+        let aValue = ''
+        let bValue = ''
+
+        switch (sortConfig.key) {
+          case 'locationName':
+            aValue = a.name || ''
+            bValue = b.name || ''
+            break
+          case 'organization':
+            aValue = a.organizations?.name || ''
+            bValue = b.organizations?.name || ''
+            break
+          case 'address':
+            aValue = a.address || ''
+            bValue = b.address || ''
+            break
+          case 'city':
+            aValue = a.cities?.name || ''
+            bValue = b.cities?.name || ''
+            break
+          case 'coordinates':
+            aValue = a.latitude && a.longitude 
+              ? `${a.latitude}, ${a.longitude}` 
+              : a.Coordinates || ''
+            bValue = b.latitude && b.longitude 
+              ? `${b.latitude}, ${b.longitude}` 
+              : b.Coordinates || ''
+            break
+          default:
+            return 0
+        }
+
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+        return 0
+      })
+    }
+
+    return filtered
+  }, [locations, filters, sortConfig])
+
+  const handleSort = (key: string) => {
+    setSortConfig(current => {
+      if (current?.key === key) {
+        return { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+      }
+      return { key, direction: 'asc' }
+    })
+  }
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
+  }
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -104,8 +191,192 @@ const Locations = () => {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {locations.map((location) => (
+      <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'table' | 'card')}>
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="table" className="flex items-center gap-2">
+            <List className="w-4 h-4" />
+            Table Format
+          </TabsTrigger>
+          <TabsTrigger value="card" className="flex items-center gap-2">
+            <Grid className="w-4 h-4" />
+            Card Format
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="table" className="space-y-4">
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('locationName')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Location Name
+                      {sortConfig?.key === 'locationName' && (
+                        sortConfig.direction === 'asc' ? 
+                        <ChevronUp className="ml-1 h-4 w-4" /> : 
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('organization')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Organization
+                      {sortConfig?.key === 'organization' && (
+                        sortConfig.direction === 'asc' ? 
+                        <ChevronUp className="ml-1 h-4 w-4" /> : 
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('address')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Address
+                      {sortConfig?.key === 'address' && (
+                        sortConfig.direction === 'asc' ? 
+                        <ChevronUp className="ml-1 h-4 w-4" /> : 
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('city')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      City
+                      {sortConfig?.key === 'city' && (
+                        sortConfig.direction === 'asc' ? 
+                        <ChevronUp className="ml-1 h-4 w-4" /> : 
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSort('coordinates')}
+                      className="h-auto p-0 font-semibold hover:bg-transparent"
+                    >
+                      Coordinates
+                      {sortConfig?.key === 'coordinates' && (
+                        sortConfig.direction === 'asc' ? 
+                        <ChevronUp className="ml-1 h-4 w-4" /> : 
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+                <TableRow>
+                  <TableHead className="p-2">
+                    <Input
+                      placeholder="Filter by name..."
+                      value={filters.locationName}
+                      onChange={(e) => handleFilterChange('locationName', e.target.value)}
+                      className="h-8"
+                    />
+                  </TableHead>
+                  <TableHead className="p-2">
+                    <Input
+                      placeholder="Filter by organization..."
+                      value={filters.organization}
+                      onChange={(e) => handleFilterChange('organization', e.target.value)}
+                      className="h-8"
+                    />
+                  </TableHead>
+                  <TableHead className="p-2">
+                    <Input
+                      placeholder="Filter by address..."
+                      value={filters.address}
+                      onChange={(e) => handleFilterChange('address', e.target.value)}
+                      className="h-8"
+                    />
+                  </TableHead>
+                  <TableHead className="p-2">
+                    <Input
+                      placeholder="Filter by city..."
+                      value={filters.city}
+                      onChange={(e) => handleFilterChange('city', e.target.value)}
+                      className="h-8"
+                    />
+                  </TableHead>
+                  <TableHead className="p-2">
+                    <Input
+                      placeholder="Filter by coordinates..."
+                      value={filters.coordinates}
+                      onChange={(e) => handleFilterChange('coordinates', e.target.value)}
+                      className="h-8"
+                    />
+                  </TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAndSortedLocations.map((location) => (
+                  <TableRow key={location.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <Building className="w-4 h-4" />
+                        {location.name}
+                      </div>
+                    </TableCell>
+                    <TableCell>{location.organizations?.name || '-'}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        {location.address}
+                      </div>
+                    </TableCell>
+                    <TableCell>{location.cities?.name || '-'}</TableCell>
+                    <TableCell>
+                      {location.latitude && location.longitude 
+                        ? `${location.latitude}, ${location.longitude}` 
+                        : location.Coordinates || '-'}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(location)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setDeletingLocation(location)
+                            setIsDeleteDialogOpen(true)
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="card">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAndSortedLocations.map((location) => (
           <Card key={location.id}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -152,8 +423,10 @@ const Locations = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <ConfirmDialog
         open={isDeleteDialogOpen}
