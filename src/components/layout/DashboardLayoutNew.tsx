@@ -263,8 +263,12 @@ const AppSidebar: React.FC = () => {
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center space-x-2">
-            <Shield className="w-8 h-8 text-sidebar-primary" />
-            <span className="text-lg font-bold text-sidebar-foreground">SOS System</span>
+            <img 
+              src="/logo-3d.svg" 
+              alt="SOS System Logo" 
+              className="w-8 h-8"
+            />
+            {!collapsed && <span className="text-lg font-bold text-sidebar-foreground">SOS System</span>}
           </div>
           <SidebarTrigger />
         </div>

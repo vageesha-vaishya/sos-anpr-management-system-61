@@ -68,7 +68,14 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-4">
+          <div className="mx-auto mb-4">
+            <img 
+              src="/logo-3d.svg" 
+              alt="SOS Management Logo" 
+              className="w-32 h-auto mx-auto"
+            />
+          </div>
           <h1 className="text-3xl font-bold tracking-tight">SOS Management</h1>
           <p className="text-muted-foreground">
             {isLogin ? 'Sign in to your account' : 'Create a new account'}

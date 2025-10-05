@@ -1,0 +1,141 @@
+<svg width="300" height="120" viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Enhanced golden gradient with metallic sheen -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
+      <stop offset="15%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="35%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="55%" style="stop-color:#FF8C00;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#DAA520;stop-opacity:1" />
+      <stop offset="90%" style="stop-color:#B8860B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B6914;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Deep black gradient for background -->
+    <radialGradient id="blackGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#1A1A1A;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0F0F0F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Dark shadow gradient with golden tint -->
+    <linearGradient id="shadowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C2416;stop-opacity:0.9" />
+      <stop offset="50%" style="stop-color:#1A1A1A;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Highlight gradient for 3D effect -->
+    <linearGradient id="highlightGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.6" />
+      <stop offset="50%" style="stop-color:#FFD700;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:0.2" />
+    </linearGradient>
+    
+    <!-- Advanced 3D emboss filter -->
+    <filter id="emboss" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feOffset in="blur" dx="4" dy="4" result="offsetBlur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.6"/>
+      <feComposite in2="offsetBlur" operator="in" result="shadow"/>
+      
+      <!-- Inner highlight -->
+      <feOffset in="SourceAlpha" dx="-1" dy="-1" result="innerOffset"/>
+      <feGaussianBlur in="innerOffset" stdDeviation="1" result="innerBlur"/>
+      <feFlood flood-color="#FFFFFF" flood-opacity="0.4"/>
+      <feComposite in2="innerBlur" operator="in" result="innerHighlight"/>
+      
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode in="innerHighlight"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Bevel effect for enhanced 3D look -->
+    <filter id="bevel" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+      <feSpecularLighting in="blur" result="specOut" lighting-color="#FFD700" specularConstant="1.5" specularExponent="20">
+        <fePointLight x="-50" y="-50" z="200"/>
+      </feSpecularLighting>
+      <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut2"/>
+      <feComposite in="SourceGraphic" in2="specOut2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+    </filter>
+  </defs>
+  
+  <!-- Background with enhanced black gradient -->
+  <rect width="300" height="120" fill="url(#blackGradient)" rx="15" ry="15"/>
+  
+  <!-- Outer glow effect -->
+  <rect width="296" height="116" x="2" y="2" fill="none" stroke="url(#goldGradient)" 
+        stroke-width="1" rx="13" ry="13" opacity="0.3"/>
+  
+  <!-- Deep shadow layer (multiple offsets for depth) -->
+  <g transform="translate(6, 6)">
+    <text x="150" y="70" font-family="Arial Black, sans-serif" font-size="48" font-weight="900" 
+          text-anchor="middle" fill="#000000" opacity="0.6">SOS</text>
+  </g>
+  <g transform="translate(4, 4)">
+    <text x="150" y="70" font-family="Arial Black, sans-serif" font-size="48" font-weight="900" 
+          text-anchor="middle" fill="#1A1A1A" opacity="0.4">SOS</text>
+  </g>
+  
+  <!-- Main logo text with enhanced golden gradient and bevel -->
+  <text x="150" y="70" font-family="Arial Black, sans-serif" font-size="48" font-weight="900" 
+        text-anchor="middle" fill="url(#goldGradient)" filter="url(#emboss) url(#bevel)">SOS</text>
+  
+  <!-- Highlight layer for 3D embossed effect -->
+  <g transform="translate(-1, -1)">
+    <text x="150" y="70" font-family="Arial Black, sans-serif" font-size="48" font-weight="900" 
+          text-anchor="middle" fill="url(#highlightGradient)" opacity="0.7">SOS</text>
+  </g>
+  
+  <!-- Enhanced decorative elements -->
+  <!-- Left ornament with improved 3D effect -->
+  <g transform="translate(25, 60)">
+    <circle cx="0" cy="0" r="10" fill="url(#shadowGradient)" opacity="0.6"/>
+    <circle cx="0" cy="0" r="8" fill="url(#goldGradient)" filter="url(#emboss)"/>
+    <circle cx="-1" cy="-1" r="6" fill="#FFD700" opacity="0.8"/>
+    <circle cx="-2" cy="-2" r="3" fill="#FFF8DC" opacity="0.6"/>
+    <path d="M -15,0 L -10,-5 L -5,0 L -10,5 Z" fill="url(#goldGradient)" filter="url(#emboss)"/>
+    <path d="M -14,-1 L -11,-4 L -6,-1 L -11,4 Z" fill="#FFD700" opacity="0.7"/>
+  </g>
+  
+  <!-- Right ornament with improved 3D effect -->
+  <g transform="translate(275, 60)">
+    <circle cx="0" cy="0" r="10" fill="url(#shadowGradient)" opacity="0.6"/>
+    <circle cx="0" cy="0" r="8" fill="url(#goldGradient)" filter="url(#emboss)"/>
+    <circle cx="1" cy="-1" r="6" fill="#FFD700" opacity="0.8"/>
+    <circle cx="2" cy="-2" r="3" fill="#FFF8DC" opacity="0.6"/>
+    <path d="M 15,0 L 10,-5 L 5,0 L 10,5 Z" fill="url(#goldGradient)" filter="url(#emboss)"/>
+    <path d="M 14,-1 L 11,-4 L 6,-1 L 11,4 Z" fill="#FFD700" opacity="0.7"/>
+  </g>
+  
+  <!-- Enhanced subtitle with golden effect -->
+  <text x="150" y="95" font-family="Arial, sans-serif" font-size="11" font-weight="700" 
+        text-anchor="middle" fill="url(#goldGradient)" opacity="0.95" letter-spacing="2px">MANAGEMENT SYSTEM</text>
+  <text x="150" y="95" font-family="Arial, sans-serif" font-size="11" font-weight="700" 
+        text-anchor="middle" fill="#FFF8DC" opacity="0.4" letter-spacing="2px" 
+        transform="translate(-0.5, -0.5)">MANAGEMENT SYSTEM</text>
+  
+  <!-- Enhanced accent lines with gradient -->
+  <line x1="60" y1="20" x2="240" y2="20" stroke="url(#goldGradient)" stroke-width="3" opacity="0.8"/>
+  <line x1="61" y1="19" x2="239" y2="19" stroke="#FFF8DC" stroke-width="1" opacity="0.5"/>
+  
+  <line x1="60" y1="100" x2="240" y2="100" stroke="url(#goldGradient)" stroke-width="3" opacity="0.8"/>
+  <line x1="61" y1="101" x2="239" y2="101" stroke="#FFF8DC" stroke-width="1" opacity="0.5"/>
+  
+  <!-- Corner decorative elements -->
+  <g transform="translate(40, 35)">
+    <path d="M 0,0 L 8,0 L 8,2 L 2,2 L 2,8 L 0,8 Z" fill="url(#goldGradient)" opacity="0.6"/>
+  </g>
+  <g transform="translate(252, 35)">
+    <path d="M 8,0 L 0,0 L 0,2 L 6,2 L 6,8 L 8,8 Z" fill="url(#goldGradient)" opacity="0.6"/>
+  </g>
+  <g transform="translate(40, 77)">
+    <path d="M 0,8 L 8,8 L 8,6 L 2,6 L 2,0 L 0,0 Z" fill="url(#goldGradient)" opacity="0.6"/>
+  </g>
+  <g transform="translate(252, 77)">
+    <path d="M 8,8 L 0,8 L 0,6 L 6,6 L 6,0 L 8,0 Z" fill="url(#goldGradient)" opacity="0.6"/>
+  </g>
+</svg>

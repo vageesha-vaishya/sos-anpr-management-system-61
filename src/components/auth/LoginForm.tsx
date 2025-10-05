@@ -44,8 +44,12 @@ export const LoginForm = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary/20 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
-            <Shield className="w-6 h-6 text-primary-foreground" />
+          <div className="mx-auto mb-6">
+            <img 
+              src="/logo-3d.svg" 
+              alt="SOS System Logo" 
+              className="w-32 h-auto mx-auto"
+            />
           </div>
           <CardTitle className="text-2xl font-bold">SOS System</CardTitle>
           <CardDescription>
