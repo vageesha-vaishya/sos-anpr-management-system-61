@@ -746,176 +746,212 @@ export default function StaffManagement() {
                 className="max-w-sm"
               />
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1 border rounded-md p-1">
-                <Button
-                  variant={departmentViewMode === 'table' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setDepartmentViewMode('table')}
-                  className="h-7 px-2"
-                >
-                  <Table className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant={departmentViewMode === 'card' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setDepartmentViewMode('card')}
-                  className="h-7 px-2"
-                >
-                  <Grid3X3 className="h-3 w-3" />
-                </Button>
-              </div>
-              <DepartmentForm onSuccess={loadDepartments} onCancel={() => {}} />
-            </div>
+            <DepartmentForm onSuccess={loadDepartments} onCancel={() => {}} />
           </div>
 
-          {departmentViewMode === 'table' ? (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">
-                      <div className="flex flex-col space-y-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="justify-start p-0 h-auto font-medium"
-                          onClick={() => handleDepartmentSort('name')}
-                        >
-                          Department Name
-                          {departmentSortConfig.key === 'name' && (
-                            departmentSortConfig.direction === 'asc' ? 
-                            <ChevronUp className="ml-1 h-3 w-3" /> : 
-                            <ChevronDown className="ml-1 h-3 w-3" />
-                          )}
-                        </Button>
-                        <Input
-                          placeholder="Filter by name..."
-                          value={departmentFilters.name}
-                          onChange={(e) => handleDepartmentFilterChange('name', e.target.value)}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[250px]">
-                      <div className="flex flex-col space-y-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="justify-start p-0 h-auto font-medium"
-                          onClick={() => handleDepartmentSort('description')}
-                        >
-                          Description
-                          {departmentSortConfig.key === 'description' && (
-                            departmentSortConfig.direction === 'asc' ? 
-                            <ChevronUp className="ml-1 h-3 w-3" /> : 
-                            <ChevronDown className="ml-1 h-3 w-3" />
-                          )}
-                        </Button>
-                        <Input
-                          placeholder="Filter by description..."
-                          value={departmentFilters.description}
-                          onChange={(e) => handleDepartmentFilterChange('description', e.target.value)}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[180px]">
-                      <div className="flex flex-col space-y-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="justify-start p-0 h-auto font-medium"
-                          onClick={() => handleDepartmentSort('head_of_department')}
-                        >
-                          Head of Department
-                          {departmentSortConfig.key === 'head_of_department' && (
-                            departmentSortConfig.direction === 'asc' ? 
-                            <ChevronUp className="ml-1 h-3 w-3" /> : 
-                            <ChevronDown className="ml-1 h-3 w-3" />
-                          )}
-                        </Button>
-                        <Input
-                          placeholder="Filter by head..."
-                          value={departmentFilters.head_of_department}
-                          onChange={(e) => handleDepartmentFilterChange('head_of_department', e.target.value)}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[120px]">
-                      <div className="flex flex-col space-y-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="justify-start p-0 h-auto font-medium"
-                          onClick={() => handleDepartmentSort('budget')}
-                        >
-                          Budget
-                          {departmentSortConfig.key === 'budget' && (
-                            departmentSortConfig.direction === 'asc' ? 
-                            <ChevronUp className="ml-1 h-3 w-3" /> : 
-                            <ChevronDown className="ml-1 h-3 w-3" />
-                          )}
-                        </Button>
-                        <Input
-                          placeholder="Filter budget..."
-                          value={departmentFilters.budget}
-                          onChange={(e) => handleDepartmentFilterChange('budget', e.target.value)}
-                          className="h-7 text-xs"
-                        />
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[100px]">
-                      <div className="flex flex-col space-y-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="justify-start p-0 h-auto font-medium"
-                          onClick={() => handleDepartmentSort('is_active')}
-                        >
-                          Status
-                          {departmentSortConfig.key === 'is_active' && (
-                            departmentSortConfig.direction === 'asc' ? 
-                            <ChevronUp className="ml-1 h-3 w-3" /> : 
-                            <ChevronDown className="ml-1 h-3 w-3" />
-                          )}
-                        </Button>
-                        <Select
-                          value={departmentFilters.status}
-                          onValueChange={(value) => handleDepartmentFilterChange('status', value)}
-                        >
-                          <SelectTrigger className="h-7 text-xs">
-                            <SelectValue placeholder="All" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="">All</SelectItem>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </TableHead>
-                    <TableHead className="w-[80px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredAndSortedDepartments.map((department) => (
-                    <TableRow key={department.id}>
-                      <TableCell className="font-medium">{department.name}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {department.description || 'N/A'}
-                      </TableCell>
-                      <TableCell>{department.head_of_department || 'N/A'}</TableCell>
-                      <TableCell className="font-medium">
-                        ${(department.budget || 0).toLocaleString()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={department.is_active ? 'default' : 'secondary'}>
-                          {department.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
+          {/* View Toggle Control */}
+          <Tabs value={departmentViewMode} onValueChange={(value) => setDepartmentViewMode(value as 'table' | 'card')} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2 max-w-md">
+              <TabsTrigger value="table" className="flex items-center gap-2">
+                <List className="h-4 w-4" />
+                Table Format
+              </TabsTrigger>
+              <TabsTrigger value="card" className="flex items-center gap-2">
+                <Grid className="h-4 w-4" />
+                Card Format
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Table View */}
+            <TabsContent value="table" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Departments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>
+                          <div className="space-y-2">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDepartmentSort('name')}
+                              className="h-auto p-0 font-semibold hover:bg-transparent"
+                            >
+                              Department Name
+                              {departmentSortConfig.key === 'name' && (
+                                departmentSortConfig.direction === 'asc' ? 
+                                <ChevronUp className="ml-1 h-4 w-4" /> : 
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                              )}
+                            </Button>
+                            <Input
+                              placeholder="Filter by Name..."
+                              value={departmentFilters.name}
+                              onChange={(e) => handleDepartmentFilterChange('name', e.target.value)}
+                              className="h-8"
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead>
+                          <div className="space-y-2">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDepartmentSort('description')}
+                              className="h-auto p-0 font-semibold hover:bg-transparent"
+                            >
+                              Description
+                              {departmentSortConfig.key === 'description' && (
+                                departmentSortConfig.direction === 'asc' ? 
+                                <ChevronUp className="ml-1 h-4 w-4" /> : 
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                              )}
+                            </Button>
+                            <Input
+                              placeholder="Filter by Description..."
+                              value={departmentFilters.description}
+                              onChange={(e) => handleDepartmentFilterChange('description', e.target.value)}
+                              className="h-8"
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead>
+                          <div className="space-y-2">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDepartmentSort('head_of_department')}
+                              className="h-auto p-0 font-semibold hover:bg-transparent"
+                            >
+                              Head of Department
+                              {departmentSortConfig.key === 'head_of_department' && (
+                                departmentSortConfig.direction === 'asc' ? 
+                                <ChevronUp className="ml-1 h-4 w-4" /> : 
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                              )}
+                            </Button>
+                            <Input
+                              placeholder="Filter by Head..."
+                              value={departmentFilters.head_of_department}
+                              onChange={(e) => handleDepartmentFilterChange('head_of_department', e.target.value)}
+                              className="h-8"
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead>
+                          <div className="space-y-2">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDepartmentSort('budget')}
+                              className="h-auto p-0 font-semibold hover:bg-transparent"
+                            >
+                              Budget
+                              {departmentSortConfig.key === 'budget' && (
+                                departmentSortConfig.direction === 'asc' ? 
+                                <ChevronUp className="ml-1 h-4 w-4" /> : 
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                              )}
+                            </Button>
+                            <Input
+                              placeholder="Filter by Budget..."
+                              value={departmentFilters.budget}
+                              onChange={(e) => handleDepartmentFilterChange('budget', e.target.value)}
+                              className="h-8"
+                            />
+                          </div>
+                        </TableHead>
+                        <TableHead>
+                          <div className="space-y-2">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleDepartmentSort('is_active')}
+                              className="h-auto p-0 font-semibold hover:bg-transparent"
+                            >
+                              Status
+                              {departmentSortConfig.key === 'is_active' && (
+                                departmentSortConfig.direction === 'asc' ? 
+                                <ChevronUp className="ml-1 h-4 w-4" /> : 
+                                <ChevronDown className="ml-1 h-4 w-4" />
+                              )}
+                            </Button>
+                            <select
+                              value={departmentFilters.status}
+                              onChange={(e) => handleDepartmentFilterChange('status', e.target.value)}
+                              className="h-8 w-full rounded border border-input bg-background px-3 py-1 text-sm"
+                            >
+                              <option value="">All Status</option>
+                              <option value="active">Active</option>
+                              <option value="inactive">Inactive</option>
+                            </select>
+                          </div>
+                        </TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAndSortedDepartments.map((department) => (
+                        <TableRow key={department.id}>
+                          <TableCell className="font-medium">{department.name}</TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {department.description || 'N/A'}
+                          </TableCell>
+                          <TableCell>{department.head_of_department || 'N/A'}</TableCell>
+                          <TableCell className="font-medium">
+                            ${(department.budget || 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={department.is_active ? 'default' : 'secondary'}>
+                              {department.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleDeleteDepartment(department.id)}
+                                  className="text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {filteredAndSortedDepartments.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No departments found
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Card View */}
+            <TabsContent value="card" className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredAndSortedDepartments.map((department) => (
+                  <Card key={department.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{department.name}</CardTitle>
+                          <p className="text-sm text-muted-foreground">
+                            {department.description}
+                          </p>
+                        </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -936,84 +972,42 @@ export default function StaffManagement() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              {filteredAndSortedDepartments.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  No departments found
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredAndSortedDepartments.map((department) => (
-                <Card key={department.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{department.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          {department.description}
-                        </p>
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteDepartment(department.id)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Head:</span>
-                        <span className="text-sm">{department.head_of_department || 'N/A'}</span>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Head:</span>
+                          <span className="text-sm">{department.head_of_department || 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Staff:</span>
+                          <Badge variant="outline">{department.staff_count}</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Budget:</span>
+                          <span className="text-sm font-medium">
+                            ${(department.budget || 0).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Status:</span>
+                          <Badge variant={department.is_active ? 'default' : 'secondary'}>
+                            {department.is_active ? 'Active' : 'Inactive'}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Staff:</span>
-                        <Badge variant="outline">{department.staff_count}</Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Budget:</span>
-                        <span className="text-sm font-medium">
-                          ${(department.budget || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Status:</span>
-                        <Badge variant={department.is_active ? 'default' : 'secondary'}>
-                          {department.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {filteredAndSortedDepartments.length === 0 && (
-                <div className="col-span-full text-center py-8 text-muted-foreground">
-                  No departments found
-                </div>
-              )}
-            </div>
-          )}
+                    </CardContent>
+                  </Card>
+                ))}
+                {filteredAndSortedDepartments.length === 0 && (
+                  <div className="col-span-full text-center py-8 text-muted-foreground">
+                    No departments found
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
     </div>
